@@ -22,7 +22,7 @@ nicht alle Aufgaben abgearbeitet werden können.
 ## Aufgaben im Projekt:
 
 Im allgemeinen sollen offene Aufgaben im Projekt als GitHub Issue dokumentiert und verwaltet werden. 
-Prinzipiell werden alle Änderungen in Features Branches implementiert und dann nach einem Review der MR nach `main` gemerged.
+Prinzipiell werden alle Änderungen in Features Branches implementiert und dann nach einem Review der Merge Request nach `main` gemerged.
 Da wir nur eine kostenloses GitHub Team sind können wir das nicht durch branch protection absichern, also **bitte nicht nach `main` pushen**.
 
 **Issues und Dokumentation erfolgt in Englisch**
