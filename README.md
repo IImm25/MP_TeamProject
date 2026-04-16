@@ -18,3 +18,14 @@ nicht alle Aufgaben abgearbeitet werden können.
 - GMPL Modell -> Leonie
 - GMPL Test -> Maurice
 - Systemtests -> Jaroslaw
+
+## Aufgaben im Projekt:
+
+Im allgemeinen sollen offene Aufgaben im Projekt als GitHub Issue dokumentiert und verwaltet werden. 
+Prinzipiell werden alle Änderungen in Features Branches implementiert und dann nach einem Review der MR nach `main` gemerged.
+Da wir nur eine kostenloses GitHub Team sind können wir das nicht durch branch protection absichern, also **bitte nicht nach `main` pushen**.
+
+**Issues und Dokumentation erfolgt in Englisch**
+
+Namesgebung der Feature Branches folgt den Issues und kann als one click in den Issue Beschreibung erzeugt werden (siehe
+https://github.com/IImm25/MP_TeamProject/issues/2#issuecomment-4262008465).
