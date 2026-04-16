@@ -12,9 +12,9 @@ zugeordnet, dass insgesamt die Arbeitszeit maximal ausgenutzt wird. Es ist dabei
 nicht alle Aufgaben abgearbeitet werden können.
 
 ## Verteilung der Aufgabe:
-Projektleitung -> Erik
-UI Design und Implementierung -> Linda
-Programmlogik ohne GMPL: Persistenz, Glue Code -> Alex
-GMPL Modell -> Leonie
-GMPL Test -> Maurice
-Systemtests -> Jaroslaw
+- Projektleitung -> Erik
+- UI Design und Implementierung -> Linda
+- Programmlogik ohne GMPL: Persistenz, Glue Code -> Alex
+- GMPL Modell -> Leonie
+- GMPL Test -> Maurice
+- Systemtests -> Jaroslaw
