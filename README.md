@@ -29,3 +29,7 @@ Da wir nur eine kostenloses GitHub Team sind können wir das nicht durch branch 
 
 Namesgebung der Feature Branches folgt den Issues und kann als one click in den Issue Beschreibung erzeugt werden (siehe
 https://github.com/IImm25/MP_TeamProject/issues/2#issuecomment-4262008465).
+
+## Termine im Projekt:
+- 23.04.2026: Sprint-Review (Vorstellung Zwischenstand 5 Minuten pro Person)
+- 30.04.2026: Abgabe des Projektes
