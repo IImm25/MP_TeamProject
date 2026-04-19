@@ -1,3 +1,10 @@
 {
-  "test": "Test"
+  "MENU": {
+    "SCHEDULER": "Planung",
+    "ADMINISTRATION": "Verwaltung",
+    "TASKS": "Aufgaben",
+    "EMPLOYEES": "Mitarbeiter",
+    "QUALIFICATIONS": "Qualifikationen",
+    "TOOLS": "Werkzeuge"
+  }
 }

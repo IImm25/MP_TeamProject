@@ -1,20 +1,16 @@
 import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
-  importProvidersFrom,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
+
 
 import { routes } from './app.routes';
-
-export function HttpLoaderFactory(): TranslateLoader {
-  return new TranslateHttpLoader();
-}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,5 +24,13 @@ export const appConfig: ApplicationConfig = {
       }),
       fallbackLang: 'de'
     }),
+    providePrimeNG({
+      theme: {
+          preset: Aura,
+           options: {
+            darkModeSelector: false || 'none'
+        }
+      }
+    })
   ],
 };
