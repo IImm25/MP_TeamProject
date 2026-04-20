@@ -1,4 +1,4 @@
-﻿// Author: Erik Schellenberger
+﻿// Author: Erik Schellenberger and Alexander Gewinnus
 
 public class TaskItem
 {
@@ -8,4 +8,9 @@ public class TaskItem
 
     public ICollection<TaskQualification> RequiredQualifications { get; set; } = [];
     public ICollection<TaskTool> RequiredTools { get; set; } = [];
+    public TaskItem(string name, int durationsHours)
+    {
+        Name = name;
+        DurationHours = durationsHours;
+    }
 }

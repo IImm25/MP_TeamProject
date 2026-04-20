@@ -9,4 +9,5 @@ public class TaskTool
     public Tool Tool { get; set; } = null!;
 
     public int RequiredAmount { get; set; }
+
 }
