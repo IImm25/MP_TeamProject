@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Windpower Postgres",
+      "Group": "Local",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "windpowerdb",
+      "Username": "admin",
+      "SSLMode": "prefer",
+      "SavePassword": true,
+      "Password": "admin"
+    }
+  }
+}
