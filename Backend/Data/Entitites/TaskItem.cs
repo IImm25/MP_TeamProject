@@ -8,9 +8,9 @@ public class TaskItem
 
     public ICollection<TaskQualification> RequiredQualifications { get; set; } = [];
     public ICollection<TaskTool> RequiredTools { get; set; } = [];
-    public TaskItem(string name, int durationsHours)
+    public TaskItem(string name, int durationHours)
     {
         Name = name;
-        DurationHours = durationsHours;
+        DurationHours = durationHours;
     }
 }
