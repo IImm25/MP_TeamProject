@@ -1,0 +1,44 @@
+#author of this example data file: Leonie Skala
+
+data;
+
+#names of the possible tasks (same order as in table)
+set TASKS := a1 a2 a3;
+set QUALIS := ElectricalEngineer Mechanic Diver Metalworker;
+set PEOPLE := p1 p2 p3;
+set TOOLS := hammer screwdriver pliers;
+
+#array with durations of the tasks
+param duration :=
+		a1		2
+		a2		8
+		a3		3;
+		
+#defines which person has which qualification(s)
+param hasQuali : ElectricalEngineer Mechanic Diver Metalworker :=
+			p1		1		1		0		0
+			p2		0		1		0		1
+			p3		0		0		1		0;
+
+#defines which task needs which qualification(s)
+param requiredQualis: ElectricalEngineer Mechanic Diver Metalworker :=
+				a1	1		0			0		0		
+				a2	0		0			1		0
+				a3	1		1			0		1;
+
+#defines which task needs which tool(s)
+param requiredTools: hammer screwdriver pliers :=
+				a1		1		2			1
+				a2		0		0			1
+				a3		3		0			0;
+
+#defines how many of each tool are available
+param stockTools :=
+		hammer			3
+		screwdriver		8
+		pliers			3;
+
+#maximal working hours per boat
+param maxWorkingHours := 8;
+
+end;
