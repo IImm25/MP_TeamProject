@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Data;
+namespace Backend.Data.DBContext;
 
 public class AppDbContext : DbContext
 {

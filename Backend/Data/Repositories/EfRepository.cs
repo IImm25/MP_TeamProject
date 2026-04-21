@@ -1,5 +1,6 @@
 ﻿
 using System;
+using Backend.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
 namespace Backend.Data.Repositories;
 public class EfRepository<T> : IRepository<T>
