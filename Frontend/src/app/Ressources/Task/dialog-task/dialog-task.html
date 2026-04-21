@@ -1,0 +1,229 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="
+    type === 'New'
+      ? ('TASKS.DIALOG.NEW' | translate)
+      : type === 'Detail'
+        ? ('TASKS.DIALOG.DETAIL' | translate)
+        : ('TASKS.DIALOG.EDIT' | translate)
+  "
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '50vw' }"
+>
+  <form [formGroup]="taskForm">
+    <p-stepper [linear]="true" [value]="1">
+      <p-step-list>
+        <p-step [value]="1">{{ 'TASKS.DIALOG.CORE' | translate }}</p-step>
+        <p-step [value]="2">{{ 'TASKS.DIALOG.QUALIFICATIONS' | translate }}</p-step>
+        <p-step [value]="3">{{ 'TASKS.DIALOG.TOOLS' | translate }}</p-step>
+      </p-step-list>
+      <p-step-panels>
+        <!-- Schritt 1: Kerninformationen -->
+        <p-step-panel [value]="1">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div class="field">
+                <label for="name">{{ 'TASKS.NAME' | translate }}*</label>
+                <input
+                  pInputText
+                  id="name"
+                  class="w-full"
+                  formControlName="name"
+                  [class.detail]="type === 'Detail'"
+                />
+                @if (taskForm.controls.name.invalid && taskForm.controls.name.touched) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'TASKS.VALIDATION.NAME_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+              <div class="field">
+                <label for="duration">{{ 'TASKS.DURATION' | translate }} (h)*</label>
+                <div class="duration-row">
+                  <p-inputNumber
+                    id="durationHours"
+                    formControlName="durationHours"
+                    [inputStyleClass]="type === 'Detail' ? 'detail' : ''"
+                    suffix=" h"
+                    [min]="0"
+                    [showButtons]="type !== 'Detail'"
+                  />
+                  <p-inputNumber
+                    id="durationMinutes"
+                    formControlName="durationMinutes"
+                    [inputStyleClass]="type === 'Detail' ? 'detail' : ''"
+                    suffix=" min"
+                    [min]="0"
+                    [max]="59"
+                    [showButtons]="type !== 'Detail'"
+                  />
+                </div>
+                @if (
+                  (taskForm.controls.durationHours.invalid && taskForm.controls.durationHours.touched) ||
+                  (taskForm.controls.durationMinutes.invalid && taskForm.controls.durationMinutes.touched)
+                ) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'TASKS.VALIDATION.DURATION_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.CANCEL' | translate"
+                [text]="true"
+                severity="secondary"
+                (onClick)="visible.set(false)"
+              />
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndGoToNext(1, 2, activateCallback)"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- Schritt 2: Qualifikationen -->
+        <p-step-panel [value]="2">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div>
+                <h3>{{ 'TASKS.DIALOG.QUALIFICATIONS' | translate }}</h3>
+              </div>
+              <p-multiselect
+                [options]="allQualifications()"
+                formControlName="qualifications"
+                [placeholder]="'TASKS.DIALOG.QUALIFICATION.PLACEHOLDER' | translate"
+                class="w-full"
+                optionLabel="name"
+                display="chip"
+                [class.detail]="type === 'Detail'"
+                [panelStyleClass]="type === 'Detail' ? 'detail' : ''"
+              />
+              @if (
+                taskForm.controls.qualifications.invalid && taskForm.controls.qualifications.touched
+              ) {
+                <div class="error-message mt-2">
+                  <i class="pi pi-exclamation-circle"></i>
+                  <span>{{ 'TASKS.VALIDATION.QUALIFICATION_REQUIRED' | translate }}</span>
+                </div>
+              }
+            </div>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                severity="secondary"
+                (onClick)="activateCallback(1)"
+              />
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndGoToNext(2, 3, activateCallback)"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- Schritt 3: Werkzeuge -->
+        <p-step-panel [value]="3">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div class="tools-header">
+                <h3 class="m-0">{{ 'TASKS.DIALOG.TOOLS' | translate }}</h3>
+                @if (type !== 'Detail') {
+                  <p-button
+                    icon="pi pi-plus"
+                    [text]="true"
+                    (onClick)="addTool()"
+                    [label]="'COMMON.ADD' | translate"
+                  />
+                }
+                @if (taskForm.controls.tools.invalid && taskForm.controls.tools.touched) {
+                  <div class="error-message ml-3">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'TASKS.VALIDATION.TOOL_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+
+              <div class="tool-list">
+                <p-table [value]="taskForm.get('tools')?.value ?? []">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'TASKS.DIALOG.TOOL.TOOL' | translate }}</th>
+                      <th>{{ 'TASKS.DIALOG.TOOL.COUNT' | translate }}</th>
+                      @if (type !== 'Detail') {
+                        <th style="width: 4rem"></th>
+                      }
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-tool let-i="rowIndex">
+                    <tr>
+                      <td>{{ tool.name }}</td>
+                      <td>{{ tool.count }}</td>
+                      @if (type !== 'Detail') {
+                        <td style="display: flex">
+                          <p-button
+                            icon="pi pi-pencil"
+                            [text]="true"
+                            [rounded]="true"
+                            severity="secondary"
+                            class="btn-edit"
+                            (onClick)="
+                              ToolType.set('Edit');
+                              selectedTool.set(tool);
+                              toolDialogVisible.set(true)
+                            "
+                          />
+                          <p-button
+                            icon="pi pi-trash"
+                            [text]="true"
+                            [rounded]="true"
+                            severity="danger"
+                            (onClick)="removeTool(i)"
+                          />
+                        </td>
+                      }
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                severity="secondary"
+                (onClick)="activateCallback(2)"
+              />
+              @if (type !== 'Detail') {
+                <p-button
+                  [label]="'COMMON.SAVE' | translate"
+                  icon="pi pi-check"
+                  (onClick)="save()"
+                />
+              }
+            </div>
+          </ng-template>
+        </p-step-panel>
+      </p-step-panels>
+    </p-stepper>
+  </form>
+</p-dialog>
+
+@if (toolDialogVisible()) {
+  <app-dialog-task-tool
+    [type]="ToolType()"
+    [selectedTool]="selectedTool()"
+    [(visible)]="toolDialogVisible"
+    (selectedToolChange)="onToolAdded($event)"
+  />
+}

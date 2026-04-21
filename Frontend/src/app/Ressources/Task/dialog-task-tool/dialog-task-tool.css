@@ -1,0 +1,56 @@
+h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+  letter-spacing: -0.02em;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 0.25rem;
+}
+
+.tool-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+
+:host ::ng-deep p-select,
+:host ::ng-deep .p-select,
+:host ::ng-deep p-inputnumber,
+:host ::ng-deep .p-inputnumber {
+  width: 100%;
+  display: flex;
+}
+
+:host ::ng-deep .p-inputnumber-input {
+  width: 100%;
+}
+
+:host ::ng-deep .p-dialog-footer {
+  border-top: 1px solid var(--secondary-color);
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+

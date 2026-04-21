@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { Tasks } from './tasks/tasks';
-import { Employees } from './employees/employees';
-import { Qualifications } from './qualifications/qualifications';
+import { Tasks } from './Ressources/Task/tasks/tasks';
+import { Employees } from './Ressources/employees/employees';
+import { Qualifications } from './Ressources/qualifications/qualifications';
 import { Scheduler } from './scheduler/scheduler';
 import { ScheduleView } from './schedule-view/schedule-view';
-import { Tools } from './tools/tools';
+import { Tools } from './Ressources/tools/tools';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'scheduler', pathMatch: 'full' },

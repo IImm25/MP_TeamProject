@@ -1,0 +1,66 @@
+<div class="content-wrapper">
+  <header class="section-header">
+    <div class="title-group">
+      <h1 class="title">{{ 'TASKS.TASKS' | translate }}</h1>
+    </div>
+    <p-button
+      [label]="'TASKS.NEW_TASK' | translate"
+      icon="pi pi-plus"
+      [raised]="true"
+      severity="secondary"
+      (onClick)="type.set('New'); selectedTask.set(null); visible.set(true)"
+    />
+  </header>
+
+  <div class="table-container">
+    <p-table [value]="tasks()" [paginator]="true" [rows]="5">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'TASKS.NAME' | translate }}</th>
+          <th>{{ 'TASKS.DURATION' | translate }}</th>
+          <th class="right">{{ 'TASKS.ACTIONS' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-task>
+        <tr>
+          <td>{{ task.name }}</td>
+          <td><span>{{ formatDuration(task.durationHours) }}</span></td>
+          <td>
+            <div class="action-buttons">
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                class="btn-edit"
+                (onClick)="type.set('Edit'); selectedTask.set(task); visible.set(true)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                class="btn-delete"
+                (onClick)="deleteTask(task)"
+              />
+              <p-button
+                icon="pi pi-ellipsis-h"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="type.set('Detail'); selectedTask.set(task); visible.set(true)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+@if (visible()) {
+  <app-dialog-task [type]="type()" [selectedTask]="selectedTask()" [(visible)]="visible" (taskSaved)="loadTasks()" />
+}
+
+<p-confirmDialog />

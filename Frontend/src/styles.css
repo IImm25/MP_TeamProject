@@ -1,10 +1,10 @@
 @import "primeicons/primeicons.css";
 
 :root {
-  --primary-color: #007bff;
+  --primary-color: #007bff !important;
   --secondary-color: #6c757d;
-  --bg-color: #f8f9fa;
-  --text-color: #212529;
+  --bg-color: #333;
+  --text-color: #f8f9fa;
 }
 
 body {
@@ -12,4 +12,22 @@ body {
   padding: 0;
   font-family: var(--p-font-family, sans-serif);
   background-color: var(--bg-color);
+  color: var(--text-color)
 }
+
+.p-paginator .p-paginator-pages .p-paginator-page {
+  background: var(--bg-color) !important;
+  color: var(--text-color);
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover,
+.p-paginator .p-link:not(.p-disabled):hover {
+    background: var(--bg-color) !important;
+    color: var(--primary-color) !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page-selected {
+  background: var(--primary-color) !important;
+  color: var(--text-color);
+}
+

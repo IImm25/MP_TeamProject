@@ -29,7 +29,6 @@ export class Navbar implements OnInit, OnDestroy {
       ])
       .subscribe({
         next: (translations) => {
-          console.log('Übersetzungen empfangen:', translations);
           this.items = [
             {
               label: translations['MENU.ADMINISTRATION'],
@@ -56,9 +55,6 @@ export class Navbar implements OnInit, OnDestroy {
             },
           ];
           this.cd.detectChanges();
-        },
-        error: (error) => {
-          console.error('Fehler beim Empfangen der Übersetzungen:', error);
         },
       });
   }
