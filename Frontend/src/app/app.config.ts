@@ -49,7 +49,8 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: BluePreset,
         options: {
-          prefix: '',
+          prefix: 'p',
+          darkModeSelector: '.my-dark-theme',
         },
       },
     }),
