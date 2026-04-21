@@ -1,5 +1,6 @@
 ﻿using Backend.Data;
 using Backend.Data.DBContext;
+using Backend.Web.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Web.Repositories;
@@ -12,8 +13,8 @@ public interface ITaskItemRepository
 {
     Task<List<TaskItem>> GetAllAsync();
     Task<TaskItem?> GetByIdAsync(int id);
-    Task<TaskItem> CreateAsync(TaskItem item);
-    Task<TaskItem?> UpdateAsync(int id, Action<TaskItem> patch);
+    Task<TaskItem> CreateAsync(TaskItemCreateDto dto);
+    Task<TaskItem?> UpdateAsync(int id, TaskItemUpdateDto dto);
     Task<TaskItem?> DeleteAsync(int id);
 }
 
@@ -21,8 +22,8 @@ public interface IPersonRepository
 {
     Task<List<Person>> GetAllAsync();
     Task<Person?> GetByIdAsync(int id);
-    Task<Person> CreateAsync(Person person);
-    Task<Person?> UpdateAsync(int id, Action<Person> patch);
+    Task<Person> CreateAsync(PersonCreateDto dto);
+    Task<Person?> UpdateAsync(int id, PersonUpdateDto dto);
     Task<Person?> DeleteAsync(int id);
 }
 
@@ -30,8 +31,8 @@ public interface IQualificationRepository
 {
     Task<List<Qualification>> GetAllAsync();
     Task<Qualification?> GetByIdAsync(int id);
-    Task<Qualification> CreateAsync(Qualification qualification);
-    Task<Qualification?> UpdateAsync(int id, Action<Qualification> patch);
+    Task<Qualification> CreateAsync(QualificationCreateDto dto);
+    Task<Qualification?> UpdateAsync(int id, QualificationUpdateDto dto);
     Task<Qualification?> DeleteAsync(int id);
 }
 
@@ -39,8 +40,8 @@ public interface IToolRepository
 {
     Task<List<Tool>> GetAllAsync();
     Task<Tool?> GetByIdAsync(int id);
-    Task<Tool> CreateAsync(Tool tool);
-    Task<Tool?> UpdateAsync(int id, Action<Tool> patch);
+    Task<Tool> CreateAsync(ToolCreateDto dto);
+    Task<Tool?> UpdateAsync(int id, ToolUpdateDto dto);
     Task<Tool?> DeleteAsync(int id);
 }
 
@@ -99,33 +100,44 @@ public class TaskItemRepository : ITaskItemRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == id);
 
-    public async Task<TaskItem> CreateAsync(TaskItem item)
+    public async Task<TaskItem> CreateAsync(TaskItemCreateDto dto)
     {
+        var item = new TaskItem(dto.Name, dto.DurationHours);
+
+        foreach (var qualId in dto.RequiredQualificationIds)
+            item.RequiredQualifications.Add(new TaskQualification { QualificationId = qualId });
+
+        foreach (var t in dto.RequiredTools)
+            item.RequiredTools.Add(new TaskTool { ToolId = t.ToolId, RequiredAmount = t.RequiredAmount });
+
         _db.Tasks.Add(item);
         await _db.SaveChangesAsync();
-        return item;
+
+        // Navigation-Properties nachladen, damit MapTask nicht auf null läuft
+        return (await GetByIdAsync(item.Id))!;
     }
 
-    /// <summary>
-    /// Wendet den <paramref name="patch"/>-Delegate auf das geladene Entity an
-    /// und speichert danach. Gibt null zurück wenn ID nicht existiert.
-    /// </summary>
-    public async Task<TaskItem?> UpdateAsync(int id, Action<TaskItem> patch)
+    public async Task<TaskItem?> UpdateAsync(int id, TaskItemUpdateDto dto)
     {
         var item = await _db.Tasks.FindAsync(id);
         if (item is null) return null;
 
-        patch(item);
+        if (!string.IsNullOrWhiteSpace(dto.Name)) item.Name = dto.Name;
+        if (dto.DurationHours.HasValue) item.DurationHours = dto.DurationHours.Value;
+
         await _db.SaveChangesAsync();
-        return item;
+
+        // Navigation-Properties nachladen
+        return await GetByIdAsync(id);
     }
 
     public async Task<TaskItem?> DeleteAsync(int id)
     {
-        var item = await _db.Tasks.FindAsync(id);
+        // Erst mit Includes laden, damit der Caller noch mappen kann
+        var item = await GetByIdAsync(id);
         if (item is null) return null;
 
-        _db.Tasks.Remove(item);
+        _db.Tasks.Remove(_db.Tasks.Find(id)!);
         await _db.SaveChangesAsync();
         return item;
     }
@@ -156,29 +168,40 @@ public class PersonRepository : IPersonRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id);
 
-    public async Task<Person> CreateAsync(Person person)
+    public async Task<Person> CreateAsync(PersonCreateDto dto)
     {
+        var person = new Person(dto.Firstname, dto.Lastname);
+
+        foreach (var qualId in dto.QualificationIds)
+            person.Qualifications.Add(new PersonQualification { QualificationId = qualId });
+
         _db.People.Add(person);
         await _db.SaveChangesAsync();
-        return person;
+
+        // Navigation-Properties nachladen
+        return (await GetByIdAsync(person.Id))!;
     }
 
-    public async Task<Person?> UpdateAsync(int id, Action<Person> patch)
+    public async Task<Person?> UpdateAsync(int id, PersonUpdateDto dto)
     {
         var person = await _db.People.FindAsync(id);
         if (person is null) return null;
 
-        patch(person);
+        if (!string.IsNullOrWhiteSpace(dto.Firstname)) person.Firstname = dto.Firstname;
+        if (!string.IsNullOrWhiteSpace(dto.Lastname)) person.Lastname = dto.Lastname;
+
         await _db.SaveChangesAsync();
-        return person;
+
+        // Navigation-Properties nachladen
+        return await GetByIdAsync(id);
     }
 
     public async Task<Person?> DeleteAsync(int id)
     {
-        var person = await _db.People.FindAsync(id);
+        var person = await GetByIdAsync(id);
         if (person is null) return null;
 
-        _db.People.Remove(person);
+        _db.People.Remove(_db.People.Find(id)!);
         await _db.SaveChangesAsync();
         return person;
     }
@@ -205,19 +228,22 @@ public class QualificationRepository : IQualificationRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(q => q.Id == id);
 
-    public async Task<Qualification> CreateAsync(Qualification qualification)
+    public async Task<Qualification> CreateAsync(QualificationCreateDto dto)
     {
+        var qualification = new Qualification(dto.Name, dto.Description);
         _db.Qualifications.Add(qualification);
         await _db.SaveChangesAsync();
         return qualification;
     }
 
-    public async Task<Qualification?> UpdateAsync(int id, Action<Qualification> patch)
+    public async Task<Qualification?> UpdateAsync(int id, QualificationUpdateDto dto)
     {
         var qualification = await _db.Qualifications.FindAsync(id);
         if (qualification is null) return null;
 
-        patch(qualification);
+        if (!string.IsNullOrWhiteSpace(dto.Name)) qualification.Name = dto.Name;
+        if (!string.IsNullOrWhiteSpace(dto.Description)) qualification.Description = dto.Description;
+
         await _db.SaveChangesAsync();
         return qualification;
     }
@@ -254,19 +280,22 @@ public class ToolRepository : IToolRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == id);
 
-    public async Task<Tool> CreateAsync(Tool tool)
+    public async Task<Tool> CreateAsync(ToolCreateDto dto)
     {
+        var tool = new Tool(dto.Name, dto.AvailableStock);
         _db.Tools.Add(tool);
         await _db.SaveChangesAsync();
         return tool;
     }
 
-    public async Task<Tool?> UpdateAsync(int id, Action<Tool> patch)
+    public async Task<Tool?> UpdateAsync(int id, ToolUpdateDto dto)
     {
         var tool = await _db.Tools.FindAsync(id);
         if (tool is null) return null;
 
-        patch(tool);
+        if (!string.IsNullOrWhiteSpace(dto.Name)) tool.Name = dto.Name;
+        if (dto.AvailableStock.HasValue) tool.AvailableStock = dto.AvailableStock.Value;
+
         await _db.SaveChangesAsync();
         return tool;
     }
