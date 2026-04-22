@@ -1,0 +1,46 @@
+<div class="content-wrapper">
+  <header class="section-header">
+    <div class="title-group">
+      <h1 class="title">{{ 'EMPLOYEES.TITLE' | translate }}</h1>
+    </div>
+    <p-button [label]="'EMPLOYEES.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="openNew()" severity="secondary" [raised]="true"/>
+  </header>
+
+  <div class="table-container">
+    <p-table [value]="employees()" [paginator]="true" [rows]="10">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'EMPLOYEES.NAME' | translate }}</th>
+          <th>{{ 'EMPLOYEES.QUALIFICATIONS' | translate }}</th>
+          <th class="right">{{ 'TASKS.ACTIONS' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-employee>
+        <tr>
+          <td>{{ employee.firstname }} {{ employee.lastname }}</td>
+          <td>
+            @for (q of employee.qualifications; track q.id; let isLast = $last) {
+              <span>{{ q.name }}{{ isLast ? '' : ', ' }}</span>
+            }
+          </td>
+          <td>
+            <div class="action-buttons">
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="openEdit(employee)" />
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="secondary" (onClick)="deleteEmployee(employee)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-dialog-employee
+  [(visible)]="dialogVisible"
+  [type]="dialogType"
+  [allQualifications]="qualifications()"
+  (onSave)="loadEmployees()"
+/>
+
+<p-confirmDialog />

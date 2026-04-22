@@ -62,8 +62,10 @@
                   />
                 </div>
                 @if (
-                  (taskForm.controls.durationHours.invalid && taskForm.controls.durationHours.touched) ||
-                  (taskForm.controls.durationMinutes.invalid && taskForm.controls.durationMinutes.touched)
+                  taskForm.controls.durationHours.value === 0 &&
+                  taskForm.controls.durationMinutes.value === 0 &&
+                  (taskForm.controls.durationHours.touched ||
+                    taskForm.controls.durationMinutes.touched)
                 ) {
                   <div class="error-message">
                     <i class="pi pi-exclamation-circle"></i>

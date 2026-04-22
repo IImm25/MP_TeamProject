@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Tasks } from './Ressources/Task/tasks/tasks';
-import { Employees } from './Ressources/employees/employees';
+import { Employees } from './Ressources/Employee/employees/employees';
 import { Qualifications } from './Ressources/qualifications/qualifications';
 import { Scheduler } from './scheduler/scheduler';
 import { ScheduleView } from './schedule-view/schedule-view';
