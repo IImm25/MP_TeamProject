@@ -71,7 +71,13 @@ export class DialogTask implements OnInit {
         this.taskForm.enable();
       }
     } else {
-      this.taskForm.reset({ name: '', durationHours: 0, durationMinutes: 0, qualifications: [], tools: [] });
+      this.taskForm.reset({
+        name: '',
+        durationHours: 0,
+        durationMinutes: 0,
+        qualifications: [],
+        tools: [],
+      });
       if (this.type !== 'Detail') {
         this.taskForm.enable();
       }
@@ -114,13 +120,31 @@ export class DialogTask implements OnInit {
 
         const h = hControl?.value || 0;
         const m = mControl?.value || 0;
-        const isDurationValid = (h > 0 || m > 0);
+        const isDurationValid = h > 0 || m > 0;
 
         if (!isDurationValid) {
           hControl?.setErrors({ minDuration: true });
           mControl?.setErrors({ minDuration: true });
+          hControl.markAsTouched();
+          mControl.markAsTouched();
+          hControl.updateValueAndValidity();
+          mControl.updateValueAndValidity();
+        } else {
+          if (hControl?.hasError('minDuration')) {
+            const { minDuration, ...rest } = hControl.errors!;
+            hControl.setErrors(Object.keys(rest).length ? rest : null);
+          }
+          if (mControl?.hasError('minDuration')) {
+            const { minDuration, ...rest } = mControl.errors!;
+            mControl.setErrors(Object.keys(rest).length ? rest : null);
+          }
         }
-        return nameControl?.valid === true && hControl?.valid === true && mControl?.valid === true && isDurationValid;
+        return (
+          nameControl?.valid === true &&
+          hControl?.valid === true &&
+          mControl?.valid === true &&
+          isDurationValid
+        );
       case 2:
         if (this.taskForm.controls.qualifications.invalid)
           this.taskForm.controls.qualifications.markAsTouched();
@@ -146,7 +170,7 @@ export class DialogTask implements OnInit {
     }
 
     const val = this.taskForm.value;
-    const totalDuration = (val.durationHours || 0) + ((val.durationMinutes || 0) / 60);
+    const totalDuration = (val.durationHours || 0) + (val.durationMinutes || 0) / 60;
     const payload = {
       name: val.name,
       durationHours: totalDuration,
@@ -183,13 +207,13 @@ export class DialogTask implements OnInit {
 
       if (this.ToolType() === 'Edit') {
         const originalTool = this.selectedTool();
-        const index = currentTools.findIndex(t => t.id === originalTool?.id);
+        const index = currentTools.findIndex((t) => t.id === originalTool?.id);
 
         if (index !== -1) {
-           currentTools[index] = newTool;
+          currentTools[index] = newTool;
         }
       } else {
-        const existingIndex = currentTools.findIndex(t => t.id === newTool.id);
+        const existingIndex = currentTools.findIndex((t) => t.id === newTool.id);
         if (existingIndex !== -1) {
           currentTools[existingIndex].count += newTool.count;
         } else {
