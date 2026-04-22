@@ -5,9 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Web.Repositories;
 
-// ─────────────────────────────────────────────
-//  Interfaces
-// ─────────────────────────────────────────────
+#region interfaces
 
 public interface ITaskItemRepository
 {
@@ -67,12 +65,12 @@ public interface ITaskToolRepository
     Task<TaskTool?> RemoveAsync(int taskId, int toolId);
 }
 
-// ─────────────────────────────────────────────
-//  Implementations
-// ─────────────────────────────────────────────
+#endregion
+
 
 public class TaskItemRepository : ITaskItemRepository
 {
+    #region implementation
     private readonly AppDbContext _db;
 
     public TaskItemRepository(AppDbContext db)
@@ -508,4 +506,6 @@ public class TaskToolRepository : ITaskToolRepository
         await _db.SaveChangesAsync();
         return link;
     }
+
+    #endregion
 }

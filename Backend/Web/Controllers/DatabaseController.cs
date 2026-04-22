@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Web.Controllers;
 
 [ApiController]
-[Route("database/[controller]")]
+[Route("/[controller]")]
 public class DatabaseController : ControllerBase
 {
     private readonly ITaskItemRepository _tasks;
