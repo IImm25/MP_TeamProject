@@ -90,8 +90,8 @@ export class DialogTask implements OnInit {
 
   taskForm = this.formBuilder.group({
     name: ['', Validators.required],
-    durationHours: [0, [Validators.required]],
-    durationMinutes: [0, [Validators.required, Validators.max(59)]],
+    durationHours: [0],
+    durationMinutes: [0, [Validators.max(59)]],
     qualifications: [[] as Qualification[], Validators.required],
     tools: [[] as TaskTool[], Validators.required],
   });
@@ -120,7 +120,6 @@ export class DialogTask implements OnInit {
           hControl?.setErrors({ minDuration: true });
           mControl?.setErrors({ minDuration: true });
         }
-
         return nameControl?.valid === true && hControl?.valid === true && mControl?.valid === true && isDurationValid;
       case 2:
         if (this.taskForm.controls.qualifications.invalid)
