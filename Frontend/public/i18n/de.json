@@ -22,7 +22,6 @@
     "DURATION": "Dauer",
     "QUALIFICATION": "Qualifikation",
     "ACTIONS": "Aktionen",
-
     "DIALOG": {
       "NEW": "Neue Aufgabe",
       "EDIT": "Aufgabe bearbeiten",
@@ -49,5 +48,26 @@
       "QUALIFICATION_REQUIRED": "Mindestens eine Qualifikation wird benötigt",
       "TOOL_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
     }
+  },
+  "EMPLOYEES": {
+    "TITLE": "Mitarbeiter",
+    "NAME": "Name",
+    "QUALIFICATIONS": "Qualifikationen",
+    "ADD_NEW": "Neuer Mitarbeiter",
+    "FIRSTNAME": "Vorname",
+    "LASTNAME": "Nachname",
+    "SELECT_QUALIFICATIONS": "Qualifikationen wählen",
+    "DIALOG": {
+      "NEW": "Neuer Mitarbeiter",
+      "EDIT": "Mitarbeiter bearbeiten",
+      "DELETE_TITLE": "Mitarbeiter löschen",
+      "DELETE_MESSAGE": "Möchten Sie den Mitarbeiter {{firstname}} {{lastname}} wirklich löschen?"
+    },
+    "VALIDATION": {
+      "FIRSTNAME_REQUIRED": "Vorname ist erforderlich",
+      "LASTNAME_REQUIRED": "Nachname ist erforderlich",
+      "QUALIFICATION_REQUIRED": "Mindestens eine Qualifikation wird benötigt"
+    }
+
   }
 }

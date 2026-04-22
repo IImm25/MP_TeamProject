@@ -1,0 +1,92 @@
+p-dialog {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
+}
+
+.content {
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.name-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.name-row .field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 0.2rem;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-multiselect {
+  background-color: var(--bg-color) !important;
+  border-color: var(--text-color) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  transition: all 0.2s ease;
+  text-align: left !important;
+}
+
+:host ::ng-deep .p-multiselect-chip-item .p-chip {
+  background: var(--p-primary-color);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+:host ::ng-deep .p-dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--text-color);
+}
+
+.detail,
+:host ::ng-deep .detail.p-inputtext,
+:host ::ng-deep .detail .p-inputtext,
+:host ::ng-deep p-multiselect.detail .p-multiselect {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  border: none !important;
+  opacity: 1 !important;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ef4444 !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.4rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.error-message i {
+  font-size: 1rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}

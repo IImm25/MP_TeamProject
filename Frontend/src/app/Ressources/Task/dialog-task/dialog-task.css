@@ -36,6 +36,13 @@ p-multiselect {
   width: 100%;
 }
 
+:host ::ng-deep .p-multiselect-chip-item .p-chip {
+  background: var(--p-primary-color);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
 :host ::ng-deep .p-stepper .p-stepper-nav {
   background-color: var(--bg-color);
   border-radius: 12px;
