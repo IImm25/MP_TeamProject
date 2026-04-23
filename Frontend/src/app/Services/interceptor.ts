@@ -9,118 +9,90 @@ import { Boat } from '../Models/boat';
 let tasks: Task[] = [
   {
     id: 1,
-    name: 'Projektplanung',
-    durationHours: 2.5,
+    name: 'Ölwechsel im Getriebe',
+    durationHours: 6.0,
     taskQualifications: [
-      { id: 1, name: 'Projektplanung' },
-      { id: 2, name: 'Projektmanagement' },
+      { id: 2, name: 'Überleben auf See' },
+      { id: 3, name: 'Elektrotechnik' }
     ],
-    tasktools: [{ id: 1, name: 'Projektplanungstool', count: 5 }],
+    tasktools: [
+      { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
+      { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 }
+    ],
   },
   {
     id: 2,
-    name: 'Meilenstein-Review',
-    durationHours: 1.0,
-    taskQualifications: [{ id: 1, name: 'Projektplanung' }],
-    tasktools: [{ id: 1, name: 'Projektplanungstool', count: 5 }],
-  },
+    name: 'Reparatur Vogelschlag (Flügel)',
+    durationHours: 8.0,
+    taskQualifications: [
+      { id: 1, name: 'Höhenrettung' },
+      { id: 4, name: 'Rotorblatt-Check' }
+    ],
+    tasktools: [
+      { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 3 },
+      { id: 3, name: 'Harz-Reparaturset', count: 1 }
+    ],
+  }
 ];
 
 let employees: Employees[] = [
   {
     id: 1,
-    firstname: 'Max',
-    lastname: 'Mustermann',
+    firstname: 'Hannes',
+    lastname: 'Fiedler',
     qualifications: [
-      { id: 1, name: 'Projektplanung' },
-      { id: 2, name: 'Projektmanagement' },
+      { id: 2, name: 'Überleben auf See' },
+      { id: 3, name: 'Elektrotechnik' }
     ],
   },
   {
     id: 2,
-    firstname: 'Max2',
-    lastname: 'Mustermann',
+    firstname: 'Sören',
+    lastname: 'Smit',
     qualifications: [
-      { id: 1, name: 'Projektplanung' },
-      { id: 2, name: 'Projektmanagement' },
+      { id: 1, name: 'Höhenrettung' },
+      { id: 2, name: 'Überleben auf See' },
+      { id: 4, name: 'Rotorblatt-Check' }
     ],
-  },
+  }
 ];
 
 let tools: Tool[] = [
-  { id: 1, name: 'Projektplanungstool', stock: 10 },
-  { id: 2, name: 'Hammer', stock: 5 },
+  { id: 1, name: 'Schwerlast-Schlagschrauber', stock: 5 },
+  { id: 2, name: 'Kletter-Ausrüstung (PSA)', stock: 20 },
+  { id: 3, name: 'Harz-Reparaturset', stock: 10 },
+  { id: 4, name: 'Spannungsprüfer', stock: 15 }
 ];
 
 let qualifications: Qualification[] = [
-  { id: 1, name: 'Projektplanung' },
-  { id: 2, name: 'Projektmanagement' },
+  { id: 1, name: 'Höhenrettung' },
+  { id: 2, name: 'Überleben auf See' },
+  { id: 3, name: 'Elektrotechnik' },
+  { id: 4, name: 'Rotorblatt-Check' },
 ];
 
 let schedule: Boat[] = [
   {
-    name: 'Boot1',
+    name: 'Service-Kutter Nordsee 1',
     taskItems: [
       {
         id: 1,
-        name: 'Projektplanung',
-        durationHours: 2.5,
-        taskQualifications: [
-          { id: 1, name: 'Projektplanung' },
-          { id: 2, name: 'Projektmanagement' },
-        ],
-        tasktools: [{ id: 1, name: 'Projektplanungstool', count: 10 }],
+        name: 'Wartung Turbine 04',
+        durationHours: 6.0,
+        taskQualifications: [{ id: 3, name: 'Elektrotechnik' }],
+        tasktools: [{ id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 }],
       },
     ],
     persons: [
       {
         id: 1,
-        firstname: 'Max',
-        lastname: 'Mustermann',
-        qualifications: [
-          { id: 1, name: 'Projektplanung' },
-          { id: 2, name: 'Projektmanagement' },
-        ],
+        firstname: 'Hannes',
+        lastname: 'Fiedler',
+        qualifications: [{ id: 3, name: 'Elektrotechnik' }],
       },
     ],
-    taskTools: [{ id: 1, name: 'Projektplanungstool', count: 10 }],
-  },
-  {
-    name: 'Boot2',
-    taskItems: [
-      {
-        id: 1,
-        name: 'Projektplanung',
-        durationHours: 2.5,
-        taskQualifications: [
-          { id: 1, name: 'Projektplanung' },
-          { id: 2, name: 'Projektmanagement' },
-        ],
-        tasktools: [],
-      },
-    ],
-    persons: [
-      {
-        id: 1,
-        firstname: 'Max',
-        lastname: 'Mustermann',
-        qualifications: [
-          { id: 1, name: 'Projektplanung' },
-          { id: 2, name: 'Projektmanagement' },
-        ],
-      },
-      {
-        id: 2,
-        firstname: 'Max2',
-        lastname: 'Mustermann',
-        qualifications: [
-          { id: 1, name: 'Projektplanung' },
-          { id: 2, name: 'Projektmanagement' },
-        ],
-      },
-    ],
-    taskTools: [{ id: 1, name: 'Projektplanungstool', count: 10 }],
-  },
+    taskTools: [{ id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 }],
+  }
 ];
 
 export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
