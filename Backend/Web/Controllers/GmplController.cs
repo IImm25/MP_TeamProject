@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 namespace Backend.Web.Controllers;
 
 [ApiController]
@@ -12,9 +11,9 @@ public class GmplController : ControllerBase
 
     }
 
-    [HttpPost("gmpl")]
-    public async void PostCalculationReqest()
+    [HttpPost("boats")]
+    public async void PostCalculationRequest()
     {
-
+        
     }
 }
