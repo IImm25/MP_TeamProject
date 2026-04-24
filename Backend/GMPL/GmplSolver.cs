@@ -2,7 +2,7 @@
 
 public static class GmplSolver
 {
-    public static GmplResults Solve(string modFilePath, string datFilePath)
+    public static async Task<GmplResults> Solve(string modFilePath, string datFilePath)
     {
         IntPtr lp = Glpk.glp_create_prob();
         IntPtr tran = Glpk.glp_mpl_alloc_wksp();

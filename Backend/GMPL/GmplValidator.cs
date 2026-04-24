@@ -2,7 +2,7 @@
 
 public static class GmplValidator
 {
-    public static void Test(string datFile)
+    public async static void Test(string datFile)
     {
         if (!File.Exists(datFile))
             throw new ValidationError($"File not found: '{datFile}'");
