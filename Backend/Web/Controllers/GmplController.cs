@@ -13,18 +13,18 @@ public class GmplController : ControllerBase
         
     }
 
-    [HttpPost("boats")]
-    public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody] List<TaskItem> tasks, [FromBody] List<Person> people)
-    {
-        if (tasks.Count != 0 && people.Count != 0)
-        {
-            GmplService gmpl = new GmplService(tasks);  
-            var res = await gmpl.WriteDatafile(people);
-
-
-
-            return Ok();
-        }
-        else return UnprocessableEntity();
-    }
+    //[HttpPost("boats")]
+    //public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody] List<TaskItem> tasks, [FromBody] List<Person> people)
+    //{
+    //    if (tasks.Count != 0 && people.Count != 0)
+    //    {
+    //        GmplService gmpl = new GmplService(tasks);  
+    //        var res = await gmpl.WriteDatafile(people);
+    //
+    //
+    //
+    //        return Ok();
+    //    }
+    //    else return UnprocessableEntity();
+    //}
 }

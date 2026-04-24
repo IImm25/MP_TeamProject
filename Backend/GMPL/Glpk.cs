@@ -3,7 +3,7 @@ namespace Backend.GMPL;
 
 public static class Glpk
 {
-    private const string Lib = "glpk_4_65"; // Windows: "glpk_4_65" | Linux/macOS: "glpk"
+    private const string Lib = "lib/glpk_4_65"; // Windows: "glpk_4_65" | Linux/macOS: "glpk"
 
     public const int GLP_OPT = 5;
     public const int GLP_FEAS = 6;
