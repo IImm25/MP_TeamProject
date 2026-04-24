@@ -1,6 +1,7 @@
 :host {
   display: block;
   width: 100%;
+  background: var(--bg-color);
 }
 
 ::ng-deep .p-menubar {
@@ -8,6 +9,8 @@
   border-radius: 0;
   padding: 0.5rem 1rem;
   margin-bottom: 2rem;
+  background: var(--bg-color) !important ;
+  color: var(--text-color) !important;
 }
 
 .navbar-logo {

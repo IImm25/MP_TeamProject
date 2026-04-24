@@ -2,7 +2,6 @@ using Backend.Data;
 using Backend.Web.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -24,7 +23,8 @@ builder.Services.AddScoped<IPersonQualificationRepository, PersonQualificationRe
 builder.Services.AddScoped<ITaskQualificationRepository, TaskQualificationRepository>();
 builder.Services.AddScoped<ITaskToolRepository, TaskToolRepository>();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql("Host=localhost;Port=5432;Database=windpowerdb;Username=admin;Password=admin"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

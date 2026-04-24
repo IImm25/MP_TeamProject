@@ -1,16 +1,16 @@
 ﻿# author: Erik Schellenberger
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "5000:8080"
-    depends_on:
-      - postgres
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=windpowerdb;Username=admin;Password=admin
+  #api:
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile
+  #  ports:
+  #    - "5000:8080"
+  #  depends_on:
+  #    - postgres
+  #  environment:
+  #    ASPNETCORE_ENVIRONMENT: Development
+  #    ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=windpowerdb;Username=admin;Password=admin
   pgadmin:
     image: dpage/pgadmin4
     container_name: windpower-pgadmin

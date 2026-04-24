@@ -1,0 +1,46 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '30vw' }"
+>
+  <ng-template pTemplate="header">
+    @if (type === 'Edit') {
+      <h3>{{ 'TASKS.DIALOG.TOOL.EDIT' | translate }}</h3>
+    } @else {
+      <h3>{{ 'TASKS.DIALOG.TOOL.NEW' | translate }}</h3>
+    }
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <form [formGroup]="toolForm" class="tool-form">
+      <div class="form-group">
+        <label>{{ 'TASKS.DIALOG.TOOL.TOOL' | translate }}</label>
+        <p-select
+          [options]="allTools()"
+          formControlName="selectedToolForm"
+          optionLabel="name"
+          appendTo="body"
+          placeholder="{{ 'TASKS.DIALOG.TOOL.PLACEHOLDER' | translate }}"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>{{ 'TASKS.DIALOG.TOOL.COUNT' | translate }}</label>
+        <p-inputNumber formControlName="selectedToolCount" [min]="1" [showButtons]="true" />
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="footer-actions">
+      <p-button
+        [label]="'COMMON.SAVE' | translate"
+        icon="pi pi-check"
+        (onClick)="addTool()"
+        [disabled]="toolForm.invalid"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

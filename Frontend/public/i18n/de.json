@@ -1,4 +1,12 @@
 {
+  "COMMON": {
+    "CANCEL": "Abbrechen",
+    "NEXT": "Weiter",
+    "SAVE": "Speichern",
+    "BACK": "Zurück",
+    "DELETE": "Löschen",
+    "ADD": "Hinzufügen"
+  },
   "MENU": {
     "SCHEDULER": "Planung",
     "ADMINISTRATION": "Verwaltung",
@@ -6,5 +14,60 @@
     "EMPLOYEES": "Mitarbeiter",
     "QUALIFICATIONS": "Qualifikationen",
     "TOOLS": "Werkzeuge"
+  },
+  "TASKS": {
+    "TASKS": "Aufgaben",
+    "NEW_TASK": "Neue Aufgabe",
+    "NAME": "Bezeichnung",
+    "DURATION": "Dauer",
+    "QUALIFICATION": "Qualifikation",
+    "ACTIONS": "Aktionen",
+    "DIALOG": {
+      "NEW": "Neue Aufgabe",
+      "EDIT": "Aufgabe bearbeiten",
+      "DETAIL": "Aufgabe anzeigen",
+      "CORE": "Allgemein",
+      "QUALIFICATIONS": "Qualifikationen",
+      "QUALIFICATION": {
+        "PLACEHOLDER": "Wähle Qualifikationen!"
+      },
+      "TOOLS": "Werkzeuge",
+      "TOOL": {
+        "NEW": "Neues Werkzeug",
+        "EDIT": "Werkzeug bearbeiten",
+        "TOOL": "Werkzeug",
+        "COUNT": "Anzahl",
+        "PLACEHOLDER": "Wähle ein Werkzeug!"
+      },
+      "DELETE_TITLE": "Aufgabe löschen",
+      "DELETE_MESSAGE": "Bist du sicher, dass du diese Aufgabe unwiderruflich löschen möchtest?"
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name ist erforderlich",
+      "DURATION_REQUIRED": "Dauer ist erforderlich",
+      "QUALIFICATION_REQUIRED": "Mindestens eine Qualifikation wird benötigt",
+      "TOOL_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
+    }
+  },
+  "EMPLOYEES": {
+    "TITLE": "Mitarbeiter",
+    "NAME": "Name",
+    "QUALIFICATIONS": "Qualifikationen",
+    "ADD_NEW": "Neuer Mitarbeiter",
+    "FIRSTNAME": "Vorname",
+    "LASTNAME": "Nachname",
+    "SELECT_QUALIFICATIONS": "Qualifikationen wählen",
+    "DIALOG": {
+      "NEW": "Neuer Mitarbeiter",
+      "EDIT": "Mitarbeiter bearbeiten",
+      "DELETE_TITLE": "Mitarbeiter löschen",
+      "DELETE_MESSAGE": "Möchten Sie den Mitarbeiter {{firstname}} {{lastname}} wirklich löschen?"
+    },
+    "VALIDATION": {
+      "FIRSTNAME_REQUIRED": "Vorname ist erforderlich",
+      "LASTNAME_REQUIRED": "Nachname ist erforderlich",
+      "QUALIFICATION_REQUIRED": "Mindestens eine Qualifikation wird benötigt"
+    }
+
   }
 }
