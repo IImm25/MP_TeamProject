@@ -1,15 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
-namespace Backend.Data.DBContext;
+namespace Backend.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
+    public AppDbContext()
+    {
+        
+    }
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
     {
     }
-
-    
 
     public DbSet<Person> People => Set<Person>();
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
@@ -24,7 +26,11 @@ public class AppDbContext : DbContext
 
     public DbSet<TaskTool> TaskTools
         => Set<TaskTool>();
-
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=windpowerdb;Username=admin;Password=admin");
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
