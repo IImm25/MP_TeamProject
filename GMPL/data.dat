@@ -1,44 +1,56 @@
-#author of this example data file: Leonie Skala
-
 data;
 
-#names of the possible tasks (same order as in table)
-set TASKS := a1 a2 a3;
-set QUALIS := ElectricalEngineer Mechanic Diver Metalworker;
-set PEOPLE := p1 p2 p3;
-set TOOLS := hammer screwdriver pliers;
+# --- SETS ---
+set TASKS := T_BIG T_SKILL_HEAVY T_TOOL_1 T_TOOL_2 T_IMPOSSIBLE;
+set QUALIS := Electric Mechanic;
+set PEOPLE := P_ALLROUNDER P_MECHANIC;
+set TOOLS  := Special_Drill;
 
-#array with durations of the tasks
-param duration :=
-		a1		2
-		a2		8
-		a3		3;
-		
-#defines which person has which qualification(s)
-param hasQuali : ElectricalEngineer Mechanic Diver Metalworker :=
-			p1		1		1		0		0
-			p2		0		1		0		1
-			p3		0		0		1		0;
+# --- PARAMETERS ---
 
-#defines which task needs which qualification(s)
-param requiredQualis: ElectricalEngineer Mechanic Diver Metalworker :=
-				a1	1		0			0		0		
-				a2	0		0			1		0
-				a3	1		1			0		1;
-
-#defines which task needs which tool(s)
-param requiredTools: hammer screwdriver pliers :=
-				a1		1		2			1
-				a2		0		0			1
-				a3		3		0			0;
-
-#defines how many of each tool are available
-param stockTools :=
-		hammer			3
-		screwdriver		8
-		pliers			3;
-
-#maximal working hours per boat
+# Szenario: 2 Boote, 8 Stunden
+param amountBoats := 2;
 param maxWorkingHours := 8;
+
+# Dauern:
+# T_BIG füllt ein Boot fast allein.
+# T_IMPOSSIBLE ist länger als die Schicht erlaubt (darf nicht geplant werden).
+param duration :=
+    T_BIG         7
+    T_SKILL_HEAVY 4
+    T_TOOL_1      3
+    T_TOOL_2      3
+    T_IMPOSSIBLE  10;
+
+# Personal-Fähigkeiten:
+# Wir haben nur einen, der Elektro kann (P_ALLROUNDER).
+param hasQuali : Electric Mechanic :=
+    P_ALLROUNDER   1        1
+    P_MECHANIC     0        1;
+
+# Personal-Bedarf:
+# T_SKILL_HEAVY benötigt 2 Mechaniker (P_ALLROUNDER + P_MECHANIC müssen zusammen aufs Boot).
+param requiredQualis : Electric Mechanic :=
+    T_BIG           0        1
+    T_SKILL_HEAVY   0        2
+    T_TOOL_1        1        0
+    T_TOOL_2        1        0
+    T_IMPOSSIBLE    0        1;
+
+# Werkzeug-Bedarf:
+# T_TOOL_1 und T_TOOL_2 brauchen denselben Spezialbohrer.
+param requiredTools : Special_Drill :=
+    T_BIG           0
+    T_SKILL_HEAVY   0
+    T_TOOL_1        1
+    T_TOOL_2        1
+    T_IMPOSSIBLE    0;
+
+# Werkzeug-Vorrat:
+# Nur 1 Bohrer vorhanden! 
+# Das bedeutet: T_TOOL_1 und T_TOOL_2 MÜSSEN auf das gleiche Boot, 
+# um den Bohrer zu teilen, sonst reicht der Vorrat nicht.
+param stockTools :=
+    Special_Drill   1;
 
 end;

@@ -10,9 +10,8 @@ set PEOPLE;
 set QUALIS; #qualifications
 set TOOLS;
 
-/*theoretical maximum of boats (one task per boat)*/
-param maxBoats := card(TASKS);
-set BOATS := 1..maxBoats;
+param amountBoats;
+set BOATS := 1..amountBoats;
 
 
 
@@ -57,9 +56,9 @@ var toolOnBoat{BOATS,TOOLS} integer >= 0;
 s.t. TimeLimit{b in BOATS}: 
 		sum{ta in TASKS} (duration[ta] * taskOnBoat[b,ta]) <= maxWorkingHours * boatUsage[b];
 
-#complete each task exactly one time
-s.t. DoneOneTime{ta in TASKS}:
-		sum{b in BOATS} (taskOnBoat[b,ta]) = 1;
+#complete each task at most one time (or not at all)
+s.t. DoneAtMostOnce{ta in TASKS}:
+		sum{b in BOATS} (taskOnBoat[b,ta]) <= 1;
 		
 #use boat in ascending order (breaking the symmetry)
 s.t. Order{b in BOATS: b > 1}:
@@ -68,9 +67,11 @@ s.t. Order{b in BOATS: b > 1}:
 
 /*people relevante constrains*/
 
+# the amount of people with a certain qualification on board must be at least equal to the most demanding task to be carried out on that boat.
 s.t. QualiCheck{b in BOATS, ta in TASKS, q in QUALIS: requiredQualis[ta,q] >= 1}:
-		sum{p in PEOPLE} (hasQuali[p,q]*personOnBoat[b,p]) >= taskOnBoat[b,ta];
+		sum{p in PEOPLE} (hasQuali[p,q] * personOnBoat[b,p]) >= (requiredQualis[ta,q] * taskOnBoat[b,ta]);
 
+#each person can only be on one boat at a time
 s.t. PersonOneBoat{p in PEOPLE}:
 		sum{b in BOATS} personOnBoat[b,p] <= 1;
 	
@@ -88,10 +89,10 @@ s.t. GlobalToolStock{t in TOOLS}:
 
 
 /**
-* minimize function
+* maximize function
 */
-minimize AmountBoats: sum{b in BOATS} (boatUsage[b]);
+maximize WorkHours: sum{b in BOATS, ta in TASKS} (duration[ta] * taskOnBoat[b,ta]);
 
 solve;
-display AmountBoats, taskOnBoat, personOnBoat;
+display taskOnBoat, personOnBoat, toolOnBoat, boatUsage, WorkHours;
 end;
