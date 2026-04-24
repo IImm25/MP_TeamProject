@@ -3,7 +3,7 @@
 ## Aufgabe 8
 Bei der Wartung von offshore Windparks müssen Arbeiten an den einzelnen Anlagen durchgeführt
 werden. Jede Aufgabe macht den Einsatz von bestimmten Werkzeugen und Personal mit bestimmten
-Qualificationen jeweils in bestimmter Anzahl erforderlich. Außerdem ist jeder Aufgabe eine Dauer
+Qualifikationen jeweils in bestimmter Anzahl erforderlich. Außerdem ist jeder Aufgabe eine Dauer
 zugeordnet. Die Gesamtheit der Aufgaben eines Einsatzteams darf die tägliche Arbeitszeit nicht
 überschreiten, Fahrzeiten werden zunächst1 vernachlässigt.
 Personal und Werkzeuge werden mit Booten zu den Anlagen gebracht. Es stehen zunächst1
