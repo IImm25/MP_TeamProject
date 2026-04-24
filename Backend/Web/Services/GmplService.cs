@@ -13,24 +13,34 @@ public class GmplService
         this.TaskItems = tasks;
     }
 
+    //public async void call()
+    //{
+    //    PersonRepository _personRepo = new PersonRepository(new AppDbContext());
+    //    TaskItemRepository _taskRepo = new TaskItemRepository(new AppDbContext());
+    //        var tasks = await _taskRepo.GetAllAsync();   // inkl. Includes
+    //        var people = await _personRepo.GetAllAsync(); // inkl. Qualifikationen
+    //        var service = new GmplService(tasks.ToList());
+    //        string datFile = service.WriteDatafile(people, maxWorkingHours: 8);
+    //        // z.B. als Datei speichern:
+    //        await File.WriteAllTextAsync("output.dat", datFile);
+    //}
     private const string MOD = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\modell.mod";
     private const string DAT = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\data.dat";
-
-    public async Task<GmplResults> CaculateGmplModel()
+    public async Task CaculateGmplModel()
     {
-        GmplResults result = new GmplResults();
         try
         {
             // ── Validate  ────────────────────────────────────
-             GmplValidator.Test(DAT);
+            GmplValidator.Test(DAT);
 
             // ── Solve ──────────────────────────────────────────
-            result = await GmplSolver.Solve(MOD, DAT);
+            GmplResults result = GmplSolver.Solve(MOD, DAT);
 
             // ── Output results ──────────────────────────────
             GmplOutput2Console.GetGmplResults(result);
 
             // ── processing ─────────────────────────
+            
         }
         catch (ValidationError ex)
         {
@@ -50,21 +60,19 @@ public class GmplService
             Console.WriteLine($"  [unexpected Error] {ex.Message}");
             Console.ResetColor();
         }
-
-        return result;
     }
 
+    
     public async Task SaveDataFile(string path, string dataFileText)
     {
         File.WriteAllText(path, dataFileText);
-    }
 
+    }
     public async Task<string> WriteDatafile(List<Person> people, int maxWorkingHours = 8, int amoutBoats = 8)
     {
         var allQualifications = ExtractQualifications();
         var allTools = ExtractTools();
         var taskIds = BuildTaskIds();
-        var personIds = people.Select(p => Sanitize($"{p.Firstname}_{p.Lastname}")).ToList();
 
         var sb = new StringBuilder();
 
@@ -73,14 +81,14 @@ public class GmplService
 
         WriteSet(sb, "TASKS", taskIds);
         WriteSet(sb, "QUALIS", allQualifications.Select(q => Sanitize(q.Name)));
-        WriteSet(sb, "PEOPLE", personIds);
+        WriteSet(sb, "PEOPLE", people.Select((_, i) => $"p{i + 1}"));
         WriteSet(sb, "TOOLS", allTools.Select(t => Sanitize(t.Name)));
         sb.AppendLine();
 
         WriteParamDuration(sb, taskIds);
         sb.AppendLine();
 
-        WriteParamHasQuali(sb, people, personIds, allQualifications);
+        WriteParamHasQuali(sb, people, allQualifications);
         sb.AppendLine();
 
         WriteParamRequiredQualis(sb, taskIds, allQualifications);
@@ -102,7 +110,7 @@ public class GmplService
     // ─── Extraction ───────────────────────────────────────────────────────────
 
     private List<string> BuildTaskIds()
-        => TaskItems.Select(t => Sanitize(t.Name)).ToList();
+        => TaskItems.Select((_, i) => $"a{i + 1}").ToList();
 
     private List<Qualification> ExtractQualifications()
         => TaskItems
@@ -140,7 +148,6 @@ public class GmplService
     private static void WriteParamHasQuali(
         StringBuilder sb,
         List<Person> people,
-        List<string> personIds,
         List<Qualification> qualifications)
     {
         if (people.Count == 0)
@@ -149,8 +156,10 @@ public class GmplService
             return;
         }
 
+        // calc ColumnWidth 
         var colWidths = qualifications.Select(q => Sanitize(q.Name).Length + 2).ToList();
 
+        // Header
         sb.Append("param hasQuali :");
         for (int c = 0; c < qualifications.Count; c++)
             sb.Append($" {Sanitize(qualifications[c].Name).PadRight(colWidths[c])}");
@@ -162,7 +171,7 @@ public class GmplService
                 .Select(pq => pq.QualificationId)
                 .ToHashSet();
 
-            sb.Append($"         {personIds[pi],-10}");
+            sb.Append($"         {$"p{pi + 1}",-10}");
             for (int c = 0; c < qualifications.Count; c++)
                 sb.Append($" {(qualIds.Contains(qualifications[c].Id) ? "1" : "0").PadRight(colWidths[c])}");
 
@@ -241,6 +250,7 @@ public class GmplService
             sb.AppendLine(i < tools.Count - 1 ? line : line + ";");
         }
     }
+
 
     private static string Sanitize(string name) => name.Replace(" ", "_");
 }

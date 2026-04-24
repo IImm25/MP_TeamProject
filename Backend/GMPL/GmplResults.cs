@@ -2,10 +2,6 @@
 
 public class GmplResults
 {
-    public GmplResults()
-    {
-        
-    }
     public GmplResults(float workHours, 
         Dictionary<int, Dictionary<string, int>> taskOnBoat, 
         Dictionary<int, int> boatUsage, 
