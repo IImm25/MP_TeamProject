@@ -20,16 +20,22 @@
     "NEW_TASK": "Neue Aufgabe",
     "NAME": "Bezeichnung",
     "DURATION": "Dauer",
-    "QUALIFICATION": "Qualifikation",
+    "QUALIFICATION": "QualifiKation",
     "ACTIONS": "Aktionen",
     "DIALOG": {
       "NEW": "Neue Aufgabe",
       "EDIT": "Aufgabe bearbeiten",
       "DETAIL": "Aufgabe anzeigen",
       "CORE": "Allgemein",
+      "NAME_PLACEHOLDER": "Gib eine Aufgabenbezeichnung ein!",
       "QUALIFICATIONS": "Qualifikationen",
       "QUALIFICATION": {
-        "PLACEHOLDER": "Wähle Qualifikationen!"
+        "NEW": "Neue Qualifikation",
+        "EDIT": "Qualifikation bearbeiten",
+        "QUALIFICATION": "Qualifikation",
+        "COUNT": "Anzahl",
+        "DURATION": "Dauer",
+        "PLACEHOLDER": "Wähle eine Qualifikation!"
       },
       "TOOLS": "Werkzeuge",
       "TOOL": {
@@ -56,12 +62,14 @@
     "ADD_NEW": "Neuer Mitarbeiter",
     "FIRSTNAME": "Vorname",
     "LASTNAME": "Nachname",
-    "SELECT_QUALIFICATIONS": "Qualifikationen wählen",
     "DIALOG": {
       "NEW": "Neuer Mitarbeiter",
       "EDIT": "Mitarbeiter bearbeiten",
       "DELETE_TITLE": "Mitarbeiter löschen",
-      "DELETE_MESSAGE": "Möchten Sie den Mitarbeiter {{firstname}} {{lastname}} wirklich löschen?"
+      "DELETE_MESSAGE": "Möchten Sie den Mitarbeiter {{firstname}} {{lastname}} wirklich löschen?",
+      "FIRSTNAME_PLACEHOLDER": "Gib einen Vornamen ein!",
+      "LASTNAME_PLACEHOLDER": "Gib einen Nachnamen ein!",
+      "SELECT_QUALIFICATIONS": "Wähle eine oder mehrere Qualifikationen!"
     },
     "VALIDATION": {
       "FIRSTNAME_REQUIRED": "Vorname ist erforderlich",

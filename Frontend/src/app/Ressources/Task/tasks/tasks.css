@@ -1,7 +1,6 @@
 .content-wrapper {
   padding: 3rem;
   background-color: var(--bg-color);
-  min-height: 100vh;
 }
 
 .section-header {

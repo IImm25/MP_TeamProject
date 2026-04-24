@@ -7,28 +7,28 @@
 >
   <ng-template pTemplate="header">
     @if (type === 'Edit') {
-      <h3>{{ 'TASKS.DIALOG.TOOL.EDIT' | translate }}</h3>
+      <h3>{{ 'TASKS.DIALOG.QUALIFICATION.EDIT' | translate }}</h3>
     } @else {
-      <h3>{{ 'TASKS.DIALOG.TOOL.NEW' | translate }}</h3>
+      <h3>{{ 'TASKS.DIALOG.QUALIFICATION.NEW' | translate }}</h3>
     }
   </ng-template>
 
   <ng-template pTemplate="content">
-    <form [formGroup]="toolForm" class="tool-form">
+    <form [formGroup]="qualificationForm" class="qualification-form">
       <div class="form-group">
-        <label>{{ 'TASKS.DIALOG.TOOL.TOOL' | translate }}</label>
+        <label>{{ 'TASKS.DIALOG.QUALIFICATION.QUALIFICATION' | translate }}</label>
         <p-select
-          [options]="allTools()"
-          formControlName="selectedToolForm"
+          [options]="allQualifications()"
+          formControlName="selectedQualificationForm"
           optionLabel="name"
           appendTo="body"
-          placeholder="{{ 'TASKS.DIALOG.TOOL.PLACEHOLDER' | translate }}"
+          placeholder="{{ 'TASKS.DIALOG.QUALIFICATION.PLACEHOLDER' | translate }}"
         />
       </div>
 
       <div class="form-group">
-        <label>{{ 'TASKS.DIALOG.TOOL.COUNT' | translate }}</label>
-        <p-inputNumber formControlName="selectedToolCount" [min]="1" [showButtons]="true" />
+        <label>{{ 'TASKS.DIALOG.QUALIFICATION.COUNT' | translate }}</label>
+        <p-inputNumber formControlName="selectedQualificationCount" [min]="1" [showButtons]="true" />
       </div>
     </form>
   </ng-template>
@@ -44,8 +44,8 @@
       <p-button
         [label]="'COMMON.SAVE' | translate"
         icon="pi pi-check"
-        (onClick)="addTool()"
-        [disabled]="toolForm.invalid"
+        (onClick)="addQualification()"
+        [disabled]="qualificationForm.invalid"
       />
     </div>
   </ng-template>

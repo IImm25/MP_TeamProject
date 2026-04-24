@@ -40,6 +40,9 @@ export class DialogTaskTool implements OnInit {
 
   ngOnInit(): void {
     this.getTools();
+    if (this.type === 'Edit') {
+      this.toolForm.controls.selectedToolForm.disable();
+    }
   }
 
   getTools() {
@@ -49,10 +52,10 @@ export class DialogTaskTool implements OnInit {
       const currentTaskTool = this.selectedTool();
 
       if (this.type === 'Edit' && currentTaskTool) {
-        const matchingTool = tools.find(t => t.id === currentTaskTool.id) || null;
+        const matchingTool = tools.find((t) => t.id === currentTaskTool.id) || null;
         this.toolForm.patchValue({
           selectedToolForm: matchingTool,
-          selectedToolCount: currentTaskTool.count
+          selectedToolCount: currentTaskTool.count,
         });
       }
     });
@@ -70,5 +73,10 @@ export class DialogTaskTool implements OnInit {
       this.visible.set(false);
       this.toolForm.reset({ selectedToolForm: null, selectedToolCount: 1 });
     }
+  }
+
+  close() {
+    this.visible.set(false);
+    this.toolForm.reset({ selectedToolForm: null, selectedToolCount: 1 });
   }
 }

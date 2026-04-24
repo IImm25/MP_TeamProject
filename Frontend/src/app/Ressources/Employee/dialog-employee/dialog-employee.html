@@ -13,7 +13,7 @@
     <div class="name-row">
       <div class="field">
         <label for="firstname">{{ 'EMPLOYEES.FIRSTNAME' | translate }}*</label>
-        <input pInputText id="firstname" formControlName="firstname" />
+        <input pInputText id="firstname" formControlName="firstname" [placeholder]="'EMPLOYEES.DIALOG.FIRSTNAME_PLACEHOLDER' | translate"/>
         @if (employeeForm.controls.firstname.invalid && employeeForm.controls.firstname.touched) {
           <div class="error-message">
             <i class="pi pi-exclamation-circle"></i>
@@ -24,7 +24,7 @@
 
       <div class="field">
         <label for="lastname">{{ 'EMPLOYEES.LASTNAME' | translate }}*</label>
-        <input pInputText id="lastname" formControlName="lastname" />
+        <input pInputText id="lastname" formControlName="lastname" [placeholder]="'EMPLOYEES.DIALOG.LASTNAME_PLACEHOLDER' | translate" />
         @if (employeeForm.controls.lastname.invalid && employeeForm.controls.lastname.touched) {
           <div class="error-message">
             <i class="pi pi-exclamation-circle"></i>
@@ -42,7 +42,7 @@
         optionLabel="name"
         display="chip"
         appendTo="body"
-        [placeholder]="'EMPLOYEES.SELECT_QUALIFICATIONS' | translate"
+        [placeholder]="'EMPLOYEES.DIALOG.SELECT_QUALIFICATIONS' | translate"
       />
       @if (employeeForm.controls.qualifications.invalid && employeeForm.controls.qualifications.touched) {
         <div class="error-message mt-2">
