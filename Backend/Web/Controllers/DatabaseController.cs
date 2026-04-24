@@ -1,4 +1,4 @@
-﻿using Backend.Web.Dto;
+﻿using Backend.Data.DTO;
 using Backend.Web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 

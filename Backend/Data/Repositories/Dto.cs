@@ -1,7 +1,5 @@
 ﻿namespace Backend.Web.Dto;
 
-// ─── Request DTOs ─────────────────────────────────────────────────────────────
-
 public class TaskItemCreateDto
 {
     public required string Name { get; set; }
@@ -58,8 +56,6 @@ public class ToolUpdateDto
     public string? Name { get; set; }
     public int? AvailableStock { get; set; }
 }
-
-// ─── Response DTOs (kein zirkulärer Verweis) ─────────────────────────────────
 
 public class QualificationResponseDto
 {

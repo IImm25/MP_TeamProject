@@ -1,7 +1,5 @@
 ﻿namespace Backend.Web.Services;
 
-using Backend.Data.DBContext;
-using Backend.Web.Repositories;
 using System.Text;
 
 public class GmplService
@@ -25,8 +23,17 @@ public class GmplService
     //        await File.WriteAllTextAsync("output.dat", datFile);
     //}
 
+    private async Task CaculateGmplModel(string dataFile)
+    {
+        string pathModel;
+        string pathData;
+    }
+    public async Task SaveDataFile(string path, string dataFileText)
+    {
+        File.WriteAllText(path, dataFileText);
 
-    public string WriteDatafile(List<Person> people, int maxWorkingHours = 8, int amoutBoats = 8)
+    }
+    public async Task<string> WriteDatafile(List<Person> people, int maxWorkingHours = 8, int amoutBoats = 8)
     {
         var allQualifications = ExtractQualifications();
         var allTools = ExtractTools();
