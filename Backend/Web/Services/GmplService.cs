@@ -1,5 +1,7 @@
 ﻿namespace Backend.Web.Services;
 
+using Backend.GMPL;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 public class GmplService
@@ -22,12 +24,45 @@ public class GmplService
     //        // z.B. als Datei speichern:
     //        await File.WriteAllTextAsync("output.dat", datFile);
     //}
-
-    private async Task CaculateGmplModel(string dataFile)
+    private const string MOD = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\modell.mod";
+    private const string DAT = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\data.dat";
+    public async Task CaculateGmplModel(string dataFile)
     {
-        string pathModel;
-        string pathData;
+        try
+        {
+            // ── Validate  ────────────────────────────────────
+            GmplValidator.Test(DAT);
+
+            // ── Solve ──────────────────────────────────────────
+            GmplResults result = GmplSolver.Solve(MOD, DAT);
+
+            // ── Output results ──────────────────────────────
+            GmplOutput2Console.GetGmplResults(result);
+
+            // ── processing ─────────────────────────
+            
+        }
+        catch (ValidationError ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [Validation-Error] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (NotSolvableError ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [Invalid] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [unexpected Error] {ex.Message}");
+            Console.ResetColor();
+        }
     }
+
+    
     public async Task SaveDataFile(string path, string dataFileText)
     {
         File.WriteAllText(path, dataFileText);
