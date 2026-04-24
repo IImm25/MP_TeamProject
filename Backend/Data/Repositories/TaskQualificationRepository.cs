@@ -1,4 +1,4 @@
-﻿using Backend.Data.DBContext;
+﻿using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Web.Repositories;

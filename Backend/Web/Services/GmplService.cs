@@ -1,7 +1,5 @@
 ﻿namespace Backend.Web.Services;
 
-using Backend.Data.DBContext;
-using Backend.Web.Repositories;
 using System.Text;
 
 public class GmplService

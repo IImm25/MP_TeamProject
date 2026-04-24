@@ -1,4 +1,4 @@
-﻿using Backend.Data.DBContext;
+﻿using Backend.Data;
 using Backend.Data.DTO;
 using Microsoft.EntityFrameworkCore;
 
