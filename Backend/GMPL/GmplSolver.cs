@@ -3,56 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace Backend.GMPL;
 
-public class GmplSolver
-{
-    private static readonly (string Titel, string Dat)[] Testfaelle =
-    {
-        ("Normalfall — erwartet 34000 Cent",           @"C:\Users\ALEX\SynologyDrive\Master\MathProgramm\Mathematische Programmierung\Mathematische Programmierung\pasta_normal.dat"),
-        ("Unlösbarer Fall — zu wenig Ressourcen",      @"C:\Users\ALEX\SynologyDrive\Master\MathProgramm\Mathematische Programmierung\Mathematische Programmierung\pasta_unloesbar.dat"),
-        ("Fehlerhafter Fall — negative Eingabewerte",  @"C:\Users\ALEX\SynologyDrive\Master\MathProgramm\Mathematische Programmierung\Mathematische Programmierung\pasta_fehlerhaft.dat"),
-    };
-    private const string MOD = @"C:\Users\ALEX\Desktop\Studium\Master\Semester 2\Mathematische Programmieren\Programs\Nudeln\Nudeln.mod";
-
-    public static void Call()
-    {
-        for (int i = 0; i < Testfaelle.Length; i++)
-        {
-            var (titel, dat) = Testfaelle[i];
-            Ausgabe.Trennlinie($"Testfall {i + 1}: {titel}");
-
-            try
-            {
-                // ── Validierung VOR dem Lösen ──────────────────
-                Validator.Pruefen(dat);
-
-                // ── Lösen ──────────────────────────────────────
-                PastaErgebnis ergebnis = WindpowerSolver.Loese(MOD, dat);
-
-                // ── Ergebnis ausgeben ──────────────────────────
-                Ausgabe.Ergebnis(dat, ergebnis);
-
-                // ── Systemtest nur beim Normalfall ─────────────
-                if (i == 0)
-                    Systemtest.Ausfuehren(ergebnis);
-            }
-            catch (ValidierungsFehler ex)
-            {
-                Ausgabe.Fehler("VALIDIERUNGSFEHLER", dat, ex.Message);
-            }
-            catch (UnloesbarFehler ex)
-            {
-                Ausgabe.Fehler("UNZULÄSSIG", dat, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"  [UNERWARTETER FEHLER] {ex.Message}");
-                Console.ResetColor();
-            }
-        }
-    }
-}
-
 internal static class Glpk
 {
     private const string Lib = "glpk_4_65"; // Windows: "glpk_4_65" | Linux/macOS: "glpk"
@@ -142,100 +92,6 @@ record PastaErgebnis(
 );
 
 
-  
-
-   
-
-
-
-static class Ausgabe
-{
-    public static void Ergebnis(string datDatei, PastaErgebnis e)
-    {
-        Console.WriteLine("╔══════════════════════════════════════════════╗");
-        Console.WriteLine("║          PASTA LÖSER — ERGEBNIS              ║");
-        Console.WriteLine("╚══════════════════════════════════════════════╝");
-        Console.WriteLine($"  Datei         : {datDatei}");
-        Console.WriteLine($"  Gesamtkosten  : {e.Gesamtkosten:F0} Cent  " +
-                          $"= {e.Gesamtkosten / 100.0:F2} €");
-        Console.WriteLine();
-        Console.WriteLine($"  {"Sorte",-14} {"Eigenherst.",12} {"Fremdbezug",12} {"Gesamt",8}");
-        Console.WriteLine($"  {"─────────────",14} {"────────────",12} {"──────────",12} {"──────",8}");
-        Console.WriteLine($"  {"Spaghetti",-14} {e.sE,12} {e.sF,12} {e.sE + e.sF,8}");
-        Console.WriteLine($"  {"Maccheroni",-14} {e.mE,12} {e.mF,12} {e.mE + e.mF,8}");
-        Console.WriteLine($"  {"Tagliolini",-14} {e.tE,12} {e.tF,12} {e.tE + e.tF,8}");
-        Console.WriteLine();
-    }
-
-    public static void Fehler(string typ, string datDatei, string nachricht)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"  [{typ}] {datDatei}");
-        Console.WriteLine($"  Ursache: {nachricht}");
-        Console.ResetColor();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("  → Test erfolgreich: Fehler korrekt abgefangen. ✓");
-        Console.ResetColor();
-        Console.WriteLine();
-    }
-
-    public static void Trennlinie(string titel)
-    {
-        Console.WriteLine();
-        Console.WriteLine(new string('═', 50));
-        Console.WriteLine($"  {titel}");
-        Console.WriteLine(new string('═', 50));
-    }
-}
-static class Systemtest
-{
-    // Erwartete optimale Lösung laut Aufgabenstellung
-    private const double ERWARTETE_KOSTEN = 34000.0;
-    private const double TOLERANZ = 0.5;
-
-    public static void Ausfuehren(PastaErgebnis e)
-    {
-        Console.WriteLine("┌─────────────────────────────────────────────┐");
-        Console.WriteLine("│               SYSTEMTEST                    │");
-        Console.WriteLine("└─────────────────────────────────────────────┘");
-
-        bool alleOk = true;
-
-        alleOk &= Test("Gesamtkosten == 34000",
-            Math.Abs(e.Gesamtkosten - ERWARTETE_KOSTEN) <= TOLERANZ,
-            $"{e.Gesamtkosten:F0} Cent");
-
-        alleOk &= Test("sE (Spaghetti eigen) == 100", e.sE == 100, $"{e.sE}");
-        alleOk &= Test("mE (Maccheroni eigen) == 100", e.mE == 100, $"{e.mE}");
-        alleOk &= Test("tE (Tagliolini eigen) == 100", e.tE == 100, $"{e.tE}");
-        alleOk &= Test("sF (Spaghetti fremd) == 0", e.sF == 0, $"{e.sF}");
-        alleOk &= Test("mF (Maccheroni fremd) == 100", e.mF == 100, $"{e.mF}");
-        alleOk &= Test("tF (Tagliolini fremd) == 200", e.tF == 200, $"{e.tF}");
-
-        Console.WriteLine();
-        if (alleOk)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("  ✓ Alle Systemtests bestanden.");
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("  ✗ Mindestens ein Systemtest fehlgeschlagen.");
-        }
-        Console.ResetColor();
-        Console.WriteLine();
-    }
-
-    private static bool Test(string beschreibung, bool ok, string istWert)
-    {
-        Console.ForegroundColor = ok ? ConsoleColor.Green : ConsoleColor.Red;
-        Console.WriteLine($"  {(ok ? "✓" : "✗")} {beschreibung,-38} → {istWert}");
-        Console.ResetColor();
-        return ok;
-    }
-}
-
 static class WindpowerSolver
 {
     public static PastaErgebnis Loese(string modDatei, string datDatei)
@@ -315,13 +171,13 @@ static class WindpowerSolver
 
 static class Validator
 {
-    public static void Pruefen(string datDatei)
+    public static void verify(string datFile)
     {
-        if (!File.Exists(datDatei))
-            throw new ValidierungsFehler($"Datei nicht gefunden: '{datDatei}'");
+        if (!File.Exists(datFile))
+            throw new ValidierungsFehler($"File does not exist: '{datFile}'");
 
         int zeilenNr = 0;
-        foreach (string zeile in File.ReadLines(datDatei))
+        foreach (string zeile in File.ReadLines(datFile))
         {
             zeilenNr++;
             string z = zeile.Trim();
@@ -344,9 +200,9 @@ static class Validator
                 // Parameter-Name aus dem Teil vor ":=" extrahieren
                 string paramName = z[..idx].Replace("param", "").Trim();
                 throw new ValidierungsFehler(
-                    $"Ungültiger Wert in '{datDatei}', Zeile {zeilenNr}: " +
-                    $"Parameter '{paramName}' hat negativen Wert {zahl}. " +
-                    $"Alle Parameter müssen >= 0 sein.");
+                    $"Invalid value in '{datFile}', line {zeilenNr}: " +
+                    $"Parameter '{paramName}' has a negative value: {zahl}. " +
+                    $"All parameters must be >= 0.");
             }
         }
     }
