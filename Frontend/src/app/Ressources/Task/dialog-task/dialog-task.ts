@@ -25,6 +25,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { DialogTaskTool } from '../dialog-task-tool/dialog-task-tool';
 import { environment } from '../../../../environments/environment';
+import { TaskQualification } from '../../../Models/task-qualification';
+import { DialogTaskQualification } from '../dialog-task-qualification/dialog-task-qualification';
 
 @Component({
   selector: 'app-dialog-task',
@@ -40,6 +42,7 @@ import { environment } from '../../../../environments/environment';
     MultiSelectModule,
     TableModule,
     DialogTaskTool,
+    DialogTaskQualification,
   ],
   templateUrl: './dialog-task.html',
   styleUrl: './dialog-task.css',
@@ -84,12 +87,19 @@ export class DialogTask implements OnInit {
     }
   }
 
+  visible = model<boolean>(false);
+
   _currentTask: Task | null = null;
 
   apiUrl = environment.apiUrl;
 
   allQualifications: WritableSignal<Qualification[]> = signal([]);
-  visible = model<boolean>(false);
+  qualificationDialogVisible: WritableSignal<boolean> = signal(false);
+  QualificationType: WritableSignal<'Edit' | 'New'> = signal('New');
+  selectedQualification: WritableSignal<TaskQualification | null> = signal(null);
+
+
+
   toolDialogVisible: WritableSignal<boolean> = signal(false);
   ToolType: WritableSignal<'Edit' | 'New'> = signal('New');
   selectedTool: WritableSignal<TaskTool | null> = signal(null);
@@ -98,7 +108,7 @@ export class DialogTask implements OnInit {
     name: ['', Validators.required],
     durationHours: [0],
     durationMinutes: [0, [Validators.max(59)]],
-    qualifications: [[] as Qualification[], Validators.required],
+    qualifications: [[] as TaskQualification[], Validators.required],
     tools: [[] as TaskTool[], Validators.required],
   });
 
@@ -236,5 +246,41 @@ export class DialogTask implements OnInit {
     this.http
       .get<Qualification[]>(`${this.apiUrl}/qualifications`)
       .subscribe((qualifications) => this.allQualifications.set(qualifications));
+  }
+
+  removeQualification(index: number) {
+    const currentQualifications = this.taskForm.controls.qualifications.value as TaskQualification[];
+    const updatedQualifications = currentQualifications.filter((_, i) => i !== index);
+    this.taskForm.patchValue({ qualifications: updatedQualifications });
+  }
+  addQualification() {
+    this.qualificationDialogVisible.set(true);
+    this.QualificationType.set('New');
+    this.selectedQualification.set(null);
+  }
+
+  onQualificationAdded(newQualification: TaskQualification | null) {
+    if (newQualification) {
+      const currentQualifications = [...(this.taskForm.controls.qualifications.value ?? [])];
+
+      if (this.QualificationType() === 'Edit') {
+        const originalQualification = this.selectedQualification();
+        const index = currentQualifications.findIndex((t) => t.id === originalQualification?.id);
+
+        if (index !== -1) {
+          currentQualifications[index] = newQualification;
+        }
+      } else {
+        const existingIndex = currentQualifications.findIndex((t) => t.id === newQualification.id);
+        if (existingIndex !== -1) {
+          currentQualifications[existingIndex].count += newQualification.count;
+        } else {
+          currentQualifications.push(newQualification);
+        }
+      }
+
+      this.taskForm.patchValue({ qualifications: currentQualifications });
+    }
+    this.qualificationDialogVisible.set(false);
   }
 }

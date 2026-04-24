@@ -1,10 +1,19 @@
-p-dialog {
+/* p-dialog {
+  display: block;
   background-color: var(--bg-color);
   color: var(--text-color);
+  height: 100%;
+} */
+
+:host ::ng-deep .p-dialog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
 }
 
 .step-content {
-  padding: 2rem 0;
+  padding-bottom: 2rem;
   min-height: 250px;
 }
 
@@ -22,10 +31,14 @@ p-dialog {
 }
 
 .step-footer {
+  position: absolute;
   display: flex;
   justify-content: space-between;
-  padding-top: 1.5rem;
+  padding: 1.5rem;
   border-top: 1px solid var(--text-color);
+  bottom: 0;
+  right: 0;
+  left: 0;
 }
 
 p-multiselect {
@@ -95,3 +108,24 @@ p-multiselect {
 :host ::ng-deep .duration-row .p-inputnumber-input {
   width: 100%;
 }
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr {
+  transition: background-color 0.2s ease;
+  background-color: var(--p-datatable-row-background);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  padding: 1rem;
+  background-color: var(--p-datatable-row-background);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  transition: background-color 0.2s ease;
+  background-color: var(--p-datatable-row-background);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.25rem  1rem;
+}
+
+

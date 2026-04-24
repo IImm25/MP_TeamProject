@@ -12,12 +12,12 @@ let tasks: Task[] = [
     name: 'Ölwechsel im Getriebe',
     durationHours: 6.0,
     taskQualifications: [
-      { id: 2, name: 'Überleben auf See' },
-      { id: 3, name: 'Elektrotechnik' }
+      { id: 2, name: 'Überleben auf See', count: 1 },
+      { id: 3, name: 'Elektrotechnik', count: 2 },
     ],
     tasktools: [
       { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
-      { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 }
+      { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 },
     ],
   },
   {
@@ -25,14 +25,14 @@ let tasks: Task[] = [
     name: 'Reparatur Vogelschlag (Flügel)',
     durationHours: 8.0,
     taskQualifications: [
-      { id: 1, name: 'Höhenrettung' },
-      { id: 4, name: 'Rotorblatt-Check' }
+      { id: 1, name: 'Höhenrettung', count: 1 },
+      { id: 4, name: 'Rotorblatt-Check', count: 1 },
     ],
     tasktools: [
       { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 3 },
-      { id: 3, name: 'Harz-Reparaturset', count: 1 }
+      { id: 3, name: 'Harz-Reparaturset', count: 1 },
     ],
-  }
+  },
 ];
 
 let employees: Employees[] = [
@@ -42,7 +42,7 @@ let employees: Employees[] = [
     lastname: 'Fiedler',
     qualifications: [
       { id: 2, name: 'Überleben auf See' },
-      { id: 3, name: 'Elektrotechnik' }
+      { id: 3, name: 'Elektrotechnik' },
     ],
   },
   {
@@ -52,16 +52,16 @@ let employees: Employees[] = [
     qualifications: [
       { id: 1, name: 'Höhenrettung' },
       { id: 2, name: 'Überleben auf See' },
-      { id: 4, name: 'Rotorblatt-Check' }
+      { id: 4, name: 'Rotorblatt-Check' },
     ],
-  }
+  },
 ];
 
 let tools: Tool[] = [
   { id: 1, name: 'Schwerlast-Schlagschrauber', stock: 5 },
   { id: 2, name: 'Kletter-Ausrüstung (PSA)', stock: 20 },
   { id: 3, name: 'Harz-Reparaturset', stock: 10 },
-  { id: 4, name: 'Spannungsprüfer', stock: 15 }
+  { id: 4, name: 'Spannungsprüfer', stock: 15 },
 ];
 
 let qualifications: Qualification[] = [
@@ -77,10 +77,16 @@ let schedule: Boat[] = [
     taskItems: [
       {
         id: 1,
-        name: 'Wartung Turbine 04',
+        name: 'Ölwechsel im Getriebe',
         durationHours: 6.0,
-        taskQualifications: [{ id: 3, name: 'Elektrotechnik' }],
-        tasktools: [{ id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 }],
+        taskQualifications: [
+          { id: 2, name: 'Überleben auf See', count: 1 },
+          { id: 3, name: 'Elektrotechnik', count: 2 },
+        ],
+        tasktools: [
+          { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
+          { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 },
+        ],
       },
     ],
     persons: [
@@ -88,11 +94,17 @@ let schedule: Boat[] = [
         id: 1,
         firstname: 'Hannes',
         lastname: 'Fiedler',
-        qualifications: [{ id: 3, name: 'Elektrotechnik' }],
+        qualifications: [
+          { id: 2, name: 'Überleben auf See' },
+          { id: 3, name: 'Elektrotechnik' },
+        ],
       },
     ],
-    taskTools: [{ id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 }],
-  }
+    taskTools: [
+      { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 },
+      { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
+    ],
+  },
 ];
 
 export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {

@@ -20,10 +20,10 @@
         <p-step [value]="3">{{ 'TASKS.DIALOG.TOOLS' | translate }}</p-step>
       </p-step-list>
       <p-step-panels>
-        <!-- Schritt 1: Kerninformationen -->
         <p-step-panel [value]="1">
           <ng-template #content let-activateCallback="activateCallback">
             <div class="step-content">
+               <h3>{{ 'TASKS.DIALOG.CORE' | translate }}</h3>
               <div class="field">
                 <label for="name">{{ 'TASKS.NAME' | translate }}*</label>
                 <input
@@ -32,6 +32,7 @@
                   class="w-full"
                   formControlName="name"
                   [class.detail]="type === 'Detail'"
+                  [placeholder]="'TASKS.DIALOG.NAME_PLACEHOLDER' | translate"
                 />
                 @if (taskForm.controls.name.invalid && taskForm.controls.name.touched) {
                   <div class="error-message">
@@ -91,50 +92,89 @@
           </ng-template>
         </p-step-panel>
 
-        <!-- Schritt 2: Qualifikationen -->
         <p-step-panel [value]="2">
           <ng-template #content let-activateCallback="activateCallback">
-            <div class="step-content">
               <div>
                 <h3>{{ 'TASKS.DIALOG.QUALIFICATIONS' | translate }}</h3>
+                @if (type !== 'Detail') {
+                  <p-button
+                    icon="pi pi-plus"
+                    [text]="true"
+                    (onClick)="addQualification()"
+                    [label]="'COMMON.ADD' | translate"
+                  />
+                }
+                @if (
+                  taskForm.controls.qualifications.invalid &&
+                  taskForm.controls.qualifications.touched
+                ) {
+                  <div class="error-message ml-3">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'TASKS.VALIDATION.QUALIFICATION_REQUIRED' | translate }}</span>
+                  </div>
+                }
               </div>
-              <p-multiselect
-                [options]="allQualifications()"
-                formControlName="qualifications"
-                [placeholder]="'TASKS.DIALOG.QUALIFICATION.PLACEHOLDER' | translate"
-                class="w-full"
-                optionLabel="name"
-                display="chip"
-                [class.detail]="type === 'Detail'"
-                [panelStyleClass]="type === 'Detail' ? 'detail' : ''"
-              />
-              @if (
-                taskForm.controls.qualifications.invalid && taskForm.controls.qualifications.touched
-              ) {
-                <div class="error-message mt-2">
-                  <i class="pi pi-exclamation-circle"></i>
-                  <span>{{ 'TASKS.VALIDATION.QUALIFICATION_REQUIRED' | translate }}</span>
-                </div>
-              }
-            </div>
-            <div class="step-footer">
-              <p-button
-                [label]="'COMMON.BACK' | translate"
-                [text]="true"
-                severity="secondary"
-                (onClick)="activateCallback(1)"
-              />
-              <p-button
-                [label]="'COMMON.NEXT' | translate"
-                icon="pi pi-arrow-right"
-                iconPos="right"
-                (onClick)="validateAndGoToNext(2, 3, activateCallback)"
-              />
-            </div>
-          </ng-template>
+
+              <div class="list">
+                <p-table [value]="taskForm.controls.qualifications.value ?? []">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'TASKS.DIALOG.QUALIFICATION.QUALIFICATION' | translate }}</th>
+                      <th>{{ 'TASKS.DIALOG.QUALIFICATION.COUNT' | translate }}</th>
+                      @if (type !== 'Detail') {
+                        <th style="width: 4rem"></th>
+                      }
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-qualification let-i="rowIndex">
+                    <tr>
+                      <td>{{ qualification.name }}</td>
+                      <td>{{ qualification.count }}</td>
+                      @if (type !== 'Detail') {
+                        <td style="display: flex">
+                          <p-button
+                            icon="pi pi-pencil"
+                            [text]="true"
+                            [rounded]="true"
+                            severity="secondary"
+                            class="btn-edit"
+                            (onClick)="
+                              QualificationType.set('Edit');
+                              selectedQualification.set(qualification);
+                              qualificationDialogVisible.set(true)
+                            "
+                          />
+                          <p-button
+                            icon="pi pi-trash"
+                            [text]="true"
+                            [rounded]="true"
+                            severity="danger"
+                            (onClick)="removeQualification(i)"
+                          />
+                        </td>
+                      }
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+
+              <div class="step-footer">
+                <p-button
+                  [label]="'COMMON.BACK' | translate"
+                  [text]="true"
+                  severity="secondary"
+                  (onClick)="activateCallback(1)"
+                />
+                <p-button
+                  [label]="'COMMON.NEXT' | translate"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  (onClick)="validateAndGoToNext(2, 3, activateCallback)"
+                />
+              </div>
+            </ng-template>
         </p-step-panel>
 
-        <!-- Schritt 3: Werkzeuge -->
         <p-step-panel [value]="3">
           <ng-template #content let-activateCallback="activateCallback">
             <div class="step-content">
@@ -227,5 +267,14 @@
     [selectedTool]="selectedTool()"
     [(visible)]="toolDialogVisible"
     (selectedToolChange)="onToolAdded($event)"
+  />
+}
+
+@if (qualificationDialogVisible()) {
+  <app-dialog-task-qualification
+    [type]="QualificationType()"
+    [selectedQualification]="selectedQualification()"
+    [(visible)]="qualificationDialogVisible"
+    (selectedQualificationChange)="onQualificationAdded($event)"
   />
 }
