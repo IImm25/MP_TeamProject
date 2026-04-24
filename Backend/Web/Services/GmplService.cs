@@ -17,22 +17,16 @@ public class GmplService
     //{
     //    PersonRepository _personRepo = new PersonRepository(new AppDbContext());
     //    TaskItemRepository _taskRepo = new TaskItemRepository(new AppDbContext());
-
-
     //        var tasks = await _taskRepo.GetAllAsync();   // inkl. Includes
     //        var people = await _personRepo.GetAllAsync(); // inkl. Qualifikationen
-
     //        var service = new GmplService(tasks.ToList());
     //        string datFile = service.WriteDatafile(people, maxWorkingHours: 8);
-
     //        // z.B. als Datei speichern:
     //        await File.WriteAllTextAsync("output.dat", datFile);
-        
-            
     //}
 
 
-    public string WriteDatafile(List<Person> people, int maxWorkingHours = 8)
+    public string WriteDatafile(List<Person> people, int maxWorkingHours = 8, int amoutBoats = 8)
     {
         var allQualifications = ExtractQualifications();
         var allTools = ExtractTools();
@@ -65,6 +59,7 @@ public class GmplService
         sb.AppendLine();
 
         sb.AppendLine($"param maxWorkingHours := {maxWorkingHours};");
+        sb.AppendLine($"param amountBoats := {amoutBoats};");
         sb.AppendLine("end;");
 
         return sb.ToString();
@@ -214,8 +209,6 @@ public class GmplService
         }
     }
 
-    // ─── Hilfsmethode ─────────────────────────────────────────────────────────
 
-    /// <summary>Ersetzt Leerzeichen durch Unterstriche für gültige GMPL-Bezeichner.</summary>
     private static string Sanitize(string name) => name.Replace(" ", "_");
 }

@@ -87,7 +87,7 @@ namespace Backend.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DurationHours")
-                        .HasColumnType("integer");
+                        .HasColumnType("real");
 
                     b.Property<string>("Name")
                         .IsRequired()
