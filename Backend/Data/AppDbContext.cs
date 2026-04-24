@@ -4,10 +4,6 @@ namespace Backend.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext()
-    {
-        
-    }
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
@@ -26,11 +22,6 @@ public class AppDbContext : DbContext
 
     public DbSet<TaskTool> TaskTools
         => Set<TaskTool>();
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=windpowerdb;Username=admin;Password=admin");
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
