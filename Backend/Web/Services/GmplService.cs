@@ -26,7 +26,7 @@ public class GmplService
     //}
     private const string MOD = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\modell.mod";
     private const string DAT = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\data.dat";
-    public async Task CaculateGmplModel(string dataFile)
+    public async Task CaculateGmplModel()
     {
         try
         {
@@ -107,7 +107,7 @@ public class GmplService
         return sb.ToString();
     }
 
-    // ─── Extraktion ───────────────────────────────────────────────────────────
+    // ─── Extraction ───────────────────────────────────────────────────────────
 
     private List<string> BuildTaskIds()
         => TaskItems.Select((_, i) => $"a{i + 1}").ToList();
@@ -126,7 +126,7 @@ public class GmplService
             .OrderBy(t => t.Name)
             .ToList();
 
-    // ─── Set-Schreiber ────────────────────────────────────────────────────────
+    // ─── Set-Writer ────────────────────────────────────────────────────────
 
     private static void WriteSet(StringBuilder sb, string name, IEnumerable<string> values)
         => sb.AppendLine($"set {name} := {string.Join(" ", values)};");
@@ -156,7 +156,7 @@ public class GmplService
             return;
         }
 
-        // Spaltenbreiten berechnen
+        // calc ColumnWidth 
         var colWidths = qualifications.Select(q => Sanitize(q.Name).Length + 2).ToList();
 
         // Header

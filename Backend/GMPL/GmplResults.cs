@@ -19,7 +19,6 @@ public class GmplResults
     // taskOnBoat[boot][task]
     public Dictionary<int, Dictionary<string, int>> TaskOnBoat {  get; set; }
 
-
     // boatUsage[boot]
     public Dictionary<int, int> BoatUsage { get; set; }
     
