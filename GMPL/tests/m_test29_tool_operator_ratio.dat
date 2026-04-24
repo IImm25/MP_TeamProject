@@ -1,0 +1,27 @@
+# Beschreibung: Werkzeug-Bediener-Verhältnis
+# Szenario:
+# - Aufgabe A1 benötigt 3 spezielle Werkzeuge (W1) gleichzeitig.
+# - Es ist nur 1 Person (P1) auf dem Boot.
+# - Logisch gesehen kann eine Person vielleicht nur ein oder zwei dieser Werkzeuge gleichzeitig bedienen.
+# - Das Modell prüft nur, ob die Werkzeuge auf dem Boot sind, nicht ob genug Personal da ist, um sie zu halten/bedienen.
+# - Erwartet: 0 (da P1 nicht 3 Werkzeuge bedienen kann).
+# - Modell wird liefern: 5 (wenn Werkzeuge vorhanden).
+#
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 3;
+param stockTools := W1 3;
+
+end;

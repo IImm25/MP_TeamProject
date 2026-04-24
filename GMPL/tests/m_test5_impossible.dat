@@ -1,0 +1,27 @@
+# Beschreibung: Unmöglicher Fall - Aufgabe A1 (10h) ist größer als maxWorkingHours (8h).
+# Erwartetes Ergebnis: WorkHours = 0. Keine Aufgaben werden erledigt.
+# Begründung: Die Bedingung DoneAtMostOnce erlaubt es, Aufgaben wegzulassen. Da A1 nicht in das Zeitlimit passt,
+# wird sie nicht eingeplant, um die Zeitbedingung (sum <= maxWorkingHours) einzuhalten.
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Techniker;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+
+param duration := A1 10;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Techniker 1;
+
+param requiredQualis :=
+A1 Techniker 1;
+
+param requiredTools :=
+A1 W1 1;
+
+param stockTools := W1 1;
+end;

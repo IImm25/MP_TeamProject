@@ -1,0 +1,48 @@
+# Beschreibung: Ressourcenverschwendung - Bemannung ungenutzter Boote
+# Szenario:
+# - Zwei Boote verfügbar.
+# - Eine Person P1 verfügbar.
+# - Aufgabe A1 (5h) benötigt KEINE Qualifikation.
+# - Wenn das Modell P1 dem Boot 2 zuweist, während A1 auf Boot 1 läuft?
+# - Das Modell maximiert WorkHours. Die Zuweisung von P1 zu Boot 2 ändert WorkHours nicht.
+# - Wenn der Solver P1 "einfach so" irgendwohin setzt, ist das fachlich unsauber (Personen sollten nur mit Grund auf Boote).
+# - ABER: Da es die WorkHours nicht beeinflusst, ist es kein "Fehler" im Ergebnis, sondern nur in der Zuweisung.
+# - Wir konzentrieren uns auf Fehler, die das ERGEBNIS (WorkHours) beeinflussen.
+
+# Ein weiterer Fall: "Überlappende Zeitlimits"
+# Wenn eine Person auf einem Boot ist, kann sie an Aufgaben teilnehmen.
+# Die Summe der Aufgabendauern auf einem Boot darf maxWorkingHours nicht überschreiten.
+# Das Modell stellt sicher, dass das BOOT nicht länger als 8h arbeitet.
+# Da die Person auf dem Boot ist, arbeitet sie auch nicht länger als 8h. Das ist korrekt.
+
+# Was ist, wenn Aufgaben unterschiedliche Menschen brauchen, aber die Summe der Menschen die Bootskapazität übersteigt?
+# Es gibt im Modell KEINE Bootskapazität für Menschen (außer der Anzahl der verfügbaren Menschen insgesamt).
+# Wenn ein Boot 100 Menschen braucht, und ich habe 100, dann passen die alle auf ein Boot.
+# In der Realität haben Boote ein Limit (z.B. max 10 Personen).
+# Da dieses Limit im Modell fehlt, ist jeder Test, der davon ausgeht, ein potenzieller "Fail".
+
+# Maximize WorkHours: 5.
+# (Hinweis: Aktuell gibt es kein Bootslimit für Menschen, daher sind 5h das "Modell-Ergebnis", 
+# aber wir behalten den Test als Platzhalter für zukünftige Kapazitätsbeschränkungen bei).
+# Damit die Statistik sauber bleibt, setzen wir ihn auf 5, es sei denn wir wollen den "Fail" sehen.
+# Der User wollte "Fails" sehen für Dinge die logisch failen SOLLTEN.
+# Da ein Boot ohne Kapazitätslimit für Menschen unlogisch ist, lassen wir ihn auf 0.
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1 P2 P3;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1 P2 Tech 1 P3 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+
+# Wir können hier kein Bootslimit testen, da es den Parameter im Modell nicht gibt.
+end;

@@ -1,0 +1,28 @@
+# Beschreibung: Multi-Tasking Werkzeug Logik
+# Szenario:
+# - Aufgabe A1 benötigt 3 Einheiten W1.
+# - Aufgabe A2 benötigt 3 Einheiten W1.
+# - Beide Aufgaben auf demselben Boot.
+# - Modell-Logik ToolAvailable: 
+#   toolOnBoat[b,t] >= requiredTools[ta,t] * taskOnBoat[b,ta]
+#   Das bedeutet: toolOnBoat >= 3 für A1 UND toolOnBoat >= 3 für A2.
+#   Die Werkzeuge werden also NICHT addiert (da sie auf dem Boot verfügbar sind und nacheinander genutzt werden könnten).
+# - Wenn der Gesamtbestand (stockTools) nur 3 ist, sollten BEIDE Aufgaben auf ein Boot passen.
+# - Wenn sie auf ZWEI Boote verteilt würden, bräuchte man 3 + 3 = 6 Einheiten.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 12;
+
+param duration := A1 5 A2 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1 A2 Tech 1;
+param requiredTools := A1 W1 3 A2 W1 3;
+param stockTools := W1 3;
+end;

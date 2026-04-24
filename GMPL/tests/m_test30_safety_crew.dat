@@ -1,0 +1,27 @@
+# Beschreibung: Mindestbesatzung (Sicherheit)
+# Szenario:
+# - Ein Boot braucht aus Sicherheitsgründen immer mindestens 2 Personen (4-Augen-Prinzip).
+# - Aufgabe A1 benötigt nur 1 Person mit Qualifikation.
+# - Das Modell wird nur 1 Person zuweisen, um WorkHours zu maximieren.
+# - Fachlich sollte das Boot aber gar nicht erst losfahren mit nur einer Person.
+# - Erwartet: 0.
+# - Modell liefert: 5.
+#
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1 P2 Tech 0;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+
+end;

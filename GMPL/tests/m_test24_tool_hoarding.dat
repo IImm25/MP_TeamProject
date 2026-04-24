@@ -1,0 +1,29 @@
+# Beschreibung: Werkzeug-Hording auf ungenutzten Booten
+# Szenario:
+# - Zwei Boote verfügbar.
+# - Boot 1 führt A1 aus (benötigt 5x W1).
+# - Es gibt insgesamt 10x W1.
+# - Boot 2 führt KEINE Aufgaben aus (boatUsage[2] = 0).
+# - Kann Boot 2 trotzdem 5x W1 "besetzen", sodass für ein drittes Boot (falls vorhanden) nichts übrig bliebe?
+# - Hier: 2 Boote, A1 braucht 5, A2 braucht 10.
+# - Wenn Boot 2 (ungenutzt) Werkzeug blockiert, könnte es Probleme geben.
+# - Aber das Modell maximiert WorkHours. Es wird Werkzeug nur dort zuweisen, wo es Aufgaben ermöglicht.
+# - Ein interessanterer Test: Kann Werkzeug auf einem Boot "sein", das gar nicht benutzt wird (boatUsage=0)?
+# - In der Theorie ja, da toolOnBoat keine Bedingung an boatUsage hat.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 2;
+param maxWorkingHours := 10;
+
+param duration := A1 10;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 5;
+param stockTools := W1 5;
+end;

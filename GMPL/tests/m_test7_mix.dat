@@ -1,0 +1,46 @@
+# Beschreibung: Mischung aus kleinen und großen Aufgaben - Viele 1h/2h Aufgaben und zwei 8h Aufgaben.
+# Erwartetes Ergebnis: A1 auf Boot 1, A2 auf Boot 2, S1-S4 auf Boot 3.
+# Begründung: A1 und A2 belegen mit jeweils 8h ein Boot komplett. Die restlichen Aufgaben S1-S4 (Summe 6h)
+# passen zusammen auf das dritte Boot. Da 3 Boote verfügbar sind (amountBoats = 3), können alle erledigt werden.
+# Maximize WorkHours: 22.
+data;
+set TASKS := A1 A2 S1 S2 S3 S4;
+set QUALIS := Tech;
+set PEOPLE := P1 P2 P3;
+set TOOLS := W1;
+
+param amountBoats := 3;
+
+param duration := 
+    A1 8
+    A2 8
+    S1 1
+    S2 2
+    S3 1
+    S4 2;
+
+param maxWorkingHours := 8;
+
+param hasQuali := 
+    P1 Tech 1
+    P2 Tech 1
+    P3 Tech 1;
+
+param requiredQualis := 
+    A1 Tech 1
+    A2 Tech 1
+    S1 Tech 1
+    S2 Tech 1
+    S3 Tech 1
+    S4 Tech 1;
+
+param requiredTools := 
+    A1 W1 1
+    A2 W1 1
+    S1 W1 1
+    S2 W1 1
+    S3 W1 1
+    S4 W1 1;
+
+param stockTools := W1 10;
+end;

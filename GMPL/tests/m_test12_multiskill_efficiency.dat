@@ -1,0 +1,53 @@
+# Beschreibung: Multi-Skilled Workers Efficiency
+# Szenario:
+# - Aufgabe A1 benötigt 2 Mechaniker.
+# - P1 ist Mechaniker und Elektriker.
+# - P2 ist nur Mechaniker.
+# - P3 ist nur Elektriker.
+# - Erwartung: A1 braucht P1 und P2 (2 Personen), auch wenn P1 zwei Qualis hat.
+# - Aufgabe A2 benötigt 1 Mechaniker und 1 Elektriker.
+# - Hier kann P1 theoretisch beide Qualis für A2 abdecken, aber da das Modell personOnBoat prüft:
+#   Wenn P1 auf dem Boot ist, sind seine Qualis kollektiv verfügbar.
+#   A2 (1 Mech, 1 Elek) kann also von P1 alleine (oder P1+P3) erfüllt werden.
+#   ABER: Wenn A2 1 Mech und 1 Elek erfordert, zählt P1 für die Headcount-Bedingung der QualiCheck-Constraint.
+#   QualiCheck: sum{p in PEOPLE} (hasQuali[p,q] * personOnBoat[b,p]) >= requiredQualis[ta,q] * taskOnBoat[b,ta]
+#   Für A2, q=Mech: hasQuali[P1,Mech]*1 >= 1 (OK)
+#   Für A2, q=Elek: hasQuali[P1,Elek]*1 >= 1 (OK)
+#   Also kann P1 tatsächlich beide Anforderungen für EINE Aufgabe gleichzeitig erfüllen.
+#   Wichtig: Für EINE Aufgabe, die 2 Personen der GLEICHEN Quali braucht (A1), reicht P1 nicht.
+# Erwartetes Ergebnis: A1 (4h) und A2 (4h) auf Boot 1.
+# Benötigt: P1, P2 auf Boot 1. (P1 deckt Mech/Elek für A2 und 1x Mech für A1, P2 deckt 1x Mech für A1).
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2;
+set QUALIS := Mech Elek;
+set PEOPLE := P1 P2 P3;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 4
+    A2 4;
+
+param hasQuali :=
+    P1 Mech 1
+    P1 Elek 1
+    P2 Mech 1
+    P2 Elek 0
+    P3 Mech 0
+    P3 Elek 1;
+
+param requiredQualis :=
+    A1 Mech 2
+    A1 Elek 0
+    A2 Mech 1
+    A2 Elek 1;
+
+param requiredTools :=
+    A1 W1 1
+    A2 W1 1;
+
+param stockTools := W1 10;
+end;

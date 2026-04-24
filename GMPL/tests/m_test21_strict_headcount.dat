@@ -1,0 +1,34 @@
+# Beschreibung: Komplexer Headcount-Check (Versuch 2)
+# Szenario:
+# - Aufgabe A1 benötigt 2x Mech.
+# - P1 ist Mech.
+# - Es gibt NUR P1 als Mech.
+# - Das Modell sollte hier A1 NICHT ausführen können, da sum(hasQuali[p,Mech] * personOnBoat[b,p]) 
+#   nur maximal 1 sein kann (da P1 nur einmal auf dem Boot sein kann).
+# - Wenn das Modell A1 trotzdem ausführt, wäre die Bedingung QualiCheck fehlerhaft
+#   oder die Annahme über personOnBoat als binary Variable greift nicht wie erwartet.
+# - ABER: P1 ist binary (0 oder 1). sum(1 * {0,1}) kann bei nur einer Person max 1 sein.
+# - Daher sollte ACTUAL = 0 sein.
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Mech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 8;
+
+param duration := A1 5;
+
+param hasQuali :=
+P1 Mech 1;
+
+param requiredQualis :=
+A1 Mech 2;
+
+param requiredTools :=
+A1 W1 0;
+
+param stockTools := W1 0;
+end;

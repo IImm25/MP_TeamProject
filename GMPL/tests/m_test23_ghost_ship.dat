@@ -1,0 +1,27 @@
+# Beschreibung: Geisterschiff-Szenario
+# Szenario:
+# - Aufgabe A1 benötigt KEINE Qualifikationen (requiredQualis = 0).
+# - Es gibt Personen, aber keine wird dem Boot zugewiesen.
+# - Das Modell sollte prüfen, ob ein Boot Personal benötigt, um Aufgaben auszuführen.
+# Logik-Check: Gibt es im Modell eine Bedingung, die besagt: "Wenn taskOnBoat > 0, dann muss sum(personOnBoat) >= 1"?
+# Aktueller Stand im Modell: Nein. Aufgaben ohne Quali-Anforderung können auf "leeren" Booten fahren.
+# Wenn das Modell dies zulässt, wird WorkHours = 5 sein. Wenn eine Crew-Pflicht bestünde, wäre es 0 (da P1 nicht zugewiesen wird).
+# Wir testen hier die AKTUELLE Logik: Es funktioniert auch ohne Personal, wenn keine Quali gefordert ist.
+# Wenn ein Boot eigentlich Personal bräuchte, sollte dieser Test fehlschlagen (FAIL).
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 0;
+param requiredTools := A1 W1 0;
+param stockTools := W1 10;
+end;

@@ -1,0 +1,30 @@
+# Beschreibung: Werkzeug-Engpass - Jede Aufgabe benötigt 5 Einheiten von W1. Insgesamt sind nur 5 im Lager.
+# Erwartetes Ergebnis: A1 und A2 werden zusammen auf Boot 1 erledigt.
+# Begründung: Ein Boot mit A1 oder A2 benötigt 5 Einheiten W1. Da nur 5 Einheiten insgesamt (stockTools)
+# verfügbar sind, kann nur ein Boot mit diesem Werkzeug ausgestattet werden.
+# Da A1 und A2 zusammen 8h dauern und somit auf ein Boot passen, können beide erledigt werden.
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 2;
+
+param duration := A1 4 A2 4;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Tech 1;
+
+param requiredQualis :=
+A1 Tech 1
+A2 Tech 1;
+
+param requiredTools :=
+A1 W1 5
+A2 W1 5;
+
+param stockTools := W1 5;
+end;

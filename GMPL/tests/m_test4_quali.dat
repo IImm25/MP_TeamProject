@@ -1,0 +1,34 @@
+# Beschreibung: Qualifikations-Check - A1 benötigt Tech1 und Tech2 gleichzeitig. P1 hat Tech1, P2 hat Tech2.
+# Erwartetes Ergebnis: A1 und A2 werden auf Boot 1 erledigt. P1 und P2 befinden sich ebenfalls auf Boot 1.
+# Begründung: A1 erfordert Tech1 und Tech2. Da P1 Tech1 und P2 Tech2 hat, müssen beide auf dasselbe Boot wie A1.
+# A2 benötigt nur Tech2, was durch P2 auf Boot 1 ebenfalls erfüllt ist.
+# Maximize WorkHours: 2.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech1 Tech2;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+
+param duration := A1 1 A2 1;
+param maxWorkingHours := 10;
+
+param hasQuali :=
+P1 Tech1 1
+P1 Tech2 0
+P2 Tech1 0
+P2 Tech2 1;
+
+param requiredQualis :=
+A1 Tech1 1
+A1 Tech2 1
+A2 Tech1 0
+A2 Tech2 1;
+
+param requiredTools :=
+A1 W1 1
+A2 W1 1;
+
+param stockTools := W1 2;
+end;

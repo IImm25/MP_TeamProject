@@ -1,0 +1,51 @@
+# Beschreibung: Werkzeug-Teilung zwischen Booten (Fehlerhafte Annahme)
+# Szenario:
+# - Werkzeuge sind physische Objekte. Wenn Boot 1 ein Werkzeug W1 mitnimmt, kann Boot 2 es NICHT gleichzeitig benutzen.
+# - Das Modell stellt sicher, dass die SUMME der Werkzeuge auf allen Booten <= stockTools ist (GlobalToolStock). Das ist korrekt.
+# - ABER: Wenn ein Werkzeug auf Boot 1 ist, bleibt es dort für den GANZEN Tag (da es morgens zugeordnet wird).
+# - Was ist, wenn Aufgaben auf Boot 1 und Boot 2 zu unterschiedlichen Zeiten stattfinden würden? Das Modell ignoriert Zeitpunkte.
+# - Das Modell ist hier eigentlich korrekt in seiner Vereinfachung, aber wir könnten einen Fall konstruieren, wo Werkzeuge "verschwinden".
+# - Ein besserer Testfall: Kann eine Person zwei Aufgaben gleichzeitig machen?
+# - Aufgabe A1 (5h), Aufgabe A2 (5h), maxWorkingHours (8h).
+# - Wenn beide Aufgaben auf Boot 1 liegen, prüft das Modell sum(5+5) <= 8 -> Fail. Korrekt.
+# - Wenn A1 auf Boot 1 und A2 auf Boot 2 liegen:
+# - Kann Person P1 an beiden teilnehmen? P1 kann nur auf EINEM Boot sein (PersonOneBoat). Korrekt.
+#
+# Neuer Versuch für m_test31: Unendliche Qualifikations-Nutzung pro Person?
+# Eine Person P1 hat Quali Tech. Aufgabe A1 braucht 1 Tech, Aufgabe A2 braucht 1 Tech.
+# Wenn beide auf demselben Boot sind, reicht P1 für beide Aufgaben?
+# Ja, im Modell: QualiCheck prüft pro Aufgabe.
+# sum{p} (hasQuali * personOnBoat) >= requiredQualis[ta] * taskOnBoat[ta]
+# Wenn P1 auf dem Boot ist, ist sum(...) = 1.
+# Das reicht für A1 (1 >= 1*1) UND für A2 (1 >= 1*1).
+# Da Aufgaben nacheinander ausgeführt werden, ist das logisch okay.
+#
+# Was ist mit parallelen Aufgaben auf EINEM Boot?
+# Das Modell hat keine Zeitachse innerhalb eines Bootes. Es geht davon aus, dass alles nacheinander passt.
+# Wenn aber A1 und A2 zusammen 10h dauern und das Boot nur 8h hat, geht es nicht.
+# Wenn A1 und A2 zusammen 8h dauern, geht es nacheinander mit 1 Person.
+#
+# Gibt es einen Fall für m_test31?
+# Vielleicht "Tool Weight / Space": Boote haben begrenzte Kapazität für Werkzeuge (Gewicht/Volumen).
+# Das fehlt komplett im Modell.
+# Erwartet: 0 (wenn zu schwer).
+# Modell liefert: 10.
+#
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := HeavyTool;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 10;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 HeavyTool 10;
+param stockTools := HeavyTool 10;
+
+end;

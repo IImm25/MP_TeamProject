@@ -1,0 +1,26 @@
+# Beschreibung: Symmetriebruch und Boot-Auslastung
+# Szenario:
+# - 5 Boote verfügbar.
+# - 1 Aufgabe A1 (1h).
+# - Symmetriebruch (Order Constraint) sollte erzwingen, dass A1 auf Boot 1 landet.
+# - Wenn die Constraint `boatUsage[b] <= boatUsage[b-1]` falsch implementiert ist (z.B. falsch herum),
+#   könnte der Solver scheitern oder falsche Ergebnisse liefern.
+# - Außerdem testen wir, ob `maxWorkingHours * boatUsage[b]` korrekt funktioniert.
+#   Wenn boatUsage[1] = 1, dann darf auf Boot 1 gearbeitet werden.
+# Maximize WorkHours: 1.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 5;
+param maxWorkingHours := 8;
+
+param duration := A1 1;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+end;

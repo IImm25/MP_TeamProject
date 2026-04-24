@@ -1,0 +1,30 @@
+# Beschreibung: Basisfall - Alle Aufgaben passen auf ein Boot.
+# Erwartetes Ergebnis: Alle Aufgaben (A1, A2, A3) werden auf Boot 1 erledigt.
+# Begründung: Gesamtdauer 6h <= 8h Limit. P1 hat die nötige Qualifikation. W1 ist ausreichend vorhanden.
+# Maximize WorkHours: 6.
+data;
+set TASKS := A1 A2 A3;
+set QUALIS := Techniker;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+
+param duration := A1 2 A2 3 A3 1;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Techniker 1;
+
+param requiredQualis :=
+A1 Techniker 1
+A2 Techniker 1
+A3 Techniker 1;
+
+param requiredTools :=
+A1 W1 1
+A2 W1 1
+A3 W1 1;
+
+param stockTools := W1 1;
+end;

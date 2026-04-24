@@ -1,0 +1,28 @@
+# Beschreibung: Maximale Arbeitszeit pro Person
+# Szenario:
+# - Ein Boot darf 12 Stunden operieren (maxWorkingHours := 12).
+# - Es gibt zwei Aufgaben: A1 (7h) und A2 (5h).
+# - Es gibt nur eine Person P1, die beide Qualifikationen für A1 und A2 hat.
+# - Das Modell wird P1 auf das Boot setzen und beide Aufgaben (12h) erledigen lassen.
+# - Fachlich sollte eine Person aber vielleicht nicht mehr als 8h oder 10h arbeiten dürfen.
+# - Da dieses Limit im Modell fehlt, wird das Modell 12h liefern.
+#
+# Logisch erwartet (bei fiktivem Personen-Limit von 8h): 7h (oder 5h).
+# Maximize WorkHours: 7.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 12;
+
+param duration := A1 7 A2 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1 A2 Tech 1;
+param requiredTools := A1 W1 0 A2 W1 0;
+param stockTools := W1 0;
+
+end;

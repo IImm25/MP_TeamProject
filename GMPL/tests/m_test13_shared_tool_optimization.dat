@@ -1,0 +1,45 @@
+# Beschreibung: Shared Tool Optimization
+# Szenario:
+# - Zwei Aufgaben (A1, A2) benötigen jeweils 1 Spezialwerkzeug (T1).
+# - Wenn beide auf demselben Boot sind, reicht 1x T1 auf diesem Boot.
+# - Es gibt insgesamt nur 1x T1 im globalen Bestand.
+# - Es gibt ein Zeitlimit von 8h. A1 (5h) und A2 (4h) passen NICHT zusammen auf ein Boot.
+# - Da nur 1x T1 da ist, kann entweder A1 oder A2 gemacht werden, aber nicht beide auf verschiedenen Booten.
+# - Aufgabe A3 braucht T2, wovon genug da ist.
+# Erwartetes Ergebnis: A1 (5h) auf Boot 1. A2 wird weggelassen. A3 (3h) passt noch auf Boot 1.
+# Summe: 5 + 3 = 8h.
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2 A3;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := T1 T2;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 5
+    A2 4
+    A3 3;
+
+param hasQuali :=
+    P1 Tech 1;
+
+param requiredQualis :=
+    A1 Tech 1
+    A2 Tech 1
+    A3 Tech 1;
+
+param requiredTools :=
+    A1 T1 1
+    A1 T2 0
+    A2 T1 1
+    A2 T2 0
+    A3 T1 0
+    A3 T2 1;
+
+param stockTools := 
+    T1 1
+    T2 5;
+end;

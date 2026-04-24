@@ -1,0 +1,30 @@
+# Beschreibung: Symmetrie-Check - Zwei Aufgaben (A1, A2) benötigen separate Boote.
+# Erwartetes Ergebnis: A1 auf Boot 1, A2 auf Boot 2 (oder umgekehrt). Boot 3 bleibt leer.
+# Begründung: A1 (5h) + A2 (5h) = 10h > 8h Zeitlimit. Daher zwei Boote nötig.
+# Die Bedingung "Order" erzwingt, dass Boot 1 und Boot 2 benutzt werden, bevor Boot 3 genutzt werden darf.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 3;
+
+param duration := A1 5 A2 5;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Tech 1
+P2 Tech 1;
+
+param requiredQualis :=
+A1 Tech 1
+A2 Tech 1;
+
+param requiredTools :=
+A1 W1 1
+A2 W1 1;
+
+param stockTools := W1 10;
+end;

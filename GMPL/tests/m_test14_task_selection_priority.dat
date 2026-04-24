@@ -1,0 +1,58 @@
+# Beschreibung: Optimal Task Selection Priority
+# Szenario:
+# - Viele Aufgaben mit unterschiedlicher Dauer.
+# - A1 (7h), A2 (6h), A3 (5h), A4 (4h), A5 (3h).
+# - 2 Boote vorhanden, max 8h pro Boot.
+# - Gesamtkapazität 16h.
+# - Personal ist begrenzt: Alle Aufgaben brauchen "Spezialist". Nur 2 Spezialisten da.
+# - Da jeder Spezialist nur auf einem Boot sein kann, können beide Boote genutzt werden.
+# - Der Solver muss die beste Kombi finden:
+#   Boot 1: A1 (7h) + nix anderes passt (7+3=10 > 8).
+#   Boot 2: A2 (6h) + nix anderes passt (6+3=9 > 8).
+#   Gesamt: 13h.
+#   ODER:
+#   Boot 1: A3 (5h) + A5 (3h) = 8h.
+#   Boot 2: A4 (4h) + ? (nix mehr da, außer A1/A2 die zu groß sind).
+#   Gesamt: 12h.
+#   ODER:
+#   Boot 1: A1 (7h).
+#   Boot 2: A3 (5h) + A5 (3h) = 8h.
+#   Gesamt: 15h. (BESTE LÖSUNG)
+# Erwartetes Ergebnis: 15h.
+# Maximize WorkHours: 15.
+data;
+set TASKS := A1 A2 A3 A4 A5;
+set QUALIS := Spezialist;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 7
+    A2 6
+    A3 5
+    A4 4
+    A5 3;
+
+param hasQuali :=
+    P1 Spezialist 1
+    P2 Spezialist 1;
+
+param requiredQualis :=
+    A1 Spezialist 1
+    A2 Spezialist 1
+    A3 Spezialist 1
+    A4 Spezialist 1
+    A5 Spezialist 1;
+
+param requiredTools :=
+    A1 W1 0
+    A2 W1 0
+    A3 W1 0
+    A4 W1 0
+    A5 W1 0;
+
+param stockTools := W1 0;
+end;

@@ -1,0 +1,27 @@
+# Beschreibung: Aufgabe zu groß - A1 hat eine Dauer von 10h, bei einem Limit von 8h.
+# Erwartetes Ergebnis: WorkHours = 0.
+# Begründung: Wie in m_test5 kann A1 nicht eingeplant werden, da sie das Zeitlimit pro Boot überschreitet.
+# Da das Modell eine Maximierung ist und DoneAtMostOnce (<= 1) gilt, ist die Lösung, A1 nicht zu erledigen.
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+
+param duration := A1 10;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Tech 1;
+
+param requiredQualis :=
+A1 Tech 1;
+
+param requiredTools :=
+A1 W1 1;
+
+param stockTools := W1 1;
+end;

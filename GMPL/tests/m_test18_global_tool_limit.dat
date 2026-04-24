@@ -1,0 +1,41 @@
+# Beschreibung: Globaler Werkzeugbestand vs. Boot-Zuweisung
+# Szenario:
+# - Es gibt 2 Boote.
+# - Es gibt 3 Aufgaben (A1, A2, A3), die jeweils 5 Einheiten von W1 benötigen.
+# - Jede Aufgabe dauert 4 Stunden. maxWorkingHours = 8.
+# - A1 und A2 passen auf Boot 1 (Dauer 8h). Sie teilen sich das Werkzeug auf dem Boot.
+# - Boot 1 benötigt also toolOnBoat[1, W1] >= 5.
+# - A3 muss auf Boot 2. Boot 2 benötigt toolOnBoat[2, W1] >= 5.
+# - Gesamtes W1 benötigt: 5 (Boot 1) + 5 (Boot 2) = 10.
+# - stockTools von W1 ist 9.
+# - Erwartung: Entweder (A1 und A2) werden gemacht ODER (A1 und A3) oder (A2 und A3).
+# - Da A1+A2 = 8h und A1+A3 = 8h, sollte das Maximum 8h sein.
+# - Wenn das Modell einen Fehler in der globalen Bestandsrechnung hätte, würde es evtl. alle 3 erlauben.
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2 A3;
+set QUALIS := Tech;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := A1 4 A2 4 A3 4;
+
+param hasQuali :=
+P1 Tech 1
+P2 Tech 1;
+
+param requiredQualis :=
+A1 Tech 1
+A2 Tech 1
+A3 Tech 1;
+
+param requiredTools :=
+A1 W1 5
+A2 W1 5
+A3 W1 5;
+
+param stockTools := W1 9;
+end;
