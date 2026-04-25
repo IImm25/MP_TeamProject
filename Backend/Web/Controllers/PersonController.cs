@@ -18,7 +18,7 @@ namespace Backend.Web.Controllers
         }
 
         [HttpGet("")]
-        public async Task<ActionResult<List<PersonDetailDto>>> GetPeople()
+        public async Task<ActionResult<List<PersonSummaryDto>>> GetAll()
         {
             return Ok(await service.GetAll());
         }
