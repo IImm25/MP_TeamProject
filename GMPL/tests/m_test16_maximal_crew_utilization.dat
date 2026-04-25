@@ -1,16 +1,9 @@
-# Beschreibung: Maximal Crew Utilization (Spezialisierte Verteilung)
-# Szenario:
-# - Zwei Boote.
-# - A1 (8h) braucht 1x Taucher.
-# - A2 (8h) braucht 1x Schweisser.
-# - P1 ist Taucher und Schweisser.
-# - P2 ist Schweisser.
-# - Wenn P1 als Taucher für A1 auf Boot 1 geht, kann er nicht mehr als Schweisser für A2 auf Boot 2 sein.
-# - Aber P2 kann als Schweisser für A2 auf Boot 2 gehen.
-# - Wenn es noch A3 (4h) gäbe, die Taucher UND Schweisser braucht:
-#   A3 auf Boot 1 würde P1 (Taucher/Schweisser) oder P1+P2 erfordern.
-#   Wir wollen testen, ob der Solver P1 und P2 so verteilt, dass beide 8h-Aufgaben erledigt werden.
-# Erwartetes Ergebnis: A1 auf Boot 1 (P1), A2 auf Boot 2 (P2). Summe 16h.
+# Description: Maximal crew utilization with specialized assignment.
+# Scenario: Two boats. A1 (8h) requires a diver, A2 (8h) requires a welder.
+# P1 is both diver and welder; P2 is a welder.
+# Expected result: A1 is assigned to boat 1 with P1, and A2 is assigned to boat 2 with P2. Total = 16h.
+# Reasoning: Assigning P1 to A1 as diver prevents him from being used as welder for A2.
+# Therefore P2 must cover A2. This yields full utilization of both boats without conflicts.
 # Maximize WorkHours: 16.
 data;
 set TASKS := A1 A2;

@@ -1,7 +1,7 @@
-# Beschreibung: Ressourcenlimit - Nur 2 Einheiten von W1 verfügbar.
-# Erwartetes Ergebnis: Alle Aufgaben (A1, A2, A3) werden auf Boot 1 erledigt.
-# Begründung: Da die Gesamtdauer (3h) unter dem Limit (10h) liegt, passen alle Aufgaben auf ein Boot.
-# Da sie auf demselben Boot sind, reicht 1 Einheit W1 aus (toolOnBoat[1,W1] >= 1), was innerhalb des Bestands (2) liegt.
+# Description: Resource limit – only 2 units of W1 are available.
+# Expected result: All tasks (A1, A2, A3) are completed on boat 1.
+# Reasoning: Since the total duration (3h) is below the limit (10h), all tasks fit on one boat.
+# As they are on the same boat, 1 unit of W1 is sufficient (toolOnBoat[1,W1] ≥ 1), which is within the available stock (2).
 # Maximize WorkHours: 3.
 data;
 set TASKS := A1 A2 A3;

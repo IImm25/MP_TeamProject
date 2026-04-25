@@ -1,14 +1,10 @@
-# Beschreibung: Multi-Tasking Werkzeug Logik
-# Szenario:
-# - Aufgabe A1 benötigt 3 Einheiten W1.
-# - Aufgabe A2 benötigt 3 Einheiten W1.
-# - Beide Aufgaben auf demselben Boot.
-# - Modell-Logik ToolAvailable: 
-#   toolOnBoat[b,t] >= requiredTools[ta,t] * taskOnBoat[b,ta]
-#   Das bedeutet: toolOnBoat >= 3 für A1 UND toolOnBoat >= 3 für A2.
-#   Die Werkzeuge werden also NICHT addiert (da sie auf dem Boot verfügbar sind und nacheinander genutzt werden könnten).
-# - Wenn der Gesamtbestand (stockTools) nur 3 ist, sollten BEIDE Aufgaben auf ein Boot passen.
-# - Wenn sie auf ZWEI Boote verteilt würden, bräuchte man 3 + 3 = 6 Einheiten.
+# Description: Multi-task tool usage logic.
+# Scenario: A1 and A2 each require 3 units of W1 and are assigned to the same boat.
+# Reasoning: The constraint toolOnBoat[b,t] >= requiredTools[ta,t] * taskOnBoat[b,ta]
+# ensures that tool requirements are enforced per boat, not summed across tasks.
+# Thus, if both tasks are on the same boat, only 3 units of W1 are needed in total (not 6),
+# since the tool can be reused between tasks sequentially.
+# Expected result: Both A1 and A2 are scheduled on one boat if stockTools(W1) ≥ 3.
 # Maximize WorkHours: 10.
 data;
 set TASKS := A1 A2;

@@ -1,28 +1,7 @@
-# Beschreibung: Interconnected Bottlenecks (Global Tool + Personnel)
-# Szenario:
-# - Zwei Boote möglich.
-# - A1 (6h) benötigt 2x T1.
-# - A2 (6h) benötigt 2x T1.
-# - Globaler Bestand T1: 3 Einheiten.
-# - Das bedeutet: A1 und A2 können NICHT gleichzeitig auf verschiedenen Booten laufen (2+2=4 > 3).
-# - Sie können auch NICHT auf einem Boot laufen (6+6=12 > 8).
-# - A3 (2h) benötigt T2 (genug da) und 2 Personen mit Quali "Experte".
-# - Insgesamt gibt es nur 2 Experten (P1, P2).
-# - A4 (2h) benötigt auch 1 Experten.
-# - Wenn A3 auf Boot 1 ist, belegt es P1 und P2. A4 kann dann nicht mehr auf Boot 2 gemacht werden.
-# - Wenn A1 (6h) auf Boot 1 ist (mit 2x T1), kann A3 (2h) noch mit auf Boot 1 (6+2=8).
-# - Dann sind P1, P2 auf Boot 1. T1=2 Einheiten auf Boot 1.
-# - Boot 2 ist frei, aber kein Experte mehr für A4 da und nicht genug T1 für A2.
-# - WARTE: In der obigen Konfiguration wäre WorkHours=8.
-# - Aber der Solver findet 10h! Warum?
-# - Er kann A1 (6h) auf Boot 1 machen (T1=2) und A3 (2h) + A4 (2h) auf Boot 2 machen!
-# - A3 braucht 2 Experten, A4 braucht 1 Experten. Summe 3 Experten?
-# - NEIN! Das Modell prüft Quali pro Aufgabe!
-# - A3 (2h) auf Boot 2 -> braucht 2 Experten auf Boot 2. P1 und P2 sind da. OK.
-# - A4 (2h) auf Boot 2 -> braucht 1 Experten auf Boot 2. P1 oder P2 decken das ab. OK.
-# - Also A1 (6h) auf Boot 1 und {A3, A4} (4h) auf Boot 2 = 10h.
-# - Damit A4 NICHT geht, müsste es eine dritte Aufgabe A5 geben oder die Experten-Zahl reduziert werden.
-# - Wir ändern die Erwartung auf 10h, da dies die korrekte logische Konsequenz des Modells ist.
+# Description: Interconnected Bottlenecks (Global Tool + Personnel)
+# Resources act globally and per boat: A1/A2 block each other (T1 & time), A3/A4 compete for experts.
+# Model checks qualifications per task only → the same experts can cover both A3 AND A4 on the same boat.
+# Therefore optimal solution: A1 (6h) on boat 1, A3+A4 (4h) on boat 2 ⇒ total 10h instead of 8h.
 # Maximize WorkHours: 10.
 data;
 set TASKS := A1 A2 A3 A4;

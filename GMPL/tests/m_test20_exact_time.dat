@@ -1,7 +1,8 @@
-# Beschreibung: Genaues Zeitlimit
-# Szenario:
-# - A1 dauert 8.0 Stunden. maxWorkingHours ist 8.
-# - Es muss exakt passen (<= Bedingung).
+# Description: Exact time limit.
+# Scenario: A1 has a duration of 8.0 hours and maxWorkingHours is 8.
+# Reasoning: The constraint is defined as a non-strict inequality (≤), so tasks that exactly match the limit are valid.
+# Therefore A1 fully occupies one boat without violating the time constraint.
+# Expected result: A1 is scheduled successfully (fits exactly within the limit).
 # Maximize WorkHours: 8.
 data;
 set TASKS := A1;

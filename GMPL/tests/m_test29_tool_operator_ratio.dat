@@ -1,11 +1,9 @@
-# Beschreibung: Werkzeug-Bediener-Verhältnis
-# Szenario:
-# - Aufgabe A1 benötigt 3 spezielle Werkzeuge (W1) gleichzeitig.
-# - Es ist nur 1 Person (P1) auf dem Boot.
-# - Logisch gesehen kann eine Person vielleicht nur ein oder zwei dieser Werkzeuge gleichzeitig bedienen.
-# - Das Modell prüft nur, ob die Werkzeuge auf dem Boot sind, nicht ob genug Personal da ist, um sie zu halten/bedienen.
-# - Erwartet: 0 (da P1 nicht 3 Werkzeuge bedienen kann).
-# - Modell wird liefern: 5 (wenn Werkzeuge vorhanden).
+# Description: Tool-to-operator ratio constraint.
+# Scenario: Task A1 requires 3 instances of tool W1 simultaneously, but only one person (P1) is available on the boat.
+# Reasoning: The model only checks tool availability on the boat, not whether enough personnel are available to operate or handle multiple tools concurrently.
+# Therefore, the feasibility is incorrectly determined solely by tool presence, ignoring human operational constraints.
+# Expected result: 0 (in a more realistic model with operator constraints).
+# Note: Current model may still return WorkHours = 5 if tool availability alone is satisfied.
 #
 # Maximize WorkHours: 0.
 data;

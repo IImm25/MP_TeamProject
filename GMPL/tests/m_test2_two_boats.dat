@@ -1,6 +1,6 @@
-# Beschreibung: Kapazitätsgrenze - Die Gesamtdauer (10h) überschreitet das Zeitlimit (8h) eines einzelnen Bootes.
-# Erwartetes Ergebnis: Aufgaben A1 und A2 werden auf zwei verschiedene Boote (Boot 1 und Boot 2) verteilt.
-# Begründung: Dauer A1 (5h) + A2 (5h) = 10h > 8h. Daher ist die Aufteilung auf zwei Boote notwendig.
+# Description: Capacity limit – the total duration (10h) exceeds the time limit (8h) of a single boat.
+# Expected result: Tasks A1 and A2 are distributed across two different boats (boat 1 and boat 2).
+# Reasoning: Duration A1 (5h) + A2 (5h) = 10h > 8h. Therefore, splitting across two boats is necessary.
 # Maximize WorkHours: 10.
 data;
 set TASKS := A1 A2;

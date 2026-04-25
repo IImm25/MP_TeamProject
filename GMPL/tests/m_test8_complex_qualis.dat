@@ -1,8 +1,8 @@
-# Beschreibung: Komplexe Qualifikationen - A1 benötigt zwei verschiedene Qualis.
-# P1 hat Quali1, P2 hat Quali2. Beide müssen auf dasselbe Boot.
-# Erwartetes Ergebnis: A1 und A2 werden auf Boot 1 erledigt. P1 und P2 befinden sich auf Boot 1.
-# Begründung: A1 benötigt Q1 und Q2 gleichzeitig. Da P1(Q1) und P2(Q2) diese abdecken, müssen beide auf Boot 1 sein.
-# A2 benötigt Q2, was durch P2 ebenfalls abgedeckt ist. Gesamtdauer 8h passt auf ein Boot.
+# Description: Complex qualifications – A1 requires two different skills.
+# P1 has skill Q1, P2 has skill Q2. Both must be assigned to the same boat.
+# Expected result: A1 and A2 are completed on boat 1. P1 and P2 are assigned to boat 1.
+# Reasoning: A1 requires Q1 and Q2 simultaneously. Since P1 (Q1) and P2 (Q2) together cover these requirements, both must be on boat 1.
+# A2 requires Q2, which is also satisfied by P2. Total duration (8h) fits within a single boat.
 # Maximize WorkHours: 8.
 data;
 set TASKS := A1 A2;

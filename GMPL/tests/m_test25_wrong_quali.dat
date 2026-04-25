@@ -1,9 +1,8 @@
-# Beschreibung: Qualifikations-Mismatch (Falsche Person)
-# Szenario:
-# - Aufgabe A1 benötigt Qualifikation Q1.
-# - P1 hat Qualifikation Q2.
-# - P1 ist auf dem Boot.
-# - Erwartung: A1 kann NICHT ausgeführt werden, obwohl jemand da ist, da die Quali nicht passt.
+# Description: Qualification mismatch (wrong person).
+# Scenario: A1 requires qualification Q1. P1 only has qualification Q2 and is assigned to the boat.
+# Reasoning: Presence on the boat is not sufficient; the QualiCheck requires matching qualifications.
+# Since no assigned person satisfies Q1, the requirement cannot be met.
+# Expected result: A1 cannot be executed.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

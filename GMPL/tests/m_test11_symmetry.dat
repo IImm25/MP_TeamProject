@@ -1,7 +1,7 @@
-# Beschreibung: Symmetrie-Check - Zwei Aufgaben (A1, A2) benötigen separate Boote.
-# Erwartetes Ergebnis: A1 auf Boot 1, A2 auf Boot 2 (oder umgekehrt). Boot 3 bleibt leer.
-# Begründung: A1 (5h) + A2 (5h) = 10h > 8h Zeitlimit. Daher zwei Boote nötig.
-# Die Bedingung "Order" erzwingt, dass Boot 1 und Boot 2 benutzt werden, bevor Boot 3 genutzt werden darf.
+# Description: Symmetry check – two tasks (A1, A2) require separate boats.
+# Expected result: A1 on boat 1, A2 on boat 2 (or vice versa). Boat 3 remains unused.
+# Reasoning: A1 (5h) + A2 (5h) = 10h > 8h time limit, so two boats are required.
+# The "Order" constraint enforces that boats 1 and 2 must be used before boat 3 can be utilized.
 # Maximize WorkHours: 10.
 data;
 set TASKS := A1 A2;

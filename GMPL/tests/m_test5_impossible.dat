@@ -1,7 +1,7 @@
-# Beschreibung: Unmöglicher Fall - Aufgabe A1 (10h) ist größer als maxWorkingHours (8h).
-# Erwartetes Ergebnis: WorkHours = 0. Keine Aufgaben werden erledigt.
-# Begründung: Die Bedingung DoneAtMostOnce erlaubt es, Aufgaben wegzulassen. Da A1 nicht in das Zeitlimit passt,
-# wird sie nicht eingeplant, um die Zeitbedingung (sum <= maxWorkingHours) einzuhalten.
+# Description: Infeasible case – task A1 (10h) exceeds maxWorkingHours (8h).
+# Expected result: WorkHours = 0. No tasks are completed.
+# Reasoning: The DoneAtMostOnce constraint allows tasks to be skipped. Since A1 does not fit within the time limit,
+# it is not scheduled in order to satisfy the time constraint (sum ≤ maxWorkingHours).
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

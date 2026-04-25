@@ -1,14 +1,10 @@
-# Beschreibung: Komplexer Headcount-Check (Versuch 2)
-# Szenario:
-# - Aufgabe A1 benötigt 2x Mech.
-# - P1 ist Mech.
-# - Es gibt NUR P1 als Mech.
-# - Das Modell sollte hier A1 NICHT ausführen können, da sum(hasQuali[p,Mech] * personOnBoat[b,p]) 
-#   nur maximal 1 sein kann (da P1 nur einmal auf dem Boot sein kann).
-# - Wenn das Modell A1 trotzdem ausführt, wäre die Bedingung QualiCheck fehlerhaft
-#   oder die Annahme über personOnBoat als binary Variable greift nicht wie erwartet.
-# - ABER: P1 ist binary (0 oder 1). sum(1 * {0,1}) kann bei nur einer Person max 1 sein.
-# - Daher sollte ACTUAL = 0 sein.
+# Description: Complex headcount check (attempt 2).
+# Scenario: A1 requires 2 mechanics. P1 is the only mechanic available.
+# Reasoning: Since personOnBoat[p,b] is binary, P1 can contribute at most 1 to the mechanic count.
+# Therefore the maximum achievable sum for Mech is 1, which is below the required 2.
+# This makes A1 infeasible under the QualiCheck constraint.
+# Expected result: A1 cannot be executed (ACTUAL = 0).
+# Note: If A1 is still scheduled, it indicates a flaw in the qualification counting logic or constraint formulation.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

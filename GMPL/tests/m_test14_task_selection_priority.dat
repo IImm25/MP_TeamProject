@@ -1,24 +1,8 @@
-# Beschreibung: Optimal Task Selection Priority
-# Szenario:
-# - Viele Aufgaben mit unterschiedlicher Dauer.
-# - A1 (7h), A2 (6h), A3 (5h), A4 (4h), A5 (3h).
-# - 2 Boote vorhanden, max 8h pro Boot.
-# - Gesamtkapazität 16h.
-# - Personal ist begrenzt: Alle Aufgaben brauchen "Spezialist". Nur 2 Spezialisten da.
-# - Da jeder Spezialist nur auf einem Boot sein kann, können beide Boote genutzt werden.
-# - Der Solver muss die beste Kombi finden:
-#   Boot 1: A1 (7h) + nix anderes passt (7+3=10 > 8).
-#   Boot 2: A2 (6h) + nix anderes passt (6+3=9 > 8).
-#   Gesamt: 13h.
-#   ODER:
-#   Boot 1: A3 (5h) + A5 (3h) = 8h.
-#   Boot 2: A4 (4h) + ? (nix mehr da, außer A1/A2 die zu groß sind).
-#   Gesamt: 12h.
-#   ODER:
-#   Boot 1: A1 (7h).
-#   Boot 2: A3 (5h) + A5 (3h) = 8h.
-#   Gesamt: 15h. (BESTE LÖSUNG)
-# Erwartetes Ergebnis: 15h.
+# Description: Optimal task selection priority.
+# Scenario: Multiple tasks with different durations and limited resources (2 specialists, 2 boats with 8h each).
+# Expected result: Total WorkHours = 15h.
+# Reasoning: The best feasible combination is A1 (7h) on boat 1 and A3 (5h) + A5 (3h) on boat 2.
+# This respects both the boat capacity constraint and specialist limitation, yielding the maximum total of 15h.
 # Maximize WorkHours: 15.
 data;
 set TASKS := A1 A2 A3 A4 A5;

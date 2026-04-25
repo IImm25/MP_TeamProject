@@ -1,7 +1,7 @@
-# Beschreibung: Personal-Limitierung - Eine Aufgabe (A1) benötigt 3 Personen mit Quali 'Tech'.
-# Erwartetes Ergebnis: WorkHours = 0.
-# Begründung: Es sind nur 2 Personen mit 'Tech' verfügbar. Da die Bedingung QualiCheck (sum >= requirement)
-# für A1 nicht erfüllt werden kann, kann A1 nicht eingeplant werden.
+# Description: Personnel limitation – a task (A1) requires 3 people with 'Tech' qualification.
+# Expected result: WorkHours = 0.
+# Reasoning: Only 2 people with 'Tech' are available. Since the QualiCheck constraint (sum ≥ requirement)
+# cannot be satisfied for A1, it cannot be scheduled.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

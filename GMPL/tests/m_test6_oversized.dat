@@ -1,7 +1,7 @@
-# Beschreibung: Aufgabe zu groß - A1 hat eine Dauer von 10h, bei einem Limit von 8h.
-# Erwartetes Ergebnis: WorkHours = 0.
-# Begründung: Wie in m_test5 kann A1 nicht eingeplant werden, da sie das Zeitlimit pro Boot überschreitet.
-# Da das Modell eine Maximierung ist und DoneAtMostOnce (<= 1) gilt, ist die Lösung, A1 nicht zu erledigen.
+# Description: Task too large – A1 has a duration of 10h with a limit of 8h.
+# Expected result: WorkHours = 0.
+# Reasoning: As in m_test5, A1 cannot be scheduled because it exceeds the per-boat time limit.
+# Since the model is a maximization and DoneAtMostOnce (≤ 1) applies, the optimal solution is to not execute A1.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

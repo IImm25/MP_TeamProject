@@ -1,13 +1,9 @@
-# Beschreibung: Shared Tool Optimization
-# Szenario:
-# - Zwei Aufgaben (A1, A2) benötigen jeweils 1 Spezialwerkzeug (T1).
-# - Wenn beide auf demselben Boot sind, reicht 1x T1 auf diesem Boot.
-# - Es gibt insgesamt nur 1x T1 im globalen Bestand.
-# - Es gibt ein Zeitlimit von 8h. A1 (5h) und A2 (4h) passen NICHT zusammen auf ein Boot.
-# - Da nur 1x T1 da ist, kann entweder A1 oder A2 gemacht werden, aber nicht beide auf verschiedenen Booten.
-# - Aufgabe A3 braucht T2, wovon genug da ist.
-# Erwartetes Ergebnis: A1 (5h) auf Boot 1. A2 wird weggelassen. A3 (3h) passt noch auf Boot 1.
-# Summe: 5 + 3 = 8h.
+# Description: Shared tool optimization.
+# Scenario: A1 and A2 each require 1 unit of tool T1, but only 1 unit of T1 is available globally.
+# Expected result: A1 (5h) on boat 1; A2 is not scheduled; A3 (3h) is also assigned to boat 1.
+# Reasoning: Since A1 and A2 cannot share time on the same boat (5h + 4h > 8h) and only one T1 exists,
+# only one of them can be selected. A1 is chosen, and A3 fits within the remaining 3h capacity,
+# resulting in a total of 8h on boat 1.
 # Maximize WorkHours: 8.
 data;
 set TASKS := A1 A2 A3;

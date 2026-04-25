@@ -1,11 +1,8 @@
-# Beschreibung: Headcount vs Multi-Quali Extremfall
-# Szenario:
-# - Aufgabe A1 benötigt 2x Q1 (z.B. zwei Mechaniker).
-# - P1 hat Q1 UND Q2 UND Q3.
-# - P1 ist alleine auf dem Boot.
-# - Erwartung: A1 kann NICHT ausgeführt werden (da Headcount=2 erforderlich).
-# - Aufgabe A2 benötigt 1x Q1, 1x Q2, 1x Q3.
-# - Erwartung: A2 KANN von P1 alleine ausgeführt werden (da kollektive Qualis auf Boot).
+# Description: Headcount vs multi-qualification extreme case.
+# Scenario: A1 requires 2x Q1. P1 has Q1, Q2, and Q3 and is the only person on the boat.
+# Reasoning: For A1, the headcount requirement for Q1 cannot be satisfied since P1 contributes only once (binary presence),
+# so 2x Q1 is infeasible. For A2, all required qualifications (Q1, Q2, Q3) are satisfied by P1 on the same boat.
+# Expected result: A1 cannot be executed; A2 can be executed by P1 alone.
 # Maximize WorkHours: 4.
 data;
 set TASKS := A1 A2;

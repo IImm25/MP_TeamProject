@@ -1,15 +1,9 @@
-# Beschreibung: Werkzeug-Hording auf ungenutzten Booten
-# Szenario:
-# - Zwei Boote verfügbar.
-# - Boot 1 führt A1 aus (benötigt 5x W1).
-# - Es gibt insgesamt 10x W1.
-# - Boot 2 führt KEINE Aufgaben aus (boatUsage[2] = 0).
-# - Kann Boot 2 trotzdem 5x W1 "besetzen", sodass für ein drittes Boot (falls vorhanden) nichts übrig bliebe?
-# - Hier: 2 Boote, A1 braucht 5, A2 braucht 10.
-# - Wenn Boot 2 (ungenutzt) Werkzeug blockiert, könnte es Probleme geben.
-# - Aber das Modell maximiert WorkHours. Es wird Werkzeug nur dort zuweisen, wo es Aufgaben ermöglicht.
-# - Ein interessanterer Test: Kann Werkzeug auf einem Boot "sein", das gar nicht benutzt wird (boatUsage=0)?
-# - In der Theorie ja, da toolOnBoat keine Bedingung an boatUsage hat.
+# Description: Tool hoarding on unused boats.
+# Scenario: Two boats. Boat 1 executes A1 (requires 5x W1). Total stock is 10x W1. Boat 2 has no tasks.
+# Reasoning: The model may allow toolOnBoat[b,t] to be assigned independently of boatUsage[b].
+# This means tools could be allocated to an unused boat (boatUsage = 0), potentially blocking availability.
+# Expected result: The model should ideally only allocate tools to boats with active tasks, but as currently defined,
+# toolOnBoat is not constrained by boatUsage, so tools may still be assigned to unused boats.
 # Maximize WorkHours: 10.
 data;
 set TASKS := A1;

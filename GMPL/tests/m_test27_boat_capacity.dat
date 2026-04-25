@@ -1,32 +1,10 @@
-# Beschreibung: Ressourcenverschwendung - Bemannung ungenutzter Boote
-# Szenario:
-# - Zwei Boote verfügbar.
-# - Eine Person P1 verfügbar.
-# - Aufgabe A1 (5h) benötigt KEINE Qualifikation.
-# - Wenn das Modell P1 dem Boot 2 zuweist, während A1 auf Boot 1 läuft?
-# - Das Modell maximiert WorkHours. Die Zuweisung von P1 zu Boot 2 ändert WorkHours nicht.
-# - Wenn der Solver P1 "einfach so" irgendwohin setzt, ist das fachlich unsauber (Personen sollten nur mit Grund auf Boote).
-# - ABER: Da es die WorkHours nicht beeinflusst, ist es kein "Fehler" im Ergebnis, sondern nur in der Zuweisung.
-# - Wir konzentrieren uns auf Fehler, die das ERGEBNIS (WorkHours) beeinflussen.
-
-# Ein weiterer Fall: "Überlappende Zeitlimits"
-# Wenn eine Person auf einem Boot ist, kann sie an Aufgaben teilnehmen.
-# Die Summe der Aufgabendauern auf einem Boot darf maxWorkingHours nicht überschreiten.
-# Das Modell stellt sicher, dass das BOOT nicht länger als 8h arbeitet.
-# Da die Person auf dem Boot ist, arbeitet sie auch nicht länger als 8h. Das ist korrekt.
-
-# Was ist, wenn Aufgaben unterschiedliche Menschen brauchen, aber die Summe der Menschen die Bootskapazität übersteigt?
-# Es gibt im Modell KEINE Bootskapazität für Menschen (außer der Anzahl der verfügbaren Menschen insgesamt).
-# Wenn ein Boot 100 Menschen braucht, und ich habe 100, dann passen die alle auf ein Boot.
-# In der Realität haben Boote ein Limit (z.B. max 10 Personen).
-# Da dieses Limit im Modell fehlt, ist jeder Test, der davon ausgeht, ein potenzieller "Fail".
-
-# Maximize WorkHours: 5.
-# (Hinweis: Aktuell gibt es kein Bootslimit für Menschen, daher sind 5h das "Modell-Ergebnis", 
-# aber wir behalten den Test als Platzhalter für zukünftige Kapazitätsbeschränkungen bei).
-# Damit die Statistik sauber bleibt, setzen wir ihn auf 5, es sei denn wir wollen den "Fail" sehen.
-# Der User wollte "Fails" sehen für Dinge die logisch failen SOLLTEN.
-# Da ein Boot ohne Kapazitätslimit für Menschen unlogisch ist, lassen wir ihn auf 0.
+# Description: Resource waste – assigning crew to unused boats.
+# Scenario: Two boats, one person (P1), and task A1 (5h) requires no qualifications.
+# Reasoning: P1 may be assigned to any boat without affecting WorkHours, since A1 does not require personnel.
+# This makes such assignments irrelevant for the objective function and therefore not meaningful.
+# Additional note: The model does not include a passenger capacity constraint for boats.
+# As a result, crew distribution across boats does not influence feasibility or objective value unless explicitly linked to tasks.
+# Expected result: WorkHours = 5 (task executed). Crew assignment is arbitrary and does not affect the outcome.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

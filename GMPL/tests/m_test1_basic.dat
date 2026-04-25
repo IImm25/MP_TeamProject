@@ -1,6 +1,6 @@
-# Beschreibung: Basisfall - Alle Aufgaben passen auf ein Boot.
-# Erwartetes Ergebnis: Alle Aufgaben (A1, A2, A3) werden auf Boot 1 erledigt.
-# Begründung: Gesamtdauer 6h <= 8h Limit. P1 hat die nötige Qualifikation. W1 ist ausreichend vorhanden.
+# Description: Base case – all tasks fit on one boat.
+# Expected result: All tasks (A1, A2, A3) are completed on boat 1.
+# Reasoning: Total duration is 6h ≤ 8h limit. P1 has the required qualification. W1 is sufficiently available.
 # Maximize WorkHours: 6.
 data;
 set TASKS := A1 A2 A3;

@@ -1,8 +1,8 @@
-# Beschreibung: Werkzeug-Engpass - Jede Aufgabe benötigt 5 Einheiten von W1. Insgesamt sind nur 5 im Lager.
-# Erwartetes Ergebnis: A1 und A2 werden zusammen auf Boot 1 erledigt.
-# Begründung: Ein Boot mit A1 oder A2 benötigt 5 Einheiten W1. Da nur 5 Einheiten insgesamt (stockTools)
-# verfügbar sind, kann nur ein Boot mit diesem Werkzeug ausgestattet werden.
-# Da A1 und A2 zusammen 8h dauern und somit auf ein Boot passen, können beide erledigt werden.
+# Description: Tool bottleneck – each task requires 5 units of W1. Only 5 units are available in total.
+# Expected result: A1 and A2 are completed together on boat 1.
+# Reasoning: A boat running A1 or A2 requires all 5 units of W1. Since only 5 units are available (stockTools),
+# only one boat can be equipped with this tool.
+# As A1 and A2 together take 8h and therefore fit on one boat, both can be executed on boat 1.
 # Maximize WorkHours: 8.
 data;
 set TASKS := A1 A2;

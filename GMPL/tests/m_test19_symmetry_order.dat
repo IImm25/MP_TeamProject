@@ -1,12 +1,9 @@
-# Beschreibung: Symmetriebruch und Boot-Auslastung
-# Szenario:
-# - 5 Boote verfügbar.
-# - 1 Aufgabe A1 (1h).
-# - Symmetriebruch (Order Constraint) sollte erzwingen, dass A1 auf Boot 1 landet.
-# - Wenn die Constraint `boatUsage[b] <= boatUsage[b-1]` falsch implementiert ist (z.B. falsch herum),
-#   könnte der Solver scheitern oder falsche Ergebnisse liefern.
-# - Außerdem testen wir, ob `maxWorkingHours * boatUsage[b]` korrekt funktioniert.
-#   Wenn boatUsage[1] = 1, dann darf auf Boot 1 gearbeitet werden.
+# Description: Symmetry breaking and boat utilization.
+# Scenario: 5 boats available, single task A1 (1h).
+# Reasoning: The Order constraint should enforce that A1 is assigned to boat 1 to break symmetry.
+# If implemented incorrectly (e.g., reversed inequality in boatUsage constraint), the solver may produce invalid or suboptimal assignments.
+# Additionally, the constraint maxWorkingHours * boatUsage[b] must correctly gate whether a boat is active.
+# Expected result: A1 is assigned to boat 1 only, and boatUsage[1] = 1 enables its utilization.
 # Maximize WorkHours: 1.
 data;
 set TASKS := A1;

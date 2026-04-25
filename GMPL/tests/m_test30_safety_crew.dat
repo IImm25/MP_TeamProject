@@ -1,12 +1,9 @@
-# Beschreibung: Mindestbesatzung (Sicherheit)
-# Szenario:
-# - Ein Boot braucht aus Sicherheitsgründen immer mindestens 2 Personen (4-Augen-Prinzip).
-# - Aufgabe A1 benötigt nur 1 Person mit Qualifikation.
-# - Das Modell wird nur 1 Person zuweisen, um WorkHours zu maximieren.
-# - Fachlich sollte das Boot aber gar nicht erst losfahren mit nur einer Person.
-# - Erwartet: 0.
-# - Modell liefert: 5.
-#
+# Description: Minimum crew requirement (safety constraint).
+# Scenario: A boat requires at least 2 persons for safety (four-eyes principle). Task A1 needs only 1 qualified person.
+# Reasoning: The model only enforces task feasibility and qualification checks, but does not include a minimum crew constraint per boat.
+# Therefore, it may assign a single person and still consider the task executable.
+# Expected result: 0 (in a realistic safety-constrained model).
+# Note: The current model may still return WorkHours = 5 because no minimum crew constraint is defined.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

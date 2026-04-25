@@ -1,26 +1,10 @@
-# Beschreibung: Qualifikations-Grenzfall (Headcount vs Skills)
-# Szenario:
-# - Aufgabe A1 benötigt 2 Mechaniker (Mech) UND 1 Elektriker (Elek).
-# - P1 ist Mechaniker UND Elektriker.
-# - P2 ist Mechaniker.
-# - P3 ist Elektriker.
-# - Logik-Check:
-#   QualiCheck(b, A1, Mech): P1.Mech + P2.Mech >= 2 (OK)
-#   QualiCheck(b, A1, Elek): P1.Elek >= 1 (OK)
-#   Das Modell erlaubt hier, dass P1 sowohl für die Mech-Anforderung als auch für die Elek-Anforderung zählt.
-#   Aber sind es genug Köpfe? Für Mech=2 werden 2 Personen gebraucht. P1 und P2 sind 2 Personen.
-#   P1 "verbraucht" sich nicht für die Elek-Anforderung. 
-#   In der Realität bräuchte man vielleicht 3 Leute, wenn die Aufgaben gleichzeitig sind, 
-#   aber das Modell prüft nur die kollektive Qualifikation pro Boot für JEDE Aufgabe einzeln.
-#   Wenn A1 2 Mechs und 1 Elek braucht, aber nur P1(Mech+Elek) und P2(Mech) auf dem Boot sind,
-#   dann sind die summierten Qualis: Mech=2, Elek=1.
-#   Die Bedingung 'QualiCheck' wird für q=Mech und q=Elek separat geprüft.
-#   q=Mech: 1*1 (P1) + 1*1 (P2) >= 2 * 1 (A1) -> 2 >= 2 (WAHR)
-#   q=Elek: 1*1 (P1) + 0*1 (P2) >= 1 * 1 (A1) -> 1 >= 1 (WAHR)
-#   Ergebnis: Die Aufgabe wird ausgeführt, obwohl nur 2 Personen auf dem Boot sind, aber 2 Mechs + 1 Elek = 3 Rollen gefordert sind.
-#   Dies ist ein potenzielles "Feature" oder "Bug" des Modells: Es gibt keine Headcount-Prüfung pro Aufgabe,
-#   nur eine Qualifikationsprüfung pro Qualifikationstyp.
-# Erwartetes Ergebnis: A1 wird ausgeführt.
+# Description: Qualification edge case (headcount vs. skill aggregation).
+# Scenario: A1 requires 2 mechanics and 1 electrician. P1 is both mechanic and electrician, P2 is a mechanic, P3 is an electrician.
+# Reasoning: The QualiCheck is evaluated per qualification type independently, not as a strict per-person role assignment.
+# Mech: P1 + P2 = 2 ≥ required 2 (OK). Elek: P1 = 1 ≥ required 1 (OK).
+# Thus A1 is feasible even though it appears to require 3 distinct role fulfillments.
+# Expected result: A1 is executed.
+# Note: This reveals a modeling characteristic where skills are aggregated per type without enforcing a strict headcount coupling across skills.
 # Maximize WorkHours: 0.
 data;
 set TASKS := A1;

@@ -1,7 +1,7 @@
-# Beschreibung: Mischung aus kleinen und großen Aufgaben - Viele 1h/2h Aufgaben und zwei 8h Aufgaben.
-# Erwartetes Ergebnis: A1 auf Boot 1, A2 auf Boot 2, S1-S4 auf Boot 3.
-# Begründung: A1 und A2 belegen mit jeweils 8h ein Boot komplett. Die restlichen Aufgaben S1-S4 (Summe 6h)
-# passen zusammen auf das dritte Boot. Da 3 Boote verfügbar sind (amountBoats = 3), können alle erledigt werden.
+# Description: Mix of small and large tasks – many 1h/2h tasks and two 8h tasks.
+# Expected result: A1 on boat 1, A2 on boat 2, S1–S4 on boat 3.
+# Reasoning: A1 and A2 each fully occupy a boat with 8h. The remaining tasks S1–S4 (total 6h)
+# fit together on the third boat. Since 3 boats are available (amountBoats = 3), all tasks can be completed.
 # Maximize WorkHours: 22.
 data;
 set TASKS := A1 A2 S1 S2 S3 S4;
