@@ -24,7 +24,6 @@ export class Employees implements OnInit {
   http = inject(HttpService);
   private translate = inject(TranslateService);
   private confirmationService = inject(ConfirmationService);
-  apiUrl = environment.apiUrl;
 
   employees = signal<EmployeeModel[]>([]);
   qualifications = signal<Qualification[]>([]);

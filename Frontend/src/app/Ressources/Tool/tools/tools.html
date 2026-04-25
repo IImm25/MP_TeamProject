@@ -1,0 +1,41 @@
+<div class="content-wrapper">
+  <header class="section-header">
+    <div class="title-group">
+      <h1 class="title">{{ 'TOOLS.TITLE' | translate }}</h1>
+    </div>
+    <p-button [label]="'TOOLS.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="openDialog('New')" severity="secondary" [raised]="true"/>
+  </header>
+
+  <div class="table-container">
+    <p-table [value]="tools()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">{{ 'TOOLS.NAME' | translate }} <p-sortIcon field="name"/></th>
+          <th>{{ 'TOOLS.AVAILABLE_STOCK' | translate }}</th>
+          <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-tool>
+        <tr>
+          <td>{{ tool.name }}</td>
+          <td>{{ tool.availableStock }}</td>
+          <td>
+            <div class="action-buttons">
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="openDialog('Edit', tool)" />
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="secondary" (onClick)="deleteTool(tool)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-dialog-tool
+  [(visible)]="dialogVisible"
+  [type]="dialogType"
+  (onSave)="loadTools()"
+/>
+
+<p-confirmDialog />

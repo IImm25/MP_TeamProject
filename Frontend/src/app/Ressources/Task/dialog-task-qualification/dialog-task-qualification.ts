@@ -26,7 +26,6 @@ import { HttpService } from '../../../Services/http-service';
 export class DialogTaskQualification {
   private http = inject(HttpService);
   private formBuilder = inject(FormBuilder);
-  apiUrl = environment.apiUrl;
 
   @Input({ required: true }) type: 'Edit' | 'New' = 'New';
   selectedQualification = model<TaskQualification | null>(null);

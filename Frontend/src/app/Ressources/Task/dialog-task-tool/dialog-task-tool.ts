@@ -27,7 +27,6 @@ import { HttpService } from '../../../Services/http-service';
 export class DialogTaskTool implements OnInit {
   private http = inject(HttpService);
   private formBuilder = inject(FormBuilder);
-  apiUrl = environment.apiUrl;
 
   @Input({ required: true }) type: 'Edit' | 'New' = 'New';
   selectedTool = model<TaskTool | null>(null);
