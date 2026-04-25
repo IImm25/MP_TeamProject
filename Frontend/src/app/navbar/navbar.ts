@@ -35,17 +35,9 @@ export class Navbar implements OnInit, OnDestroy {
               icon: 'pi pi-cog',
               items: [
                 { label: translations['MENU.TASKS'], icon: 'pi pi-list', routerLink: ['/tasks'] },
-                {
-                  label: translations['MENU.EMPLOYEES'],
-                  icon: 'pi pi-users',
-                  routerLink: ['/employees'],
-                },
-                {
-                  label: translations['MENU.QUALIFICATIONS'],
-                  icon: 'pi pi-id-card',
-                  routerLink: ['/qualifications'],
-                },
-                { label: translations['MENU.TOOLS'], icon: 'pi pi-wrench', routerLink: ['/tools'] },
+                { label: translations['MENU.EMPLOYEES'], icon: 'pi pi-users', routerLink: ['/employees'] },
+                { label: translations['MENU.QUALIFICATIONS'], icon: 'pi pi-id-card', routerLink: ['/qualifications'] },
+                { label: translations['MENU.TOOLS'], icon: 'pi pi-wrench', routerLink: ['/tools'] }
               ],
             },
             {

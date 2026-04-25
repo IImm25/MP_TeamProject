@@ -23,7 +23,6 @@ import { HttpService } from '../../../Services/http-service';
 export class DialogEmployee {
   private fb = inject(FormBuilder);
   private httpService = inject(HttpService);
-  apiUrl = environment.apiUrl;
 
   @Input() type: 'Edit' | 'New' = 'New';
   @Input() allQualifications: Qualification[] = [];

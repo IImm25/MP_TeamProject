@@ -89,8 +89,6 @@ export class DialogTask implements OnInit {
 
   currentTask: Task | null = null;
 
-  apiUrl = environment.apiUrl;
-
   allQualifications: WritableSignal<Qualification[]> = signal([]);
   qualificationDialogVisible: WritableSignal<boolean> = signal(false);
   QualificationType: WritableSignal<'Edit' | 'New'> = signal('New');

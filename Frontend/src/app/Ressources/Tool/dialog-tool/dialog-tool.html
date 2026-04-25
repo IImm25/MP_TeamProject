@@ -1,0 +1,50 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="close()"
+  [header]="
+    type === 'New' ? ('TOOLS.DIALOG.NEW' | translate) : ('TOOLS.DIALOG.EDIT' | translate)
+  "
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '50vw' }"
+>
+  <form [formGroup]="toolForm" class="content">
+      <div class="field">
+        <label for="name">{{ 'TOOLS.NAME' | translate }}*</label>
+        <input pInputText id="name" formControlName="name" [placeholder]="'TOOLS.DIALOG.NAME_PLACEHOLDER' | translate"/>
+        @if (toolForm.controls.name.invalid && toolForm.controls.name.touched) {
+          <div class="error-message">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ 'TOOLS.VALIDATION.NAME_REQUIRED' | translate }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="field">
+        <label for="availableStock">{{ 'TOOLS.AVAILABLE_STOCK' | translate }}*</label>
+        <p-inputNumber id="availableStock" formControlName="availableStock" [min]="1" [showButtons]="true" [placeholder]="'TOOLS.DIALOG.AVAILABLE_STOCK_PLACEHOLDER' | translate"/>
+        @if (toolForm.controls.availableStock.invalid && toolForm.controls.availableStock.touched) {
+          <div class="error-message">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ 'TOOLS.VALIDATION.AVAILABLE_STOCK_REQUIRED' | translate }}</span>
+          </div>
+        }
+      </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'COMMON.CANCEL' | translate"
+      [text]="true"
+      severity="secondary"
+      (onClick)="close()"
+    />
+    <p-button
+      [label]="'COMMON.SAVE' | translate"
+      icon="pi pi-check"
+      (onClick)="save()"
+      [disabled]="toolForm.invalid"
+    />
+  </ng-template>
+</p-dialog>

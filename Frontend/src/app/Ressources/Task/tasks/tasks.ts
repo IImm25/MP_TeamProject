@@ -26,8 +26,6 @@ export class Tasks implements OnInit {
   visible: WritableSignal<boolean> = signal(false);
   tasks: WritableSignal<TaskSummary[]> = signal([]);
 
-  apiUrl = environment.apiUrl;
-
   ngOnInit() {
     this.loadTasks();
   }
