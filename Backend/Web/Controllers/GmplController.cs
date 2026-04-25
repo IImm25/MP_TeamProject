@@ -1,4 +1,5 @@
-﻿using Backend.Web.Services;
+﻿using Backend.Data.DTO;
+using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
 using System.Threading.Tasks;
@@ -24,16 +25,16 @@ public class GmplController : ControllerBase
     }
 
 
-    //[HttpPost("boats")]
-    //public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody] List<TaskItem> tasks, [FromBody] List<Person> people)
+    //[HttpPost("calculate")]
+    //public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody]List<TaskItemCreateDto> tasks)
     //{
     //    if (tasks.Count != 0 && people.Count != 0)
     //    {
-    //        GmplService gmpl = new GmplService(tasks);  
+    //        GmplService gmpl = new GmplService(tasks);
     //        var res = await gmpl.WriteDatafile(people);
-    //
-    //
-    //
+
+
+
     //        return Ok();
     //    }
     //    else return UnprocessableEntity();
