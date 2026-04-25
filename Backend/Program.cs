@@ -1,5 +1,6 @@
 using Backend.Data;
-using Backend.Web.Repositories;
+using Backend.Data.Mappers;
+using Backend.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,17 +12,42 @@ builder.Services.AddSwaggerGen();
 // In deiner Program.cs – Repositories registrieren
 // (Scoped passt für EF Core DbContext am besten)
 
-builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
-builder.Services.AddScoped<IPersonRepository, PersonRepository>();
-builder.Services.AddScoped<IQualificationRepository, QualificationRepository>();
-builder.Services.AddScoped<IToolRepository, ToolRepository>();
-builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
-builder.Services.AddScoped<IPersonRepository, PersonRepository>();
-builder.Services.AddScoped<IQualificationRepository, QualificationRepository>();
-builder.Services.AddScoped<IToolRepository, ToolRepository>();
-builder.Services.AddScoped<IPersonQualificationRepository, PersonQualificationRepository>();
-builder.Services.AddScoped<ITaskQualificationRepository, TaskQualificationRepository>();
-builder.Services.AddScoped<ITaskToolRepository, TaskToolRepository>();
+//builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+//builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+//builder.Services.AddScoped<IQualificationRepository, QualificationRepository>();
+//builder.Services.AddScoped<IToolRepository, ToolRepository>();
+//builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+//builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+//builder.Services.AddScoped<IQualificationRepository, QualificationRepository>();
+//builder.Services.AddScoped<IToolRepository, ToolRepository>();
+//builder.Services.AddScoped<IPersonQualificationRepository, PersonQualificationRepository>();
+//builder.Services.AddScoped<ITaskQualificationRepository, TaskQualificationRepository>();
+//builder.Services.AddScoped<ITaskToolRepository, TaskToolRepository>();
+
+// registering repositories to Dependency Injection
+builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
+builder.Services.AddScoped<IRepository<Person>, Repository<Person>>();
+builder.Services.AddScoped<IRepository<Qualification>, Repository<Qualification>>();
+builder.Services.AddScoped<IRepository<Tool>, Repository<Tool>>();
+builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
+//builder.Services.AddScoped<IRepository<Person>, Repository<Person>>();
+//builder.Services.AddScoped<IRepository<Qualification>, Repository<Qualification>>();
+//builder.Services.AddScoped<IToolRepository, ToolRepository>();
+builder.Services.AddScoped<IRepository<PersonQualification>, Repository<PersonQualification>>();
+builder.Services.AddScoped<IRepository<TaskQualification>, Repository<TaskQualification>>();
+builder.Services.AddScoped<IRepository<TaskTool>, Repository<TaskTool>>();
+
+builder.Services.AddAutoMapper(cfg => {
+    cfg.AddProfile<PersonSummaryMapper>();
+    cfg.AddProfile<TaskItemSummaryMapper>();
+    cfg.AddProfile<TaskItemDetailMapper>();
+    cfg.AddProfile<TaskQualificationMapper>();
+    cfg.AddProfile<TaskToolMapper>();
+    cfg.AddProfile<ToolResponseMapper>();
+    cfg.AddProfile<QualificationResponseMapper>();
+});
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
