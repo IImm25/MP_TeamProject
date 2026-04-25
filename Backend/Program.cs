@@ -35,6 +35,7 @@ builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<TaskToolMapper>();
     cfg.AddProfile<ToolResponseMapper>();
     cfg.AddProfile<QualificationResponseMapper>();
+    cfg.AddProfile<PersonDetailMapper>();
 });
 
 
