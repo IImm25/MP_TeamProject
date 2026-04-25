@@ -20,8 +20,8 @@ public class GmplController : ControllerBase
     [HttpGet("")]
     public async Task<ActionResult<string>> Test()
     {
-        await DataFileGenerator.SaveDataFile("sometext");
-        return Ok("sometext");
+        string path = await DataFileGenerator.SaveDataFile("sometext");
+        return Ok(path);
 
     }
 

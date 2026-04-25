@@ -9,21 +9,22 @@ public class GmplService
 {
     private List<TaskItem> TaskItems = new List<TaskItem>();
     private List<Person> People = new List<Person>();
-    public GmplService(List<int> tasksIds)
+    public GmplService(List<int> taskIds, List<int> personIds)
     {
-      
+        TaskItems = GetTasksFromIds(taskIds);
+        People = GetPeopleFromIds(personIds);
     }
 
-    private async Task<List<TaskItem>> GetTasksFromIds()
+    private List<TaskItem> GetTasksFromIds(List<int> taskIds)
     {
         List<TaskItem> tasks = new List<TaskItem>();
-        
+
 
         //from repo
         throw new NotImplementedException();
         return tasks;
     }
-    private async Task<List<Person>> GetPeopleFromIds()
+    private List<Person> GetPeopleFromIds(List<int> personIds)
     {
         List<Person> people = new List<Person>();
 
@@ -35,22 +36,29 @@ public class GmplService
 
 
 
-    public async Task CaculateGmplModel()
-    {   
+    public async Task<GmplResults> CaculateGmplModel()
+    {
         try
         {
-            DataFileGenerator datFileGenerator = new DataFileGenerator();
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People);
+
+            string datFileText = await datFileGenerator.CreateDataFile();
+            string resp = await DataFileGenerator.SaveDataFile(datFileText);
+
             // ── Validate  ────────────────────────────────────
             GmplValidator.Test(DAT);
 
             // ── Solve ──────────────────────────────────────────
-            GmplResults result = GmplSolver.Solve(MOD, DAT);
 
-            // ── Output results ──────────────────────────────
-            GmplOutput2Console.GetGmplResults(result);
+            if (!resp.Contains("Exception"))
+            {
+                GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
+                
+                GmplOutput2Console.GetGmplResults(result);
 
-            // ── processing ─────────────────────────
-            
+                return result;
+            }
+
         }
         catch (ValidationError ex)
         {
@@ -70,9 +78,8 @@ public class GmplService
             Console.WriteLine($"  [unexpected Error] {ex.Message}");
             Console.ResetColor();
         }
+        return null;
     }
-
-
 
     //public async void call()
     //{

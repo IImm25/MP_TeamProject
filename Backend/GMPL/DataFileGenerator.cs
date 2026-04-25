@@ -8,18 +8,29 @@ public class DataFileGenerator
     const int maxWorkingHours = 8;
     const int amoutBoats = 8;
     private List<TaskItem> TaskItems {  get; set; }
+    private List<Person> People {  get; set; }
 
-    public DataFileGenerator(List<TaskItem> taskItems)
+    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people)
     {
         TaskItems = taskItems;
+        People = people;
     }
 
-    public async static Task SaveDataFile(string dataFileText)
+    public async static Task<string> SaveDataFile(string dataFileText)
     {
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "test.dat");
-        File.WriteAllText(path, dataFileText);
+        try
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "test.dat");
+            File.WriteAllText(path, dataFileText);
+            return path;
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+
     }
-    public async Task<string> WriteDatafile(List<Person> people)
+    public async Task<string> CreateDataFile()
     {
         var allQualifications = ExtractQualifications();
         var allTools = ExtractTools();
@@ -32,14 +43,14 @@ public class DataFileGenerator
 
         WriteSet(sb, "TASKS", taskIds);
         WriteSet(sb, "QUALIS", allQualifications.Select(q => Sanitize(q.Name)));
-        WriteSet(sb, "PEOPLE", people.Select((_, i) => $"p{i + 1}"));
+        WriteSet(sb, "PEOPLE", People.Select((_, i) => $"p{i + 1}"));
         WriteSet(sb, "TOOLS", allTools.Select(t => Sanitize(t.Name)));
         sb.AppendLine();
 
         WriteParamDuration(sb, taskIds);
         sb.AppendLine();
 
-        WriteParamHasQuali(sb, people, allQualifications);
+        WriteParamHasQuali(sb, People, allQualifications);
         sb.AppendLine();
 
         WriteParamRequiredQualis(sb, taskIds, allQualifications);
