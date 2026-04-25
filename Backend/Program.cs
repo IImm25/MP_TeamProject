@@ -1,6 +1,7 @@
 using Backend.Data;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
+using Backend.Web.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,13 @@ builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
 builder.Services.AddScoped<IRepository<PersonQualification>, Repository<PersonQualification>>();
 builder.Services.AddScoped<IRepository<TaskQualification>, Repository<TaskQualification>>();
 builder.Services.AddScoped<IRepository<TaskTool>, Repository<TaskTool>>();
+
+//Linda meinte das geht nicht damitm sollte es gehen
+builder.Services.AddScoped<PersonService>();
+//builder.Services.AddScoped<GmplService>();
+builder.Services.AddScoped<QualificationService>();
+builder.Services.AddScoped<TaskItemService>();
+builder.Services.AddScoped<ToolService>();
 
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonSummaryMapper>();
