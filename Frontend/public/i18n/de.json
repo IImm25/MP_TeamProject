@@ -33,7 +33,7 @@
         "NEW": "Neue Qualifikation",
         "EDIT": "Qualifikation bearbeiten",
         "QUALIFICATION": "Qualifikation",
-        "COUNT": "Anzahl",
+        "REQUIRED_AMOUNT": "Anzahl",
         "DURATION": "Dauer",
         "PLACEHOLDER": "Wähle eine Qualifikation!"
       },
@@ -42,7 +42,7 @@
         "NEW": "Neues Werkzeug",
         "EDIT": "Werkzeug bearbeiten",
         "TOOL": "Werkzeug",
-        "COUNT": "Anzahl",
+        "REQUIRED_AMOUNT": "Anzahl",
         "PLACEHOLDER": "Wähle ein Werkzeug!"
       },
       "DELETE_TITLE": "Aufgabe löschen",

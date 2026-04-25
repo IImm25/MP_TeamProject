@@ -1,5 +1,5 @@
 import { Component, inject, Input, model, OnInit, signal, WritableSignal } from '@angular/core';
-import { TaskTool } from '../../../Models/task-tool';
+import { TaskTool } from '../../../Models/task';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
+import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-dialog-task-tool',
@@ -24,7 +25,7 @@ import { environment } from '../../../../environments/environment';
   styleUrl: './dialog-task-tool.css',
 })
 export class DialogTaskTool implements OnInit {
-  private http = inject(HttpClient);
+  private http = inject(HttpService);
   private formBuilder = inject(FormBuilder);
   apiUrl = environment.apiUrl;
 
@@ -35,7 +36,7 @@ export class DialogTaskTool implements OnInit {
 
   toolForm = this.formBuilder.group({
     selectedToolForm: new FormControl<Tool | null>(null, Validators.required),
-    selectedToolCount: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
+    selectedToolAmount: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
   });
 
   ngOnInit(): void {
@@ -46,16 +47,16 @@ export class DialogTaskTool implements OnInit {
   }
 
   getTools() {
-    this.http.get<Tool[]>(`${this.apiUrl}/tools`).subscribe((tools) => {
+    this.http.getTools().subscribe((tools) => {
       this.allTools.set(tools);
 
       const currentTaskTool = this.selectedTool();
 
       if (this.type === 'Edit' && currentTaskTool) {
-        const matchingTool = tools.find((t) => t.id === currentTaskTool.id) || null;
+        const matchingTool = tools.find((t) => t.id === currentTaskTool.toolId) || null;
         this.toolForm.patchValue({
           selectedToolForm: matchingTool,
-          selectedToolCount: currentTaskTool.count,
+          selectedToolAmount: currentTaskTool.requiredAmount,
         });
       }
     });
@@ -65,18 +66,17 @@ export class DialogTaskTool implements OnInit {
     if (this.toolForm.valid && this.toolForm.value) {
       const toolBase = this.toolForm.controls.selectedToolForm.value as Tool;
       const taskTool: TaskTool = {
-        id: toolBase.id,
-        name: toolBase.name,
-        count: this.toolForm.controls.selectedToolCount.value as number,
+        toolId: toolBase.id,
+        requiredAmount: this.toolForm.controls.selectedToolAmount.value as number,
       };
       this.selectedTool.set(taskTool);
       this.visible.set(false);
-      this.toolForm.reset({ selectedToolForm: null, selectedToolCount: 1 });
+      this.toolForm.reset({ selectedToolForm: null, selectedToolAmount: 1 });
     }
   }
 
   close() {
     this.visible.set(false);
-    this.toolForm.reset({ selectedToolForm: null, selectedToolCount: 1 });
+    this.toolForm.reset({ selectedToolForm: null, selectedToolAmount: 1 });
   }
 }

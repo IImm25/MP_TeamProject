@@ -1,7 +1,7 @@
-import { HttpInterceptorFn, HttpResponse, HttpRequest } from '@angular/common/http';
+/* import { HttpInterceptorFn, HttpResponse} from '@angular/common/http';
 import { delay, of } from 'rxjs';
 import { Task } from '../Models/task';
-import { Employees } from '../Models/employees';
+import { Employee } from '../Models/employee';
 import { Tool } from '../Models/tool';
 import { Qualification } from '../Models/qualification';
 import { Boat } from '../Models/boat';
@@ -11,64 +11,81 @@ let tasks: Task[] = [
     id: 1,
     name: 'Ölwechsel im Getriebe',
     durationHours: 6.0,
-    taskQualifications: [
-      { id: 2, name: 'Überleben auf See', count: 1 },
-      { id: 3, name: 'Elektrotechnik', count: 2 },
+    requiredQualifications: [
+      {
+        id: 2,
+        requiredAmount: 2,
+      },
+      {
+        id: 3,
+        requiredAmount: 2,
+      },
     ],
-    tasktools: [
-      { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
-      { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 },
+    requiredTools: [
+      {
+        id: 1,
+        requiredAmount: 1,
+      },
+      {
+        id: 2,
+        requiredAmount: 2,
+      },
     ],
   },
   {
     id: 2,
     name: 'Reparatur Vogelschlag (Flügel)',
-    durationHours: 8.0,
-    taskQualifications: [
-      { id: 1, name: 'Höhenrettung', count: 1 },
-      { id: 4, name: 'Rotorblatt-Check', count: 1 },
+    durationHours: 8.5,
+    requiredQualifications: [
+      {
+        id: 1,
+        requiredAmount: 1,
+      },
+      {
+        id: 4,
+        requiredAmount: 1,
+      },
     ],
-    tasktools: [
-      { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 3 },
-      { id: 3, name: 'Harz-Reparaturset', count: 1 },
+    requiredTools: [
+      {
+        id: 2,
+        requiredAmount: 1,
+      },
+      {
+        id: 3,
+        requiredAmount: 2,
+      },
     ],
   },
 ];
 
-let employees: Employees[] = [
+let people: Employee[] = [
   {
     id: 1,
     firstname: 'Hannes',
     lastname: 'Fiedler',
-    qualifications: [
-      { id: 2, name: 'Überleben auf See' },
-      { id: 3, name: 'Elektrotechnik' },
-    ],
+    qualificationIds: [ 2, 3 ],
   },
   {
     id: 2,
     firstname: 'Sören',
     lastname: 'Smit',
-    qualifications: [
-      { id: 1, name: 'Höhenrettung' },
-      { id: 2, name: 'Überleben auf See' },
-      { id: 4, name: 'Rotorblatt-Check' },
-    ],
+    qualificationIds: [ 1, 2, 4 ],
   },
 ];
 
 let tools: Tool[] = [
-  { id: 1, name: 'Schwerlast-Schlagschrauber', stock: 5 },
-  { id: 2, name: 'Kletter-Ausrüstung (PSA)', stock: 20 },
-  { id: 3, name: 'Harz-Reparaturset', stock: 10 },
-  { id: 4, name: 'Spannungsprüfer', stock: 15 },
+  { id: 1, name: 'Schwerlast-Schlagschrauber', availableStock: 5 },
+  { id: 2, name: 'Kletter-Ausrüstung (PSA)', availableStock: 20 },
+  { id: 3, name: 'Harz-Reparaturset', availableStock: 10 },
+  { id: 4, name: 'Spannungsprüfer', availableStock: 15 },
 ];
 
 let qualifications: Qualification[] = [
-  { id: 1, name: 'Höhenrettung' },
-  { id: 2, name: 'Überleben auf See' },
-  { id: 3, name: 'Elektrotechnik' },
-  { id: 4, name: 'Rotorblatt-Check' },
+  { id: 1, name: 'Höhenrettung', description: 'Höhenrettung mit Kletter-Ausrüstung' },
+  { id: 2, name: 'Überleben auf See', description: 'Überleben auf See mit Harz-Reparaturset' },
+  { id: 3, name: 'Elektrotechnik', description: 'Elektrotechnik mit Spannungsprüfer' },
+  { id: 4, name: 'Rotorblatt-Check', description: 'Rotorblatt-Check mit Schwerlast-Schlagschrauber' },
 ];
 
 let schedule: Boat[] = [
@@ -79,13 +96,25 @@ let schedule: Boat[] = [
         id: 1,
         name: 'Ölwechsel im Getriebe',
         durationHours: 6.0,
-        taskQualifications: [
-          { id: 2, name: 'Überleben auf See', count: 1 },
-          { id: 3, name: 'Elektrotechnik', count: 2 },
+        requiredQualifications: [
+          {
+            id: 2,
+            requiredAmount: 2,
+          },
+          {
+            id: 3,
+            requiredAmount: 2,
+          },
         ],
-        tasktools: [
-          { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
-          { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 },
+        requiredTools: [
+          {
+            id: 1,
+            requiredAmount: 1,
+          },
+          {
+            id: 2,
+            requiredAmount: 2,
+          },
         ],
       },
     ],
@@ -94,15 +123,12 @@ let schedule: Boat[] = [
         id: 1,
         firstname: 'Hannes',
         lastname: 'Fiedler',
-        qualifications: [
-          { id: 2, name: 'Überleben auf See' },
-          { id: 3, name: 'Elektrotechnik' },
-        ],
+        qualificationIds: [2,3],
       },
     ],
     taskTools: [
-      { id: 1, name: 'Schwerlast-Schlagschrauber', count: 1 },
-      { id: 2, name: 'Kletter-Ausrüstung (PSA)', count: 2 },
+      { id: 1, requiredAmount: 1},
+      { id: 2, requiredAmount: 2},
     ],
   },
 ];
@@ -145,38 +171,38 @@ export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
     return of(new HttpResponse({ status: 200, body: task })).pipe(delay(100));
   }
 
-  //Employees
-  // GET /employees
-  if (url.endsWith('/employees') && method === 'GET') {
-    return of(new HttpResponse({ status: 200, body: employees })).pipe(delay(100));
+  //people
+  // GET /people
+  if (url.endsWith('/people') && method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: people })).pipe(delay(100));
   }
 
-  // POST /employees
-  if (url.endsWith('/employees') && method === 'POST') {
+  // POST /people
+  if (url.endsWith('/people') && method === 'POST') {
     const newEmployee = { ...(body as any), id: Math.floor(Math.random() * 1000) };
-    employees.push(newEmployee);
+    people.push(newEmployee);
     return of(new HttpResponse({ status: 201, body: newEmployee })).pipe(delay(100));
   }
 
-  // PATCH /employees/{id}
-  if (url.match(/\/employees\/\d+$/) && method === 'PATCH') {
+  // PATCH /people/{id}
+  if (url.match(/\/people\/\d+$/) && method === 'PATCH') {
     const id = parseInt(url.split('/').pop() || '0');
-    employees = employees.map((t) => (t.id === id ? { ...t, ...(body as any) } : t));
-    var employee = employees.find((t) => t.id === id);
+    people = people.map((t) => (t.id === id ? { ...t, ...(body as any) } : t));
+    var employee = people.find((t) => t.id === id);
     return of(new HttpResponse({ status: 200, body: employee })).pipe(delay(100));
   }
 
-  // DELETE /employees/{id}
-  if (url.match(/\/employees\/\d+$/) && method === 'DELETE') {
+  // DELETE /people/{id}
+  if (url.match(/\/people\/\d+$/) && method === 'DELETE') {
     const id = parseInt(url.split('/').pop() || '0');
-    employees = employees.filter((t) => t.id !== id);
+    people = people.filter((t) => t.id !== id);
     return of(new HttpResponse({ status: 204 })).pipe(delay(100));
   }
 
-  // GET /employees/{id}
-  if (url.match(/\/employees\/\d+$/) && method === 'GET') {
+  // GET /people/{id}
+  if (url.match(/\/people\/\d+$/) && method === 'GET') {
     const id = parseInt(url.split('/').pop() || '0');
-    const employee = employees.find((t) => t.id === id);
+    const employee = people.find((t) => t.id === id);
     return of(new HttpResponse({ status: 200, body: employee })).pipe(delay(100));
   }
 
@@ -259,3 +285,4 @@ export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
   // Falls keine Route matcht, Anfrage normal durchlassen (oder Fehler werfen)
   return next(req);
 };
+ */

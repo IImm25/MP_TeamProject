@@ -120,7 +120,7 @@
                   <ng-template pTemplate="header">
                     <tr>
                       <th>{{ 'TASKS.DIALOG.QUALIFICATION.QUALIFICATION' | translate }}</th>
-                      <th>{{ 'TASKS.DIALOG.QUALIFICATION.COUNT' | translate }}</th>
+                      <th>{{ 'TASKS.DIALOG.QUALIFICATION.REQUIRED_AMOUNT' | translate }}</th>
                       @if (type !== 'Detail') {
                         <th style="width: 4rem"></th>
                       }
@@ -128,8 +128,8 @@
                   </ng-template>
                   <ng-template pTemplate="body" let-qualification let-i="rowIndex">
                     <tr>
-                      <td>{{ qualification.name }}</td>
-                      <td>{{ qualification.count }}</td>
+                      <td>{{ getQualificationName(qualification.qualificationId) }}</td>
+                      <td>{{ qualification.requiredAmount }}</td>
                       @if (type !== 'Detail') {
                         <td style="display: flex">
                           <p-button
@@ -197,11 +197,11 @@
               </div>
 
               <div class="tool-list">
-                <p-table [value]="taskForm.get('tools')?.value ?? []">
+                <p-table [value]="taskForm.controls.tools.value ?? []">
                   <ng-template pTemplate="header">
                     <tr>
                       <th>{{ 'TASKS.DIALOG.TOOL.TOOL' | translate }}</th>
-                      <th>{{ 'TASKS.DIALOG.TOOL.COUNT' | translate }}</th>
+                      <th>{{ 'TASKS.DIALOG.TOOL.REQUIRED_AMOUNT' | translate }}</th>
                       @if (type !== 'Detail') {
                         <th style="width: 4rem"></th>
                       }
@@ -209,8 +209,8 @@
                   </ng-template>
                   <ng-template pTemplate="body" let-tool let-i="rowIndex">
                     <tr>
-                      <td>{{ tool.name }}</td>
-                      <td>{{ tool.count }}</td>
+                      <td>{{ getToolName(tool.toolId) }}</td>
+                      <td>{{ tool.requiredAmount }}</td>
                       @if (type !== 'Detail') {
                         <td style="display: flex">
                           <p-button

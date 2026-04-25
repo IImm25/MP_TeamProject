@@ -9,7 +9,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { Task } from '../../../Models/task';
+import { Task, TaskQualification, TaskTool } from '../../../Models/task';
 import { DialogModule } from 'primeng/dialog';
 import { StepperModule } from 'primeng/stepper';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -18,15 +18,14 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormBuilder } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Qualification } from '../../../Models/qualification';
-import { TaskTool } from '../../../Models/task-tool';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { DialogTaskTool } from '../dialog-task-tool/dialog-task-tool';
 import { environment } from '../../../../environments/environment';
-import { TaskQualification } from '../../../Models/task-qualification';
 import { DialogTaskQualification } from '../dialog-task-qualification/dialog-task-qualification';
+import { Tool } from '../../../Models/tool';
+import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-dialog-task',
@@ -49,24 +48,23 @@ import { DialogTaskQualification } from '../dialog-task-qualification/dialog-tas
 })
 export class DialogTask implements OnInit {
   private formBuilder = inject(FormBuilder);
-  private http = inject(HttpClient);
+  private http = inject(HttpService);
 
   @Output() taskSaved = new EventEmitter<void>();
 
   @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' = 'New';
   @Input() set selectedTask(val: Task | null) {
-    this._currentTask = val;
+    this.currentTask = val;
 
     if (val) {
       const dHours = Math.floor(val.durationHours);
       const dMinutes = Math.round((val.durationHours - dHours) * 60);
-
       this.taskForm.patchValue({
         name: val.name,
         durationHours: dHours,
         durationMinutes: dMinutes,
-        qualifications: val.taskQualifications,
-        tools: val.tasktools,
+        qualifications: val.requiredQualifications,
+        tools: val.requiredTools,
       });
       if (this.type === 'Detail') {
         this.taskForm.disable();
@@ -89,7 +87,7 @@ export class DialogTask implements OnInit {
 
   visible = model<boolean>(false);
 
-  _currentTask: Task | null = null;
+  currentTask: Task | null = null;
 
   apiUrl = environment.apiUrl;
 
@@ -97,8 +95,6 @@ export class DialogTask implements OnInit {
   qualificationDialogVisible: WritableSignal<boolean> = signal(false);
   QualificationType: WritableSignal<'Edit' | 'New'> = signal('New');
   selectedQualification: WritableSignal<TaskQualification | null> = signal(null);
-
-
 
   toolDialogVisible: WritableSignal<boolean> = signal(false);
   ToolType: WritableSignal<'Edit' | 'New'> = signal('New');
@@ -112,8 +108,15 @@ export class DialogTask implements OnInit {
     tools: [[] as TaskTool[], Validators.required],
   });
 
+  allTools: WritableSignal<Tool[]> = signal([]);
+
   ngOnInit(): void {
-    this.getQualifications();
+    this.http.getQualifications().subscribe((qualifications) => {
+      this.allQualifications.set(qualifications);
+    });
+    this.http.getTools().subscribe((tools) => {
+      this.allTools.set(tools);
+    });
   }
 
   validateStep(step: number): boolean {
@@ -181,22 +184,25 @@ export class DialogTask implements OnInit {
 
     const val = this.taskForm.value;
     const totalDuration = (val.durationHours || 0) + (val.durationMinutes || 0) / 60;
-    const payload = {
-      name: val.name,
+
+    const payload: Partial<Task> = {
+      name: val.name || '',
       durationHours: totalDuration,
-      taskQualifications: val.qualifications,
-      tasktools: val.tools,
+      requiredQualifications: val.qualifications || [],
+      requiredTools: val.tools || [],
     };
 
-    if (this.type === 'Edit' && this._currentTask) {
-      this.http.patch(`${this.apiUrl}/tasks/${this._currentTask.id}`, payload).subscribe({
+    console.log(payload);
+
+    if (this.type === 'Edit' && this.currentTask) {
+      this.http.updateTask(this.currentTask.id, payload).subscribe({
         next: () => {
           this.taskSaved.emit();
           this.visible.set(false);
         },
       });
     } else if (this.type === 'New') {
-      this.http.post(`${this.apiUrl}/tasks`, payload).subscribe({
+      this.http.createTask(payload).subscribe({
         next: () => {
           this.taskSaved.emit();
           this.visible.set(false);
@@ -217,15 +223,15 @@ export class DialogTask implements OnInit {
 
       if (this.ToolType() === 'Edit') {
         const originalTool = this.selectedTool();
-        const index = currentTools.findIndex((t) => t.id === originalTool?.id);
+        const index = currentTools.findIndex((t) => t.toolId === originalTool?.toolId);
 
         if (index !== -1) {
           currentTools[index] = newTool;
         }
       } else {
-        const existingIndex = currentTools.findIndex((t) => t.id === newTool.id);
+        const existingIndex = currentTools.findIndex((t) => t.toolId === newTool.toolId);
         if (existingIndex !== -1) {
-          currentTools[existingIndex].count += newTool.count;
+          currentTools[existingIndex].requiredAmount += newTool.requiredAmount;
         } else {
           currentTools.push(newTool);
         }
@@ -242,14 +248,14 @@ export class DialogTask implements OnInit {
     this.taskForm.patchValue({ tools: updatedTools });
   }
 
-  getQualifications() {
-    this.http
-      .get<Qualification[]>(`${this.apiUrl}/qualifications`)
-      .subscribe((qualifications) => this.allQualifications.set(qualifications));
+  getToolName(id: number): string {
+    const t = this.allTools().find((item) => item.id === id);
+    return t ? t.name : 'Unbekannt';
   }
 
   removeQualification(index: number) {
-    const currentQualifications = this.taskForm.controls.qualifications.value as TaskQualification[];
+    const currentQualifications = this.taskForm.controls.qualifications
+      .value as TaskQualification[];
     const updatedQualifications = currentQualifications.filter((_, i) => i !== index);
     this.taskForm.patchValue({ qualifications: updatedQualifications });
   }
@@ -265,15 +271,19 @@ export class DialogTask implements OnInit {
 
       if (this.QualificationType() === 'Edit') {
         const originalQualification = this.selectedQualification();
-        const index = currentQualifications.findIndex((t) => t.id === originalQualification?.id);
+        const index = currentQualifications.findIndex(
+          (q) => q.qualificationId === originalQualification?.qualificationId,
+        );
 
         if (index !== -1) {
           currentQualifications[index] = newQualification;
         }
       } else {
-        const existingIndex = currentQualifications.findIndex((t) => t.id === newQualification.id);
+        const existingIndex = currentQualifications.findIndex(
+          (q) => q.qualificationId === newQualification.qualificationId,
+        );
         if (existingIndex !== -1) {
-          currentQualifications[existingIndex].count += newQualification.count;
+          currentQualifications[existingIndex].requiredAmount += newQualification.requiredAmount;
         } else {
           currentQualifications.push(newQualification);
         }
@@ -282,5 +292,11 @@ export class DialogTask implements OnInit {
       this.taskForm.patchValue({ qualifications: currentQualifications });
     }
     this.qualificationDialogVisible.set(false);
+  }
+
+  getQualificationName(id: number): string {
+    const q = this.allQualifications().find((item) => item.id === id);
+    console.log("q: ", q, "id: ", id);
+    return q ? q.name : 'Unbekannt';
   }
 }
