@@ -2,6 +2,7 @@
 
 public class TaskItem
 {
+    TaskItem() { }
     public int Id { get; set; }
     public string Name { get; set; } = "";
     public float DurationHours { get; set; }

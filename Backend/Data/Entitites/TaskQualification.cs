@@ -7,4 +7,5 @@ public class TaskQualification
 
     public int QualificationId { get; set; }
     public Qualification Qualification { get; set; } = null!;
+    public int RequiredAmount { get; set; }
 }

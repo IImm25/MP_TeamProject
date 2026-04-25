@@ -1,12 +1,8 @@
-﻿using Backend.Data.DTO;
-
-namespace Backend.Web.Repositories;
-
-public interface ITaskItemRepository
+﻿namespace Backend.Data.Repositories
 {
-    Task<List<TaskItem>> GetAllAsync();
-    Task<TaskItem?> GetByIdAsync(int id);
-    Task<TaskItem> CreateAsync(TaskItemCreateDto dto);
-    Task<TaskItem?> UpdateAsync(int id, TaskItemUpdateDto dto);
-    Task<TaskItem?> DeleteAsync(int id);
+    public interface ITaskItemRepository : IRepository<TaskItem>
+    {
+        Task<TaskItem?> GetFullByIdAsync(int id);
+        Task<List<TaskItem>> GetAllFullAsync();
+    }
 }

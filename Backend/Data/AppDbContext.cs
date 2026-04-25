@@ -9,7 +9,7 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Person> People => Set<Person>();
+    public DbSet<Person> Persons => Set<Person>();
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
     public DbSet<Tool> Tools => Set<Tool>();
     public DbSet<Qualification> Qualifications => Set<Qualification>();
