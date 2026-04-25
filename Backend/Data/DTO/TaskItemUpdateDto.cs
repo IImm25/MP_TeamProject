@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO.Update;
+﻿namespace Backend.Data.DTO;
 
 public class TaskItemUpdateDto
 {

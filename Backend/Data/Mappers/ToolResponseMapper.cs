@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Backend.Data.DTO.Read;
+using Backend.Data.DTO;
 
 namespace Backend.Data.Mappers
 {

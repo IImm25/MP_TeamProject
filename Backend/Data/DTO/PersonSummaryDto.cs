@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO.Read
+﻿namespace Backend.Data.DTO
 {
     public class PersonSummaryDto
     {

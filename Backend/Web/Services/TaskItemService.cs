@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
+using Backend.Data.DTO;
 using Backend.Data.DTO.Create;
-using Backend.Data.DTO.Read;
-using Backend.Data.DTO.Update;
 using Backend.Data.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
 

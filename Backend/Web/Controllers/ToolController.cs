@@ -1,6 +1,5 @@
-﻿using Backend.Data.DTO.Create;
-using Backend.Data.DTO.Read;
-using Backend.Data.DTO.Update;
+﻿using Backend.Data.DTO;
+using Backend.Data.DTO.Create;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 

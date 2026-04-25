@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO.Read;
+﻿namespace Backend.Data.DTO;
 
 // ─── Response DTOs (kein zirkulärer Verweis) ─────────────────────────────────
 
