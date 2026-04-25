@@ -11,8 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // registering repositories to Dependency Injection
-builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
-builder.Services.AddScoped<IRepository<Person>, Repository<Person>>();
+builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IRepository<Qualification>, Repository<Qualification>>();
 builder.Services.AddScoped<IRepository<Tool>, Repository<Tool>>();
 builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();

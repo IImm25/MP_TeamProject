@@ -8,10 +8,10 @@ namespace Backend.Web.Services
 {
     public class TaskItemService
     {
-        private readonly IRepository<TaskItem> tasks;
+        private readonly ITaskItemRepository tasks;
         private readonly IMapper mapper;
 
-        public TaskItemService(IRepository<TaskItem> tasks, IMapper mapper)
+        public TaskItemService(ITaskItemRepository tasks, IMapper mapper)
         {
             this.tasks = tasks;
             this.mapper = mapper;
@@ -38,9 +38,9 @@ namespace Backend.Web.Services
                     RequiredAmount = reqQual.requiredAmount
                 });
             }
-
-
-            return mapper.Map<TaskItemDetailDto>(await tasks.AddAsync(taskItem));
+            await tasks.AddAsync(taskItem);
+            var saved = await tasks.GetFullByIdAsync(taskItem.Id);
+            return mapper.Map<TaskItemDetailDto>(saved);
         }
 
         public async Task<List<TaskItemSummaryDto>> GetAll()
@@ -50,12 +50,12 @@ namespace Backend.Web.Services
 
         public async Task<TaskItemDetailDto?> GetTaskItem(int id)
         {
-            return mapper.Map<TaskItemDetailDto?>(await tasks.GetByIdAsync(id));
+            return mapper.Map<TaskItemDetailDto?>(await tasks.GetFullByIdAsync(id));
         }
 
         public async Task<TaskItemDetailDto?> UpdateTaskItem(int id, TaskItemUpdateDto update)
         {
-            var taskItem = await tasks.GetByIdAsync(id);
+            var taskItem = await tasks.GetFullByIdAsync(id);
 
             if (taskItem == null) {
                 return null;

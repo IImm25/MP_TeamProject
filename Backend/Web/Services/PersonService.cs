@@ -8,10 +8,10 @@ namespace Backend.Web.Services
 {
     public class PersonService
     {
-        private readonly IRepository<Person> persons;
+        private readonly IPersonRepository persons;
         private readonly IMapper mapper;
 
-        public PersonService(IRepository<Person> persons, IMapper mapper)
+        public PersonService(IPersonRepository persons, IMapper mapper)
         {
             this.persons = persons;
             this.mapper = mapper;
@@ -29,8 +29,9 @@ namespace Backend.Web.Services
                     QualificationId = qId
                 });
             }
-
-            return mapper.Map<PersonDetailDto>(await persons.AddAsync(person));
+            await persons.AddAsync(person);
+            var saved = await persons.GetFullByIdAsync(person.Id);
+            return mapper.Map<PersonDetailDto>(saved);
         }
 
         public async Task<List<PersonSummaryDto>> GetAll()
@@ -41,13 +42,13 @@ namespace Backend.Web.Services
 
         public async Task<PersonDetailDto?> GetPerson(int id)
         {
-            Person? person = await persons.GetByIdAsync(id);
+            Person? person = await persons.GetFullByIdAsync(id);
             return mapper.Map<PersonDetailDto?>(person);
         }
 
         public async Task<PersonDetailDto?> UpdatePerson(int id, PersonUpdateDto update)
         {
-            var person = await persons.GetByIdAsync(id);
+            var person = await persons.GetFullByIdAsync(id);
 
             if (person == null)
                 return null;
