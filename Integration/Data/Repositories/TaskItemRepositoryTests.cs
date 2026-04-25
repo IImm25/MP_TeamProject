@@ -1,20 +1,41 @@
 ﻿using Backend.Data;
 using Backend.Data.DTO;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+using Respawn;
 
 namespace Backend.Web.Repositories.Tests
 {
     [TestClass()]
     public class TaskItemRepositoryTests
     {
-        private WebApplicationFactory<Program> _factory = null!;
+        private static WindPowerFactory _factory = null!;
+        private static Respawner _respawner = null!;
+
+        [ClassInitialize]
+        public static async Task ClassSetup(TestContext context)
+        {
+            _factory = new WindPowerFactory();
+            // creates client, automatically handles migrations through EF Core
+            _factory.CreateClient();
+
+            // Respawn
+            using var conn = new NpgsqlConnection(_factory.GetConnectionString());
+            await conn.OpenAsync();
+            _respawner = await Respawner.CreateAsync(conn, new RespawnerOptions
+            {
+                DbAdapter = DbAdapter.Postgres,
+                SchemasToInclude = new[] { "public" }
+            });
+        }
 
         [TestInitialize]
-        public void Setup()
+        public async Task TestSetup()
         {
-            _factory = new WebApplicationFactory<Program>();
+            using var conn = new NpgsqlConnection(_factory.GetConnectionString());
+            await conn.OpenAsync();
+            await _respawner.ResetAsync(conn);
         }
 
         [TestMethod()]
@@ -30,7 +51,7 @@ namespace Backend.Web.Repositories.Tests
             db.Qualifications.Add(qual);
             await db.SaveChangesAsync();
 
-            var repo = new TaskItemRepository(db);
+            var repo = scope.ServiceProvider.GetRequiredService<ITaskItemRepository>(); ;
             var dto = new TaskItemCreateDto
             {
                 Name = expectedTaskName,
@@ -47,7 +68,13 @@ namespace Backend.Web.Repositories.Tests
             Assert.AreEqual(expectedQualName, result.RequiredQualifications.First().Qualification.Name, "Nested qualification name mismatch.");
 
             var dbItem = await db.Tasks.AnyAsync(t => t.Id == result.Id);
-            Assert.IsTrue(dbItem, "Data was not commited to database.");
+            Assert.IsTrue(dbItem, "Data was not commited to the database.");
+        }
+
+        [ClassCleanup]
+        public static async Task ClassTeardown()
+        {
+            await _factory.DisposeAsync();
         }
     }
 }
