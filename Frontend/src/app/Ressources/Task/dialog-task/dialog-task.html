@@ -13,7 +13,7 @@
   [style]="{ width: '50vw' }"
 >
   <form [formGroup]="taskForm">
-    <p-stepper [linear]="true" [value]="1">
+    <p-stepper [linear]="type !== 'Detail'" [value]="1">
       <p-step-list>
         <p-step [value]="1">{{ 'TASKS.DIALOG.CORE' | translate }}</p-step>
         <p-step [value]="2">{{ 'TASKS.DIALOG.QUALIFICATIONS' | translate }}</p-step>
