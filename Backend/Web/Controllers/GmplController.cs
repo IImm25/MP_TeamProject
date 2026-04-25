@@ -1,4 +1,5 @@
 ﻿using Backend.Data.DTO;
+using Backend.GMPL;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
@@ -19,7 +20,7 @@ public class GmplController : ControllerBase
     [HttpGet("")]
     public async Task<ActionResult<string>> Test()
     {
-        await GmplService.SaveDataFile("sometext2");
+        await DataFileGenerator.SaveDataFile("sometext");
         return Ok("sometext");
 
     }
