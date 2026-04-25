@@ -20,6 +20,16 @@ namespace Backend.Web.Services
         public async Task<PersonDetailDto> CreatePerson(PersonCreateDto create)
         {
             Person person = new Person(create.Firstname, create.Lastname);
+
+            foreach (var qId in create.QualificationIds)
+            {
+                person.Qualifications.Add(new PersonQualification
+                {
+                    PersonId = person.Id,
+                    QualificationId = qId
+                });
+            }
+
             return mapper.Map<PersonDetailDto>(await persons.AddAsync(person));
         }
 
