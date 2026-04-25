@@ -1,15 +1,14 @@
 import { Component, inject, Input, model, signal, WritableSignal } from '@angular/core';
-import { TaskQualification } from '../../../Models/task-qualification';
 import { Qualification } from '../../../Models/qualification';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
 import { DialogModule } from 'primeng/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { disabled } from '@angular/forms/signals';
+import { TaskQualification } from '../../../Models/task';
+import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-dialog-task-qualification',
@@ -25,7 +24,7 @@ import { disabled } from '@angular/forms/signals';
   styleUrl: './dialog-task-qualification.css',
 })
 export class DialogTaskQualification {
-  private http = inject(HttpClient);
+  private http = inject(HttpService);
   private formBuilder = inject(FormBuilder);
   apiUrl = environment.apiUrl;
 
@@ -36,7 +35,7 @@ export class DialogTaskQualification {
 
   qualificationForm = this.formBuilder.group({
     selectedQualificationForm: new FormControl<Qualification | null>(null, Validators.required),
-    selectedQualificationCount: new FormControl<number>(1, [
+    selectedQualificationAmount: new FormControl<number>(1, [
       Validators.required,
       Validators.min(1),
     ]),
@@ -50,17 +49,17 @@ export class DialogTaskQualification {
   }
 
   getQualifications() {
-    this.http.get<Qualification[]>(`${this.apiUrl}/qualifications`).subscribe((Qualifications) => {
+    this.http.getQualifications().subscribe((Qualifications) => {
       this.allQualifications.set(Qualifications);
 
       const currentTaskQualification = this.selectedQualification();
 
       if (this.type === 'Edit' && currentTaskQualification) {
         const matchingQualification =
-          Qualifications.find((t) => t.id === currentTaskQualification.id) || null;
+          Qualifications.find((q) => q.id === currentTaskQualification.qualificationId) || null;
         this.qualificationForm.patchValue({
           selectedQualificationForm: matchingQualification,
-          selectedQualificationCount: currentTaskQualification.count,
+          selectedQualificationAmount: currentTaskQualification.requiredAmount,
         });
       }
     });
@@ -71,15 +70,14 @@ export class DialogTaskQualification {
       const qualificationBase = this.qualificationForm.controls.selectedQualificationForm
         .value as Qualification;
       const taskQualification: TaskQualification = {
-        id: qualificationBase.id,
-        name: qualificationBase.name,
-        count: this.qualificationForm.controls.selectedQualificationCount.value as number,
+        qualificationId: qualificationBase.id,
+        requiredAmount: this.qualificationForm.controls.selectedQualificationAmount.value as number,
       };
       this.selectedQualification.set(taskQualification);
       this.visible.set(false);
       this.qualificationForm.reset({
         selectedQualificationForm: null,
-        selectedQualificationCount: 1,
+        selectedQualificationAmount: 1,
       });
     }
   }
@@ -88,7 +86,7 @@ export class DialogTaskQualification {
     this.visible.set(false);
     this.qualificationForm.reset({
       selectedQualificationForm: null,
-      selectedQualificationCount: 1,
+      selectedQualificationAmount: 1,
     });
   }
 }

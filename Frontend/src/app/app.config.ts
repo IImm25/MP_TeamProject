@@ -12,7 +12,7 @@ import Aura from '@primeuix/themes/aura';
 
 import { routes } from './app.routes';
 import { FormBuilder } from '@angular/forms';
-import { httpMockInterceptor } from './Services/interceptor';
+//import { httpMockInterceptor } from './Services/interceptor';
 import { definePreset } from '@primeuix/themes';
 
 const BluePreset = definePreset(Aura, {
@@ -37,7 +37,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withFetch(), withInterceptors([httpMockInterceptor])),
+    provideHttpClient(withFetch()/*, withInterceptors([httpMockInterceptor])*/),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: './i18n/',
