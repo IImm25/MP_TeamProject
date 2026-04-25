@@ -3,11 +3,12 @@
 using Backend.GMPL;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 public class GmplService
 {
     private List<TaskItem> TaskItems = new List<TaskItem>();
-
+    private List<Person> People = new List<Person>();
     public GmplService(List<TaskItem> tasks)
     {
         this.TaskItems = tasks;
@@ -28,6 +29,7 @@ public class GmplService
     private const string DAT = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\data.dat";
     public async Task CaculateGmplModel()
     {
+        
         try
         {
             // ── Validate  ────────────────────────────────────
@@ -63,10 +65,10 @@ public class GmplService
     }
 
     
-    public async Task SaveDataFile(string path, string dataFileText)
+    public async static Task SaveDataFile(string dataFileText)
     {
+        string path = Path.Combine(Directory.GetCurrentDirectory(),   "..", "GMPL", "test.dat");
         File.WriteAllText(path, dataFileText);
-
     }
     public async Task<string> WriteDatafile(List<Person> people, int maxWorkingHours = 8, int amoutBoats = 8)
     {

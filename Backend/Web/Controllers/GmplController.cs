@@ -5,13 +5,24 @@ using System.Threading.Tasks;
 namespace Backend.Web.Controllers;
 
 [ApiController]
-[Route("/[controller]")]
+[Route("api/gmpl")]
 public class GmplController : ControllerBase
 {
+
     public GmplController()
     {
         
     }
+
+
+    [HttpGet("")]
+    public async Task<ActionResult<string>> Test()
+    {
+        await GmplService.SaveDataFile("sometext2");
+        return Ok("sometext");
+
+    }
+
 
     //[HttpPost("boats")]
     //public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody] List<TaskItem> tasks, [FromBody] List<Person> people)
