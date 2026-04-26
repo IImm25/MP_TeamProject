@@ -1,0 +1,24 @@
+# Description: Minimum crew requirement (safety constraint).
+# Scenario: A boat requires at least 2 persons for safety (four-eyes principle). Task A1 needs only 1 qualified person.
+# Reasoning: The model only enforces task feasibility and qualification checks, but does not include a minimum crew constraint per boat.
+# Therefore, it may assign a single person and still consider the task executable.
+# Expected result: 0 (in a realistic safety-constrained model).
+# Note: The current model may still return WorkHours = 5 because no minimum crew constraint is defined.
+# Maximize WorkHours: 5.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1 P2 Tech 0;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+
+end;

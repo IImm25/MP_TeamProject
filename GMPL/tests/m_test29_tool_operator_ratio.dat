@@ -1,0 +1,25 @@
+# Description: Tool-to-operator ratio constraint.
+# Scenario: Task A1 requires 3 instances of tool W1 simultaneously, but only one person (P1) is available on the boat.
+# Reasoning: The model only checks tool availability on the boat, not whether enough personnel are available to operate or handle multiple tools concurrently.
+# Therefore, the feasibility is incorrectly determined solely by tool presence, ignoring human operational constraints.
+# Expected result: 0 (in a more realistic model with operator constraints).
+# Note: Current model may still return WorkHours = 5 if tool availability alone is satisfied.
+#
+# Maximize WorkHours: 5.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 3;
+param stockTools := W1 3;
+
+end;

@@ -1,0 +1,26 @@
+# Description: Resource waste – assigning crew to unused boats.
+# Scenario: Two boats, one person (P1), and task A1 (5h) requires no qualifications.
+# Reasoning: P1 may be assigned to any boat without affecting WorkHours, since A1 does not require personnel.
+# This makes such assignments irrelevant for the objective function and therefore not meaningful.
+# Additional note: The model does not include a passenger capacity constraint for boats.
+# As a result, crew distribution across boats does not influence feasibility or objective value unless explicitly linked to tasks.
+# Expected result: WorkHours = 5 (task executed). Crew assignment is arbitrary and does not affect the outcome.
+# Maximize WorkHours: 5.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1 P2 P3;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Tech 1 P2 Tech 1 P3 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+
+# Wir können hier kein Bootslimit testen, da es den Parameter im Modell nicht gibt.
+end;

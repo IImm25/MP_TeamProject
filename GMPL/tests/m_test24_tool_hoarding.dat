@@ -1,0 +1,23 @@
+# Description: Tool hoarding on unused boats.
+# Scenario: Two boats. Boat 1 executes A1 (requires 5x W1). Total stock is 10x W1. Boat 2 has no tasks.
+# Reasoning: The model may allow toolOnBoat[b,t] to be assigned independently of boatUsage[b].
+# This means tools could be allocated to an unused boat (boatUsage = 0), potentially blocking availability.
+# Expected result: The model should ideally only allocate tools to boats with active tasks, but as currently defined,
+# toolOnBoat is not constrained by boatUsage, so tools may still be assigned to unused boats.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 2;
+param maxWorkingHours := 10;
+
+param duration := A1 10;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 5;
+param stockTools := W1 5;
+end;

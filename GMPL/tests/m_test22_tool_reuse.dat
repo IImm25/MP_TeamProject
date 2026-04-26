@@ -1,0 +1,24 @@
+# Description: Multi-task tool usage logic.
+# Scenario: A1 and A2 each require 3 units of W1 and are assigned to the same boat.
+# Reasoning: The constraint toolOnBoat[b,t] >= requiredTools[ta,t] * taskOnBoat[b,ta]
+# ensures that tool requirements are enforced per boat, not summed across tasks.
+# Thus, if both tasks are on the same boat, only 3 units of W1 are needed in total (not 6),
+# since the tool can be reused between tasks sequentially.
+# Expected result: Both A1 and A2 are scheduled on one boat if stockTools(W1) ≥ 3.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 12;
+
+param duration := A1 5 A2 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1 A2 Tech 1;
+param requiredTools := A1 W1 3 A2 W1 3;
+param stockTools := W1 3;
+end;

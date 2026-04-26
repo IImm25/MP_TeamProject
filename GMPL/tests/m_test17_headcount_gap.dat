@@ -1,0 +1,34 @@
+# Description: Qualification edge case (headcount vs. skill aggregation).
+# Scenario: A1 requires 2 mechanics and 1 electrician. P1 is both mechanic and electrician, P2 is a mechanic, P3 is an electrician.
+# Reasoning: The QualiCheck is evaluated per qualification type independently, not as a strict per-person role assignment.
+# Mech: P1 + P2 = 2 ≥ required 2 (OK). Elek: P1 = 1 ≥ required 1 (OK).
+# Thus A1 is feasible even though it appears to require 3 distinct role fulfillments.
+# Expected result: A1 is executed.
+# Note: This reveals a modeling characteristic where skills are aggregated per type without enforcing a strict headcount coupling across skills.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1;
+set QUALIS := Mech Elek;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 12;
+
+param duration := A1 10;
+
+param hasQuali :=
+P1 Mech 1
+P1 Elek 1
+P2 Mech 1
+P2 Elek 0;
+
+param requiredQualis :=
+A1 Mech 2
+A1 Elek 1;
+
+param requiredTools :=
+A1 W1 0;
+
+param stockTools := W1 0;
+end;

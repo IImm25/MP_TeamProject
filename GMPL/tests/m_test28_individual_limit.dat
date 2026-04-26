@@ -1,0 +1,24 @@
+# Description: Maximum working time per person.
+# Scenario: One boat allows 12h operation (maxWorkingHours = 12). A1 (7h) and A2 (5h). Only one person P1 with required skills.
+# Reasoning: The model assigns P1 to the boat and allows both tasks to be executed sequentially, totaling 12h.
+# Since there is no constraint limiting individual working time per person, P1 can be assigned to the full duration.
+# Expected result: WorkHours = 12.
+# Note: With an additional (non-modelled) personal working time limit (e.g., 8h), only one task would be feasible.
+# Maximize WorkHours: 12.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 12;
+
+param duration := A1 7 A2 5;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1 A2 Tech 1;
+param requiredTools := A1 W1 0 A2 W1 0;
+param stockTools := W1 0;
+
+end;

@@ -1,0 +1,30 @@
+# Description: Complex headcount check (attempt 2).
+# Scenario: A1 requires 2 mechanics. P1 is the only mechanic available.
+# Reasoning: Since personOnBoat[p,b] is binary, P1 can contribute at most 1 to the mechanic count.
+# Therefore the maximum achievable sum for Mech is 1, which is below the required 2.
+# This makes A1 infeasible under the QualiCheck constraint.
+# Expected result: A1 cannot be executed (ACTUAL = 0).
+# Note: If A1 is still scheduled, it indicates a flaw in the qualification counting logic or constraint formulation.
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Mech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 8;
+
+param duration := A1 5;
+
+param hasQuali :=
+P1 Mech 1;
+
+param requiredQualis :=
+A1 Mech 2;
+
+param requiredTools :=
+A1 W1 0;
+
+param stockTools := W1 0;
+end;
