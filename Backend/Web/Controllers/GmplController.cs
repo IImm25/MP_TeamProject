@@ -28,7 +28,7 @@ public class GmplController : ControllerBase
         {
             return Ok(response);
         }
-        else return BadRequest();
+        else return Ok("Planning failed.");
     }
 
 
