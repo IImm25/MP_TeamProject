@@ -1,60 +1,108 @@
-# GMPL Test Runner for Windows (PowerShell)
+$ErrorActionPreference = "Stop"
 
-# Verzeichnis der Testdateien (relativ zum Skript-Standort)
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$TestDir = Join-Path $ScriptDir "tests"
-$ModelFile = Join-Path $ScriptDir "modell.mod"
+# ==============================
+# Paths
+# ==============================
+$ScriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
+$TestDir    = Join-Path $ScriptDir "tests"
+$ModelFile  = Join-Path $ScriptDir "modell.mod"
+
+# ==============================
+# Counters
+# ==============================
+$total = 0
+$passed = 0
+$failed = 0
 
 Write-Host "Starte GMPL Tests..."
 Write-Host "--------------------------------------------------"
 
-$Total = 0
-$Passed = 0
+# ==============================
+# Test loop
+# ==============================
+Get-ChildItem "$TestDir\m_test*.dat" | ForEach-Object {
 
-# Alle .dat Dateien im GMPL Verzeichnis finden
-$TestFiles = Get-ChildItem -Path $TestDir -Filter "m_test*.dat"
+    $file = $_.FullName
+    $name = $_.Name
+    $total++
 
-foreach ($file in $TestFiles) {
-    $testfile = $file.FullName
-    $Total++
-    
-    $filename = $file.Name
-    
-    # Erwarteten Wert extrahieren (Suche nach "# Maximize WorkHours: X.")
-    # Wir nehmen den letzten Treffer, falls mehrere vorhanden sind
-    $content = Get-Content $testfile
-    $expectedLine = $content | Select-String -Pattern "# Maximize WorkHours: (\d+)" | Select-Object -Last 1
-    
-    if ($expectedLine -match "# Maximize WorkHours: (\d+)") {
-        $Expected = $Matches[1]
-    } else {
-        Write-Host "[FEHLER] $filename: Kein Erwartungswert in den Kommentaren gefunden." -ForegroundColor Red
-        continue
+    # ------------------------------
+    # Extract EXPECTED value
+    # ------------------------------
+    $expectedLine = Select-String -Path $file -Pattern "# Maximize WorkHours:" | Select-Object -Last 1
+
+    if (-not $expectedLine) {
+        Write-Host "[FEHLER] $name : Kein Erwartungswert gefunden" -ForegroundColor Yellow
+        $failed++
+        return
     }
-    
-    # glpsol ausf√ºhren und Ergebnis extrahieren
-    # Wir suchen nach der Zeile "WorkHours.val = X" oder "WorkHours = X"
-    $glpOutput = glpsol --model "$ModelFile" --data "$testfile" 2>$null
-    $actualLine = $glpOutput | Select-String -Pattern "WorkHours(\.val)? = (\d+)" | Select-Object -First 1
-    
-    if ($actualLine -match "WorkHours(\.val)? = (\d+)") {
-        $Actual = $Matches[2]
+
+    if ($expectedLine.Line -match "Maximize WorkHours:\s*([0-9]+)") {
+        $expected = [int]$matches[1]
     } else {
-        $Actual = "Not Found"
+        Write-Host "[FEHLER] $name : Erwartungswert Parsing fehlgeschlagen" -ForegroundColor Yellow
+        $failed++
+        return
     }
-    
-    if ($Expected -eq $Actual) {
-        Write-Host "[PASS] $filename (Erwartet: $Expected, Tats√§chlich: $Actual)" -ForegroundColor Green
-        $Passed++
+
+    # ------------------------------
+    # Run GLPSOL
+    # ------------------------------
+    try {
+        $output = & glpsol --model $ModelFile --data $file 2>$null
+    }
+    catch {
+        Write-Host "[FEHLER] $name : glpsol execution failed" -ForegroundColor Red
+        $failed++
+        return
+    }
+
+    if (-not $output) {
+        Write-Host "[FAIL] $name (Kein Output von glpsol)" -ForegroundColor Red
+        $failed++
+        return
+    }
+
+    # ------------------------------
+    # Extract ACTUAL value
+    # ------------------------------
+    $match = $output | Select-String -Pattern "WorkHours(\.val)?\s*=\s*([0-9]+)"
+
+    if (-not $match) {
+        Write-Host "[FAIL] $name (WorkHours nicht gefunden)" -ForegroundColor Red
+        $failed++
+        return
+    }
+
+    if ($match.Line -match "=\s*([0-9]+)") {
+        $actual = [int]$matches[1]
     } else {
-        Write-Host "[FAIL] $filename (Erwartet: $Expected, Tats√§chlich: $Actual)" -ForegroundColor Red
+        Write-Host "[FAIL] $name (Parsing Fehler)" -ForegroundColor Red
+        $failed++
+        return
+    }
+
+    # ------------------------------
+    # Compare
+    # ------------------------------
+    if ($expected -eq $actual) {
+        Write-Host "[PASS] $name (Erwartet: $expected, Tats‰chlich: $actual)" -ForegroundColor Green
+        $passed++
+    }
+    else {
+        Write-Host "[FAIL] $name (Erwartet: $expected, Tats‰chlich: $actual)" -ForegroundColor Red
+        $failed++
     }
 }
 
+# ==============================
+# Summary
+# ==============================
 Write-Host "--------------------------------------------------"
-Write-Host "Statistik: $Passed von $Total Tests erfolgreich bestanden."
+Write-Host "Statistik: $passed von $total Tests bestanden."
+Write-Host "Fehlgeschlagen: $failed"
 
-if ($Passed -eq $Total) {
+if ($failed -eq 0) {
     exit 0
 } else {
     exit 1
