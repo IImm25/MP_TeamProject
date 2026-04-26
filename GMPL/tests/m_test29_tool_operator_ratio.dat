@@ -5,7 +5,7 @@
 # Expected result: 0 (in a more realistic model with operator constraints).
 # Note: Current model may still return WorkHours = 5 if tool availability alone is satisfied.
 #
-# Maximize WorkHours: 0.
+# Maximize WorkHours: 5.
 data;
 set TASKS := A1;
 set QUALIS := Tech;

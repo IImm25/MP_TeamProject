@@ -5,7 +5,7 @@
 # Additional note: The model does not include a passenger capacity constraint for boats.
 # As a result, crew distribution across boats does not influence feasibility or objective value unless explicitly linked to tasks.
 # Expected result: WorkHours = 5 (task executed). Crew assignment is arbitrary and does not affect the outcome.
-# Maximize WorkHours: 0.
+# Maximize WorkHours: 5.
 data;
 set TASKS := A1;
 set QUALIS := Tech;

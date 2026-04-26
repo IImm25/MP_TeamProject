@@ -4,7 +4,7 @@
 # Therefore, tasks without qualification requirements can be executed on a "crewless" boat.
 # Expected result: WorkHours = 5 (task is executed without personnel).
 # Note: If a crew requirement constraint existed (taskOnBoat > 0 ⇒ at least one person), this case would fail.
-# Maximize WorkHours: 0.
+# Maximize WorkHours: 5.
 data;
 set TASKS := A1;
 set QUALIS := Tech;

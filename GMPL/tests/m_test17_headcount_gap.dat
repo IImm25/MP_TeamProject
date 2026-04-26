@@ -5,7 +5,7 @@
 # Thus A1 is feasible even though it appears to require 3 distinct role fulfillments.
 # Expected result: A1 is executed.
 # Note: This reveals a modeling characteristic where skills are aggregated per type without enforcing a strict headcount coupling across skills.
-# Maximize WorkHours: 0.
+# Maximize WorkHours: 10.
 data;
 set TASKS := A1;
 set QUALIS := Mech Elek;

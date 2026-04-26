@@ -4,7 +4,7 @@
 # Therefore, it may assign a single person and still consider the task executable.
 # Expected result: 0 (in a realistic safety-constrained model).
 # Note: The current model may still return WorkHours = 5 because no minimum crew constraint is defined.
-# Maximize WorkHours: 0.
+# Maximize WorkHours: 5.
 data;
 set TASKS := A1;
 set QUALIS := Tech;

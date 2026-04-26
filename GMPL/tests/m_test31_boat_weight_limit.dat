@@ -4,7 +4,7 @@
 # It also assumes static tool allocation per boat and no intra-day redistribution.
 # Expected result: 0 in a realistic model with boat capacity constraints.
 # Note: Current model may still return WorkHours = 10 due to missing physical constraints.
-# Maximize WorkHours: 0.
+# Maximize WorkHours: 10.
 data;
 set TASKS := A1;
 set QUALIS := Tech;

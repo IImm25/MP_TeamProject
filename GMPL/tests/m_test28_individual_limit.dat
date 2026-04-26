@@ -4,7 +4,7 @@
 # Since there is no constraint limiting individual working time per person, P1 can be assigned to the full duration.
 # Expected result: WorkHours = 12.
 # Note: With an additional (non-modelled) personal working time limit (e.g., 8h), only one task would be feasible.
-# Maximize WorkHours: 7.
+# Maximize WorkHours: 12.
 data;
 set TASKS := A1 A2;
 set QUALIS := Tech;
