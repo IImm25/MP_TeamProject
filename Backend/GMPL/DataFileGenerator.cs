@@ -9,11 +9,13 @@ public class DataFileGenerator
     const int amoutBoats = 8;
     private List<TaskItem> TaskItems {  get; set; }
     private List<Person> People {  get; set; }
+    private List<Tool> Tools { get; set; }
 
-    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people)
+    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people, List<Tool> tools)
     {
         TaskItems = taskItems;
         People = people;
+        Tools = tools;
     }
 
     public async static Task<string> SaveDataFile(string dataFileText)

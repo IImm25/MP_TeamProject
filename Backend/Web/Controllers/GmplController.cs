@@ -7,37 +7,41 @@ using System.Threading.Tasks;
 namespace Backend.Web.Controllers;
 
 [ApiController]
-[Route("api/gmpl")]
+[Route("api/plan")]
 public class GmplController : ControllerBase
 {
-
-    public GmplController()
+    GmplService _gmplService;
+    public GmplController(GmplService gmplService)
     {
-        
+        _gmplService = gmplService;
+    }
+
+    [HttpPost("")]
+    public async Task<ActionResult<List<PlanResponseDto>>> Plan([FromBody] PlanRequestDto request)
+    {
+
+        if (request == null) return BadRequest("Wrong Inpout");
+
+        List<PlanResponseDto> response = await _gmplService.CaculateGmplModel(request);
+
+        if (response != null)
+        {
+            return Ok(response);
+        }
+        else return BadRequest();
     }
 
 
-    [HttpGet("")]
-    public async Task<ActionResult<string>> Test()
+    [HttpGet("/test")]
+    public async Task<ActionResult<GmplResults>> Test()
     {
+
+        var res = await _gmplService.TestGLPK();
+
         string path = await DataFileGenerator.SaveDataFile("sometext");
-        return Ok(path);
+        return Ok(res);
 
     }
 
 
-    //[HttpPost("calculate")]
-    //public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody]List<TaskItemCreateDto> tasks)
-    //{
-    //    if (tasks.Count != 0 && people.Count != 0)
-    //    {
-    //        GmplService gmpl = new GmplService(tasks);
-    //        var res = await gmpl.WriteDatafile(people);
-
-
-
-    //        return Ok();
-    //    }
-    //    else return UnprocessableEntity();
-    //}
 }

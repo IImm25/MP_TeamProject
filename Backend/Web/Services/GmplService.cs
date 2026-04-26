@@ -1,57 +1,57 @@
-﻿namespace Backend.Web.Services;
+﻿using AutoMapper;
+using Backend.Data.DTO;
+using Backend.Data.DTO.Create;
+using Backend.Data.Mappers;
+using Backend.Data.Repositories;
 
+using Backend.Data.DTO;
+using Backend.Data.Repositories;
 using Backend.GMPL;
+namespace Backend.Web.Services;
 
 public class GmplService
 {
+    private readonly IRepository<Tool> repository;
+    private readonly IPersonRepository personRepository;
+    private readonly ITaskItemRepository taskItemRepository;
+
     private List<TaskItem> TaskItems = new List<TaskItem>();
     private List<Person> People = new List<Person>();
-    public GmplService(List<int> taskIds, List<int> personIds)
+    private List<Tool> Tools = new List<Tool>();
+    public GmplService(IRepository<Tool> repo, IPersonRepository personRepo, ITaskItemRepository taskItemRepo)
     {
-        TaskItems = GetTasksFromIds(taskIds);
-        People = GetPeopleFromIds(personIds);
+        repository = repo;
+        personRepository = personRepo;
+        taskItemRepository = taskItemRepo;
     }
 
-    private List<TaskItem> GetTasksFromIds(List<int> taskIds)
+    public async Task<List<PlanResponseDto>> TestGLPK()
     {
-        List<TaskItem> tasks = new List<TaskItem>();
+        string pathMod = @"..\..\GMPL\modell.mod";
+        string pathDat = @"..\GMPL\data.dat";
 
+        GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), pathDat);
 
-        //from repo
-        throw new NotImplementedException();
-        return tasks;
-    }
-    private List<Person> GetPeopleFromIds(List<int> personIds)
-    {
-        List<Person> people = new List<Person>();
-
-        //fom repo
-        throw new NotImplementedException();
-
-        return people;
+        return ResponseMapper.MapToResponse(result);
     }
 
-    public async Task<GmplResults> CaculateGmplModel()
+    public async Task<List<PlanResponseDto>> CaculateGmplModel(PlanRequestDto request)
     {
         try
         {
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People);
+            ReadInRequestDto(request);
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools);
 
             string datFileText = await datFileGenerator.CreateDataFile();
             string resp = await DataFileGenerator.SaveDataFile(datFileText);
-
-            // ── Validate  ────────────────────────────────────
-            GmplValidator.Test(DAT);
-
-            // ── Solve ──────────────────────────────────────────
+                        
+            GmplValidator.Test(DAT);            
 
             if (!resp.Contains("Exception"))
             {
                 GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
-                
                 GmplOutput2Console.GetGmplResults(result);
-
-                return result;
+                return ResponseMapper.MapToResponse(result);
             }
 
         }
@@ -75,6 +75,66 @@ public class GmplService
         }
         return null;
     }
+
+    private async void ReadInRequestDto(PlanRequestDto request)
+    {
+        this.TaskItems = await GetTasksFromIds(request.TaskItemIds);
+        this.People = await GetPeopleFromIds(request.PersonIds);
+        this.Tools = await GetToolsFromIds(request.ToolIds);
+    }
+    
+    private async Task<List<Tool>> GetToolsFromIds(List<int> toolIds)
+    {
+        try
+        {
+            var tools = await Task.WhenAll(toolIds.Select(repository.GetByIdAsync).ToList());
+            if (tools.Any())
+            {
+                return tools.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            
+        }
+        return null;
+    }
+    private async Task<List<TaskItem>> GetTasksFromIds(List<int> taskIds)
+    {
+        try
+        {
+            var tasks = await Task.WhenAll(taskIds.Select(taskItemRepository.GetByIdAsync).ToList());
+            if (tasks.Any())
+            {
+                return tasks.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+        return null;
+    }
+    private async Task<List<Person>> GetPeopleFromIds(List<int> personIds)
+    {
+        try
+        {
+            var people = await Task.WhenAll(personIds.Select(personRepository.GetByIdAsync).ToList());
+            if (people.Any())
+            {
+                return people.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+        return null;
+    }
+
 
     //public async void call()
     //{
