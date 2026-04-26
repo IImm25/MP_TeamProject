@@ -1,9 +1,6 @@
 ﻿namespace Backend.Web.Services;
 
 using Backend.GMPL;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 public class GmplService
 {
@@ -33,8 +30,6 @@ public class GmplService
 
         return people;
     }
-
-
 
     public async Task<GmplResults> CaculateGmplModel()
     {
