@@ -17,9 +17,18 @@ public class GmplController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<ActionResult<List<PlanResponseDto>>> Plan([FromBody] PlanRequestDto)
+    public async Task<ActionResult<List<PlanResponseDto>>> Plan([FromBody] PlanRequestDto request)
     {
-        List<PlanResponseDto> response = _
+
+        if (request == null) return BadRequest("Wrong Inpout");
+
+        List<PlanResponseDto> response = await _gmplService.CaculateGmplModel(request);
+
+        if (response != null)
+        {
+            return Ok(response);
+        }
+        else return BadRequest();
     }
 
 

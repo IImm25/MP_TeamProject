@@ -1,5 +1,6 @@
 ﻿namespace Backend.Web.Services;
 
+using Backend.Data.DTO;
 using Backend.GMPL;
 
 public class GmplService
@@ -14,6 +15,70 @@ public class GmplService
         Tools = GetToolsFromIds(toolIds);
     }
 
+   
+
+    public async Task<List<PlanResponseDto>> CaculateGmplModel(PlanRequestDto request)
+    {
+        try
+        {
+            ReadInRequestDto(request);
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People);
+
+            string datFileText = await datFileGenerator.CreateDataFile();
+            string resp = await DataFileGenerator.SaveDataFile(datFileText);
+
+            // ── Validate  ────────────────────────────────────
+            GmplValidator.Test(DAT);
+
+            // ── Solve ──────────────────────────────────────────
+
+            if (!resp.Contains("Exception"))
+            {
+                GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
+                
+                GmplOutput2Console.GetGmplResults(result);
+
+
+
+
+                return GmplResult2PlanResult(result);
+            }
+
+        }
+        catch (ValidationError ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [Validation-Error] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (NotSolvableError ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [Invalid] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [unexpected Error] {ex.Message}");
+            Console.ResetColor();
+        }
+        return null;
+    }
+
+    private void ReadInRequestDto(PlanRequestDto request)
+    {
+        this.TaskItems = GetTasksFromIds(request.TaskItemIds);
+        this.People = GetPeopleFromIds(request.PersonIds);
+        this.Tools = GetToolsFromIds(request.ToolIds);
+    }
+    private PlanResponseDto GmplResult2PlanResult(GmplResults results)
+    {
+        
+        throw new NotImplementedException();
+        PlanResponseDto response = new PlanResponseDto();
+        return response;
+    }
     private List<Tool> GetToolsFromIds(List<int> toolIds)
     {
         List<Tool> tools = new List<Tool>();
@@ -40,52 +105,8 @@ public class GmplService
 
         return people;
     }
-
-    public async Task<GmplResults> CaculateGmplModel()
-    {
-        try
-        {
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People);
-
-            string datFileText = await datFileGenerator.CreateDataFile();
-            string resp = await DataFileGenerator.SaveDataFile(datFileText);
-
-            // ── Validate  ────────────────────────────────────
-            GmplValidator.Test(DAT);
-
-            // ── Solve ──────────────────────────────────────────
-
-            if (!resp.Contains("Exception"))
-            {
-                GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
-                
-                GmplOutput2Console.GetGmplResults(result);
-
-                return result;
-            }
-
-        }
-        catch (ValidationError ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [Validation-Error] {ex.Message}");
-            Console.ResetColor();
-        }
-        catch (NotSolvableError ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [Invalid] {ex.Message}");
-            Console.ResetColor();
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [unexpected Error] {ex.Message}");
-            Console.ResetColor();
-        }
-        return null;
-    }
-
+    
+    
     //public async void call()
     //{
     //    PersonRepository _personRepo = new PersonRepository(new AppDbContext());
