@@ -25,31 +25,33 @@ public class GmplService
         taskItemRepository = taskItemRepo;
     }
 
+    public async Task<List<PlanResponseDto>> TestGLPK()
+    {
+        string pathMod = @"..\..\GMPL\modell.mod";
+        string pathDat = @"..\GMPL\data.dat";
+
+        GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), pathDat);
+
+        return ResponseMapper.MapToResponse(result);
+    }
+
     public async Task<List<PlanResponseDto>> CaculateGmplModel(PlanRequestDto request)
     {
         try
         {
             ReadInRequestDto(request);
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People);
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools);
 
             string datFileText = await datFileGenerator.CreateDataFile();
             string resp = await DataFileGenerator.SaveDataFile(datFileText);
-
-            // ── Validate  ────────────────────────────────────
-            GmplValidator.Test(DAT);
-
-            // ── Solve ──────────────────────────────────────────
+                        
+            GmplValidator.Test(DAT);            
 
             if (!resp.Contains("Exception"))
             {
                 GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
-
                 GmplOutput2Console.GetGmplResults(result);
-
-
-
-
-                return GmplResult2PlanResult(result);
+                return ResponseMapper.MapToResponse(result);
             }
 
         }
@@ -80,13 +82,7 @@ public class GmplService
         this.People = await GetPeopleFromIds(request.PersonIds);
         this.Tools = await GetToolsFromIds(request.ToolIds);
     }
-    private List<PlanResponseDto> GmplResult2PlanResult(GmplResults results)
-    {
-
-        throw new NotImplementedException();
-        PlanResponseDto response = new PlanResponseDto();
-        return response;
-    }
+    
     private async Task<List<Tool>> GetToolsFromIds(List<int> toolIds)
     {
         try

@@ -37,6 +37,7 @@ builder.Services.AddScoped<PersonService>();
 builder.Services.AddScoped<QualificationService>();
 builder.Services.AddScoped<TaskItemService>();
 builder.Services.AddScoped<ToolService>();
+builder.Services.AddScoped<GmplService>();
 
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonSummaryMapper>();

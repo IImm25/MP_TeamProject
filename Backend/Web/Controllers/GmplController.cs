@@ -32,29 +32,16 @@ public class GmplController : ControllerBase
     }
 
 
+    [HttpGet("/test")]
+    public async Task<ActionResult<GmplResults>> Test()
+    {
+
+        var res = await _gmplService.TestGLPK();
+
+        string path = await DataFileGenerator.SaveDataFile("sometext");
+        return Ok(res);
+
+    }
 
 
-    //[HttpGet("")]
-    //public async Task<ActionResult<string>> Test()
-    //{
-    //    string path = await DataFileGenerator.SaveDataFile("sometext");
-    //    return Ok(path);
-
-    //}
-
-
-    //[HttpPost("calculate")]
-    //public async Task<ActionResult<List<TaskItem>>> PostCalculationRequest([FromBody]List<TaskItemCreateDto> tasks)
-    //{
-    //    if (tasks.Count != 0 && people.Count != 0)
-    //    {
-    //        GmplService gmpl = new GmplService(tasks);
-    //        var res = await gmpl.WriteDatafile(people);
-
-
-
-    //        return Ok();
-    //    }
-    //    else return UnprocessableEntity();
-    //}
 }
