@@ -6,12 +6,22 @@ public class GmplService
 {
     private List<TaskItem> TaskItems = new List<TaskItem>();
     private List<Person> People = new List<Person>();
-    public GmplService(List<int> taskIds, List<int> personIds)
+    private List<Tool> Tools = new List<Tool>(); 
+    public GmplService(List<int> taskIds, List<int> personIds, List<int> toolIds)
     {
         TaskItems = GetTasksFromIds(taskIds);
         People = GetPeopleFromIds(personIds);
+        Tools = GetToolsFromIds(toolIds);
     }
 
+    private List<Tool> GetToolsFromIds(List<int> toolIds)
+    {
+        List<Tool> tools = new List<Tool>();
+
+        //from repo
+        throw new NotImplementedException();
+        return tools;
+    }
     private List<TaskItem> GetTasksFromIds(List<int> taskIds)
     {
         List<TaskItem> tasks = new List<TaskItem>();

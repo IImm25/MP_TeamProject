@@ -7,23 +7,31 @@ using System.Threading.Tasks;
 namespace Backend.Web.Controllers;
 
 [ApiController]
-[Route("api/gmpl")]
+[Route("api/plan")]
 public class GmplController : ControllerBase
 {
-
-    public GmplController()
+    GmplService _gmplService;
+    public GmplController(GmplService gmplService)
     {
-        
+        _gmplService = gmplService;
+    }
+
+    [HttpPost("")]
+    public async Task<ActionResult<List<PlanResponseDto>>> Plan([FromBody] PlanRequestDto)
+    {
+        List<PlanResponseDto> response = _
     }
 
 
-    [HttpGet("")]
-    public async Task<ActionResult<string>> Test()
-    {
-        string path = await DataFileGenerator.SaveDataFile("sometext");
-        return Ok(path);
 
-    }
+
+    //[HttpGet("")]
+    //public async Task<ActionResult<string>> Test()
+    //{
+    //    string path = await DataFileGenerator.SaveDataFile("sometext");
+    //    return Ok(path);
+
+    //}
 
 
     //[HttpPost("calculate")]
