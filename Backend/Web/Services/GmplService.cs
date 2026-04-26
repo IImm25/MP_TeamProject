@@ -1,21 +1,29 @@
-﻿namespace Backend.Web.Services;
+﻿using AutoMapper;
+using Backend.Data.DTO;
+using Backend.Data.DTO.Create;
+using Backend.Data.Mappers;
+using Backend.Data.Repositories;
 
 using Backend.Data.DTO;
+using Backend.Data.Repositories;
 using Backend.GMPL;
+namespace Backend.Web.Services;
 
 public class GmplService
 {
+    private readonly IRepository<Tool> repository;
+    private readonly IPersonRepository personRepository;
+    private readonly ITaskItemRepository taskItemRepository;
+
     private List<TaskItem> TaskItems = new List<TaskItem>();
     private List<Person> People = new List<Person>();
-    private List<Tool> Tools = new List<Tool>(); 
-    public GmplService(List<int> taskIds, List<int> personIds, List<int> toolIds)
+    private List<Tool> Tools = new List<Tool>();
+    public GmplService(IRepository<Tool> repo, IPersonRepository personRepo, ITaskItemRepository taskItemRepo)
     {
-        TaskItems = GetTasksFromIds(taskIds);
-        People = GetPeopleFromIds(personIds);
-        Tools = GetToolsFromIds(toolIds);
+        repository = repo;
+        personRepository = personRepo;
+        taskItemRepository = taskItemRepo;
     }
-
-   
 
     public async Task<List<PlanResponseDto>> CaculateGmplModel(PlanRequestDto request)
     {
@@ -35,7 +43,7 @@ public class GmplService
             if (!resp.Contains("Exception"))
             {
                 GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
-                
+
                 GmplOutput2Console.GetGmplResults(result);
 
 
@@ -66,47 +74,72 @@ public class GmplService
         return null;
     }
 
-    private void ReadInRequestDto(PlanRequestDto request)
+    private async void ReadInRequestDto(PlanRequestDto request)
     {
-        this.TaskItems = GetTasksFromIds(request.TaskItemIds);
-        this.People = GetPeopleFromIds(request.PersonIds);
-        this.Tools = GetToolsFromIds(request.ToolIds);
+        this.TaskItems = await GetTasksFromIds(request.TaskItemIds);
+        this.People = await GetPeopleFromIds(request.PersonIds);
+        this.Tools = await GetToolsFromIds(request.ToolIds);
     }
-    private PlanResponseDto GmplResult2PlanResult(GmplResults results)
+    private List<PlanResponseDto> GmplResult2PlanResult(GmplResults results)
     {
-        
+
         throw new NotImplementedException();
         PlanResponseDto response = new PlanResponseDto();
         return response;
     }
-    private List<Tool> GetToolsFromIds(List<int> toolIds)
+    private async Task<List<Tool>> GetToolsFromIds(List<int> toolIds)
     {
-        List<Tool> tools = new List<Tool>();
-
-        //from repo
-        throw new NotImplementedException();
-        return tools;
+        try
+        {
+            var tools = await Task.WhenAll(toolIds.Select(repository.GetByIdAsync).ToList());
+            if (tools.Any())
+            {
+                return tools.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            
+        }
+        return null;
     }
-    private List<TaskItem> GetTasksFromIds(List<int> taskIds)
+    private async Task<List<TaskItem>> GetTasksFromIds(List<int> taskIds)
     {
-        List<TaskItem> tasks = new List<TaskItem>();
+        try
+        {
+            var tasks = await Task.WhenAll(taskIds.Select(taskItemRepository.GetByIdAsync).ToList());
+            if (tasks.Any())
+            {
+                return tasks.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
 
-
-        //from repo
-        throw new NotImplementedException();
-        return tasks;
+        }
+        return null;
     }
-    private List<Person> GetPeopleFromIds(List<int> personIds)
+    private async Task<List<Person>> GetPeopleFromIds(List<int> personIds)
     {
-        List<Person> people = new List<Person>();
+        try
+        {
+            var people = await Task.WhenAll(personIds.Select(personRepository.GetByIdAsync).ToList());
+            if (people.Any())
+            {
+                return people.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
 
-        //fom repo
-        throw new NotImplementedException();
-
-        return people;
+        }
+        return null;
     }
-    
-    
+
+
     //public async void call()
     //{
     //    PersonRepository _personRepo = new PersonRepository(new AppDbContext());
