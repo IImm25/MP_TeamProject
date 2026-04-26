@@ -39,7 +39,7 @@ public class GmplService
     {
         try
         {
-            ReadInRequestDto(request);
+            await ReadInRequestDto(request);
             DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools);
 
             string datFileText = await datFileGenerator.CreateDataFile();
@@ -76,7 +76,7 @@ public class GmplService
         return null;
     }
 
-    private async void ReadInRequestDto(PlanRequestDto request)
+    private async Task ReadInRequestDto(PlanRequestDto request)
     {
         this.TaskItems = await GetTasksFromIds(request.TaskItemIds);
         this.People = await GetPeopleFromIds(request.PersonIds);
@@ -121,10 +121,10 @@ public class GmplService
     {
         try
         {
-            var people = await Task.WhenAll(personIds.Select(personRepository.GetByIdAsync).ToList());
-            if (people.Any())
+            var tasks = await Task.WhenAll(personIds.Select(personRepository.GetByIdAsync).ToList());
+            if (tasks.Any())
             {
-                return people.ToList();
+                return tasks.ToList();
             }
         }
         catch (Exception ex)
