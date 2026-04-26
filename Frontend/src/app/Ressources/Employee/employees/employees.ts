@@ -2,13 +2,13 @@ import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { HttpClient } from '@angular/common/http';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogEmployee } from '../dialog-employee/dialog-employee';
 import { environment } from '../../../../environments/environment';
 import { Qualification } from '../../../Models/qualification';
-import { Employees as EmployeeModel } from '../../../Models/employees';
+import { Employee as EmployeeModel, EmployeeSummary } from '../../../Models/employee';
+import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-employees',
@@ -16,15 +16,14 @@ import { Employees as EmployeeModel } from '../../../Models/employees';
   imports: [TranslatePipe, ButtonModule, TableModule, ConfirmDialogModule, DialogEmployee],
   providers: [ConfirmationService],
   templateUrl: './employees.html',
-  styleUrl: './employees.css'
+  styleUrl: './employees.css',
 })
 export class Employees implements OnInit {
   @ViewChild(DialogEmployee) dialogComp!: DialogEmployee;
 
-  private http = inject(HttpClient);
+  http = inject(HttpService);
   private translate = inject(TranslateService);
   private confirmationService = inject(ConfirmationService);
-  apiUrl = environment.apiUrl;
 
   employees = signal<EmployeeModel[]>([]);
   qualifications = signal<Qualification[]>([]);
@@ -34,16 +33,23 @@ export class Employees implements OnInit {
 
   ngOnInit() {
     this.loadEmployees();
-    this.loadQualifications();
+    this.http.getQualifications().subscribe((data) => this.qualifications.set(data));
   }
 
-  loadEmployees() {
-    this.http.get<EmployeeModel[]>(`${this.apiUrl}/employees`).subscribe(data => this.employees.set(data));
-  }
+loadEmployees() {
+  this.http.getEmployees().subscribe((summaries) => {
+    const employeeList = summaries as EmployeeModel[];
+    this.employees.set(employeeList);
 
-  loadQualifications() {
-    this.http.get<Qualification[]>(`${this.apiUrl}/qualifications`).subscribe(data => this.qualifications.set(data));
-  }
+    employeeList.forEach(employee => {
+      this.http.getEmployeeById(employee.id).subscribe(fullDetails => {
+        this.employees.update(current =>
+          current.map(e => e.id === fullDetails.id ? fullDetails : e)
+        );
+      });
+    });
+  });
+}
 
   openNew() {
     this.dialogType = 'New';
@@ -51,19 +57,37 @@ export class Employees implements OnInit {
     this.dialogVisible = true;
   }
 
-  openEdit(employee: EmployeeModel) {
+  openEdit(summary: EmployeeSummary) {
     this.dialogType = 'Edit';
-    this.dialogComp.patchForm(employee);
-    this.dialogVisible = true;
+    this.http.getEmployeeById(summary.id).subscribe((fullEmployee) => {
+      this.dialogComp.patchForm(fullEmployee);
+      this.dialogVisible = true;
+    });
   }
 
   deleteEmployee(employee: EmployeeModel) {
     this.confirmationService.confirm({
-      message: this.translate.instant('EMPLOYEES.DIALOG.DELETE_MESSAGE', { firstname: employee.firstname, lastname: employee.lastname }),
+      message: this.translate.instant('EMPLOYEES.DIALOG.DELETE_MESSAGE', {
+        firstname: employee.firstname,
+        lastname: employee.lastname,
+      }),
       header: this.translate.instant('EMPLOYEES.DIALOG.DELETE_TITLE'),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.translate.instant('COMMON.DELETE'),
+      rejectLabel: this.translate.instant('COMMON.CANCEL'),
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.http.delete(`${this.apiUrl}/employees/${employee.id}`).subscribe(() => this.loadEmployees());
-      }
+        this.http.deleteEmployee(employee.id).subscribe(() => {
+          this.employees.update((employees) => employees.filter((e) => e.id !== employee.id));
+        });
+      },
+    });
+  }
+
+  getTaskQualifications(id: number) {
+    this.http.getEmployees().subscribe((data) => {
+      this.employees.set(data as unknown as EmployeeModel[]);
     });
   }
 }

@@ -3,11 +3,11 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DialogTask } from '../dialog-task/dialog-task';
-import { Task } from '../../../Models/task';
-import { HttpClient } from '@angular/common/http';
+import { Task, TaskSummary } from '../../../Models/task';
 import { environment } from '../../../../environments/environment';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-tasks',
@@ -17,23 +17,29 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   styleUrl: './tasks.css',
 })
 export class Tasks implements OnInit {
-  private http = inject(HttpClient);
+  private http = inject(HttpService);
   private translate = inject(TranslateService);
   private confirmationService = inject(ConfirmationService);
 
   type: WritableSignal<'Edit' | 'New' | 'Detail'> = signal('New');
   selectedTask: WritableSignal<Task | null> = signal(null);
   visible: WritableSignal<boolean> = signal(false);
-  tasks: WritableSignal<Task[]> = signal([]);
-
-  apiUrl = environment.apiUrl;
+  tasks: WritableSignal<TaskSummary[]> = signal([]);
 
   ngOnInit() {
     this.loadTasks();
   }
 
   loadTasks() {
-    this.http.get<Task[]>(`${this.apiUrl}/tasks`).subscribe(tasks => this.tasks.set(tasks));
+    this.http.getTasks().subscribe((tasks) => this.tasks.set(tasks));
+  }
+
+  openEditOrDetail(taskSummary: TaskSummary, mode: 'Edit' | 'Detail') {
+    this.type.set(mode);
+    this.http.getTaskById(taskSummary.id).subscribe(fullTask => {
+      this.selectedTask.set(fullTask);
+      this.visible.set(true);
+    });
   }
 
   deleteTask(task: Task) {
@@ -46,10 +52,10 @@ export class Tasks implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.http.delete(`${this.apiUrl}/tasks/${task.id}`).subscribe(() => {
-          this.tasks.update(tasks => tasks.filter(t => t.id !== task.id));
+        this.http.deleteTask(task.id).subscribe(() => {
+          this.tasks.update((tasks) => tasks.filter((t) => t.id !== task.id));
         });
-      }
+      },
     });
   }
 

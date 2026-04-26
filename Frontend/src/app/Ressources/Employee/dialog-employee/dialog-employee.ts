@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject, signal, WritableSignal, model, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -6,10 +6,10 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { Employees as EmployeeModel } from '../../../Models/employees';
+import { EmployeeCreateUpdate, Employee as EmployeeModel } from '../../../Models/employee';
 import { Qualification } from '../../../Models/qualification';
+import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-dialog-employee',
@@ -22,8 +22,7 @@ import { Qualification } from '../../../Models/qualification';
 })
 export class DialogEmployee {
   private fb = inject(FormBuilder);
-  private http = inject(HttpClient);
-  apiUrl = environment.apiUrl;
+  private httpService = inject(HttpService);
 
   @Input() type: 'Edit' | 'New' = 'New';
   @Input() allQualifications: Qualification[] = [];
@@ -61,10 +60,14 @@ export class DialogEmployee {
   save() {
     if (this.employeeForm.invalid) return;
 
-    const payload = this.employeeForm.value;
+    const payload: EmployeeCreateUpdate = {
+       firstname: this.employeeForm.value.firstname || '',
+       lastname: this.employeeForm.value.lastname || '',
+       qualificationIds: this.employeeForm.value.qualifications?.map(q => q.id) || [],
+    };
     const request = this.type === 'Edit' && this.selectedId
-      ? this.http.patch(`${this.apiUrl}/employees/${this.selectedId}`, payload)
-      : this.http.post(`${this.apiUrl}/employees`, payload);
+      ? this.httpService.updateEmployee(this.selectedId, payload)
+      : this.httpService.createEmployee(payload);
 
     request.subscribe(() => {
       this.onSave.emit();

@@ -39,7 +39,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("People");
+                    b.ToTable("Persons");
                 });
 
             modelBuilder.Entity("PersonQualification", b =>
@@ -76,6 +76,128 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Qualifications");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Fundamental knowledge of electrical systems in wind turbines.",
+                            Name = "Electrical Systems Basics"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Safe handling and operation in high-voltage environments.",
+                            Name = "High Voltage Safety"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Inspection and repair of hydraulic turbine systems.",
+                            Name = "Hydraulic Systems Maintenance"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Repair of mechanical components like gearboxes and shafts.",
+                            Name = "Mechanical Assembly & Repair"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Detecting and repairing structural blade damage.",
+                            Name = "Blade Inspection & Repair"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Monitoring turbines via SCADA systems.",
+                            Name = "SCADA Systems Operation"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Certified safety procedures for high-altitude work.",
+                            Name = "Working at Heights Safety"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Fault detection and maintenance of gearboxes.",
+                            Name = "Gearbox Diagnostics"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Identifying and resolving electrical failures.",
+                            Name = "Electrical Fault Diagnosis"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Fundamentals of turbine assembly and installation.",
+                            Name = "Wind Turbine Installation Basics"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Monitoring turbine health using sensor data.",
+                            Name = "Condition Monitoring Systems"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Understanding vibration and rotor behavior.",
+                            Name = "Rotor Dynamics Understanding"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Description = "Handling turbine emergencies and shutdowns.",
+                            Name = "Emergency Response Procedures"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Maintaining lubrication systems for moving parts.",
+                            Name = "Lubrication Systems Maintenance"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Description = "Servicing internal nacelle components.",
+                            Name = "Nacelle Systems Maintenance"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Description = "Installation and repair of electrical wiring systems.",
+                            Name = "Electrical Cabling & Wiring"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Description = "Maintenance of converters and inverters.",
+                            Name = "Power Conversion Systems"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Connecting turbines to power grid infrastructure.",
+                            Name = "Grid Connection Systems"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Understanding control logic and turbine automation.",
+                            Name = "Turbine Control Systems"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Planning and scheduling turbine maintenance tasks.",
+                            Name = "Preventive Maintenance Planning"
+                        });
                 });
 
             modelBuilder.Entity("TaskItem", b =>
@@ -86,7 +208,7 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DurationHours")
+                    b.Property<float>("DurationHours")
                         .HasColumnType("real");
 
                     b.Property<string>("Name")
@@ -104,6 +226,9 @@ namespace Backend.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("QualificationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RequiredAmount")
                         .HasColumnType("integer");
 
                     b.HasKey("TaskItemId", "QualificationId");

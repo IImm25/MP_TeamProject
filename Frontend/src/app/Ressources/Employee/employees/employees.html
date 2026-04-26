@@ -7,12 +7,12 @@
   </header>
 
   <div class="table-container">
-    <p-table [value]="employees()" [paginator]="true" [rows]="10">
+    <p-table [value]="employees()" [paginator]="true" [rows]="5" sortField="firstname" [sortOrder]="1">
       <ng-template pTemplate="header">
         <tr>
-          <th>{{ 'EMPLOYEES.NAME' | translate }}</th>
+          <th pSortableColumn="firstname">{{ 'EMPLOYEES.NAME' | translate }} <p-sortIcon field="firstname"/></th>
           <th>{{ 'EMPLOYEES.QUALIFICATIONS' | translate }}</th>
-          <th class="right">{{ 'TASKS.ACTIONS' | translate }}</th>
+          <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
         </tr>
       </ng-template>
 

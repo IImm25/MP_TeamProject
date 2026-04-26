@@ -13,12 +13,12 @@
   </header>
 
   <div class="table-container">
-    <p-table [value]="tasks()" [paginator]="true" [rows]="5">
+    <p-table [value]="tasks()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
       <ng-template pTemplate="header">
         <tr>
-          <th>{{ 'TASKS.NAME' | translate }}</th>
+          <th pSortableColumn="name">{{ 'TASKS.NAME' | translate }} <p-sortIcon field="name"/></th>
           <th>{{ 'TASKS.DURATION' | translate }}</th>
-          <th class="right">{{ 'TASKS.ACTIONS' | translate }}</th>
+          <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -34,7 +34,7 @@
                 [rounded]="true"
                 severity="secondary"
                 class="btn-edit"
-                (onClick)="type.set('Edit'); selectedTask.set(task); visible.set(true)"
+                (onClick)="openEditOrDetail(task, 'Edit')"
               />
               <p-button
                 icon="pi pi-trash"
@@ -49,7 +49,7 @@
                 [text]="true"
                 [rounded]="true"
                 severity="secondary"
-                (onClick)="type.set('Detail'); selectedTask.set(task); visible.set(true)"
+                (onClick)="openEditOrDetail(task, 'Detail')"
               />
             </div>
           </td>

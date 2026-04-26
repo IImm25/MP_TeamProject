@@ -2,6 +2,7 @@
 
 public class Tool
 {
+    public Tool() { }
     public int Id { get; set; }
     public string Name { get; set; } = "";
     public int AvailableStock { get; set; }

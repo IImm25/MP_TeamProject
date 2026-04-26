@@ -1,0 +1,41 @@
+<div class="content-wrapper">
+  <header class="section-header">
+    <div class="title-group">
+      <h1 class="title">{{ 'QUALIFICATIONS.TITLE' | translate }}</h1>
+    </div>
+    <p-button [label]="'QUALIFICATIONS.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="openDialog('New')" severity="secondary" [raised]="true"/>
+  </header>
+
+  <div class="table-container">
+    <p-table [value]="qualifications()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">{{ 'QUALIFICATIONS.NAME' | translate }} <p-sortIcon field="name"/></th>
+          <th>{{ 'QUALIFICATIONS.DESCRIPTION' | translate }}</th>
+          <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-qualification>
+        <tr>
+          <td>{{ qualification.name }}</td>
+          <td>{{ qualification.description }}</td>
+          <td>
+            <div class="action-buttons">
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="openDialog('Edit', qualification)" />
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="secondary" (onClick)="deleteQualification(qualification)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-dialog-qualification
+  [(visible)]="dialogVisible"
+  [type]="dialogType"
+  (onSave)="loadQualifications()"
+/>
+
+<p-confirmDialog />

@@ -1,0 +1,50 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="close()"
+  [header]="
+    type === 'New' ? ('QUALIFICATIONS.DIALOG.NEW' | translate) : ('QUALIFICATIONS.DIALOG.EDIT' | translate)
+  "
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '50vw' }"
+>
+  <form [formGroup]="qualificationForm" class="content">
+      <div class="field">
+        <label for="name">{{ 'QUALIFICATIONS.NAME' | translate }}*</label>
+        <input pInputText id="name" formControlName="name" [placeholder]="'QUALIFICATIONS.DIALOG.NAME_PLACEHOLDER' | translate"/>
+        @if (qualificationForm.controls.name.invalid && qualificationForm.controls.name.touched) {
+          <div class="error-message">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ 'QUALIFICATIONS.VALIDATION.NAME_REQUIRED' | translate }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="field">
+        <label for="description">{{ 'QUALIFICATIONS.DESCRIPTION' | translate }}*</label>
+        <textarea pTextarea id="description" formControlName="description" [placeholder]="'QUALIFICATIONS.DIALOG.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
+        @if (qualificationForm.controls.description.invalid && qualificationForm.controls.description.touched) {
+          <div class="error-message">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ 'QUALIFICATIONS.VALIDATION.DESCRIPTION_REQUIRED' | translate }}</span>
+          </div>
+        }
+      </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'COMMON.CANCEL' | translate"
+      [text]="true"
+      severity="secondary"
+      (onClick)="close()"
+    />
+    <p-button
+      [label]="'COMMON.SAVE' | translate"
+      icon="pi pi-check"
+      (onClick)="save()"
+      [disabled]="qualificationForm.invalid"
+    />
+  </ng-template>
+</p-dialog>

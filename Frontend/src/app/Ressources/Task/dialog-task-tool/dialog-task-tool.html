@@ -22,13 +22,15 @@
           formControlName="selectedToolForm"
           optionLabel="name"
           appendTo="body"
+          [filter]="true"
+          filterBy="name"
           placeholder="{{ 'TASKS.DIALOG.TOOL.PLACEHOLDER' | translate }}"
         />
       </div>
 
       <div class="form-group">
-        <label>{{ 'TASKS.DIALOG.TOOL.COUNT' | translate }}</label>
-        <p-inputNumber formControlName="selectedToolCount" [min]="1" [showButtons]="true" />
+        <label>{{ 'TASKS.DIALOG.TOOL.REQUIRED_AMOUNT' | translate }}</label>
+        <p-inputNumber formControlName="selectedToolAmount" [min]="1" [showButtons]="true" />
       </div>
     </form>
   </ng-template>
