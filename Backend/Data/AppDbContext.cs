@@ -29,6 +29,20 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<PersonQualification>()
             .HasKey(x => new { x.PersonId, x.QualificationId });
 
+        #region test
+        // NEU – Beziehungen explizit definieren
+        modelBuilder.Entity<PersonQualification>()
+            .HasOne(pq => pq.Person)
+            .WithMany(p => p.Qualifications)
+            .HasForeignKey(pq => pq.PersonId);
+
+        modelBuilder.Entity<PersonQualification>()
+            .HasOne(pq => pq.Qualification)
+            .WithMany()
+            .HasForeignKey(pq => pq.QualificationId);
+        #endregion
+
+
         modelBuilder.Entity<TaskQualification>()
             .HasKey(x => new { x.TaskItemId, x.QualificationId });
 

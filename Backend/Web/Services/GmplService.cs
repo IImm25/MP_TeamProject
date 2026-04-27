@@ -14,11 +14,20 @@ public class GmplService
     private readonly IRepository<Tool> repository;
     private readonly IPersonRepository personRepository;
     private readonly ITaskItemRepository taskItemRepository;
+    private readonly IRepository<Qualification> qualificationRepository;
+    private readonly IRepository<PersonQualification> qualificationPersonRepository;
 
     private List<TaskItem> TaskItems = new List<TaskItem>();
     private List<Person> People = new List<Person>();
     private List<Tool> Tools = new List<Tool>();
-    public GmplService(IRepository<Tool> repo, IPersonRepository personRepo, ITaskItemRepository taskItemRepo)
+    private List<Qualification> Qualifications = new List<Qualification>();
+    public GmplService(
+        IRepository<Tool> repo,
+        IPersonRepository personRepo,
+        ITaskItemRepository taskItemRepo,
+        IRepository<Qualification> qualiRepo,
+        IRepository<PersonQualification> qualiPersonRepo
+        )
     {
         repository = repo;
         personRepository = personRepo;
@@ -40,12 +49,14 @@ public class GmplService
         try
         {
             await ReadInRequestDto(request);
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools);
+            List<Qualification> qualifications;
+            
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools, Qualifications);
 
             string datFileText = await datFileGenerator.CreateDataFile();
             string resp = await DataFileGenerator.SaveDataFile(datFileText);
-                        
-            GmplValidator.Test(DAT);            
+              
+            GmplValidator.Test(resp);            
 
             if (!resp.Contains("Exception"))
             {
@@ -81,50 +92,67 @@ public class GmplService
         this.TaskItems = await GetTasksFromIds(request.TaskItemIds);
         this.People = await GetPeopleFromIds(request.PersonIds);
         this.Tools = await GetToolsFromIds(request.ToolIds);
+        this.Qualifications = await GetQualificationsFromPeople();
     }
     
+    private async Task<List<Qualification>> GetQualificationsFromPeople()
+    {
+        List<Qualification> qualifications = People.SelectMany(x => x.Qualifications.Select(y => y.Qualification)).ToList();
+        
+        return qualifications;
+    }
     private async Task<List<Tool>> GetToolsFromIds(List<int> toolIds)
     {
         try
         {
-            var tools = await Task.WhenAll(toolIds.Select(repository.GetByIdAsync).ToList());
-            if (tools.Any())
+            var tools = new List<Tool>();
+            foreach (var id in toolIds)
             {
-                return tools.ToList();
+                var tool = await repository.GetByIdAsync(id);
+                if (tool is not null)
+                    tools.Add(tool);
             }
+            return tools.Any() ? tools : null;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            
+            return null;
         }
-        return null;
     }
     private async Task<List<TaskItem>> GetTasksFromIds(List<int> taskIds)
     {
         try
         {
-            var tasks = await Task.WhenAll(taskIds.Select(taskItemRepository.GetByIdAsync).ToList());
-            if (tasks.Any())
+            var tasks = new List<TaskItem>();
+            foreach (var id in taskIds)
             {
-                return tasks.ToList();
+                var task = await taskItemRepository.GetByIdAsync(id);
+                if (task is not null)
+                    tasks.Add(task);
             }
+            return tasks.Any() ? tasks : null;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-
+            return null;
         }
-        return null;
     }
     private async Task<List<Person>> GetPeopleFromIds(List<int> personIds)
     {
         try
         {
-            var tasks = await Task.WhenAll(personIds.Select(personRepository.GetByIdAsync).ToList());
-            if (tasks.Any())
+            var people = new List<Person>();
+            foreach (var id in personIds)
             {
-                return tasks.ToList();
+                var person = await personRepository.GetFullByIdAsync(id);
+                if (person is not null)
+                    people.Add(person);
+            }
+            if (people.Any())
+            {
+                return people.ToList();
             }
         }
         catch (Exception ex)
@@ -135,18 +163,6 @@ public class GmplService
         return null;
     }
 
-
-    //public async void call()
-    //{
-    //    PersonRepository _personRepo = new PersonRepository(new AppDbContext());
-    //    TaskItemRepository _taskRepo = new TaskItemRepository(new AppDbContext());
-    //        var tasks = await _taskRepo.GetAllAsync();   // inkl. Includes
-    //        var people = await _personRepo.GetAllAsync(); // inkl. Qualifikationen
-    //        var service = new GmplService(tasks.ToList());
-    //        string datFile = service.WriteDatafile(people, maxWorkingHours: 8);
-    //        // z.B. als Datei speichern:
-    //        await File.WriteAllTextAsync("output.dat", datFile);
-    //}
     private const string MOD = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\modell.mod";
     private const string DAT = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\data.dat";
 }

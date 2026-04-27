@@ -1,1 +1,25 @@
-sometext
+data;
+
+set TASKS := ta1;
+set QUALIS := q1;
+set PEOPLE := p1;
+set TOOLS := to1;
+
+param duration :=
+      1         4;
+
+param hasQuali : Electrical_Systems_Basics  :=
+         p1         1                          ;
+
+param requiredQualis: Electrical_Systems_Basics  :=
+            1        0                          ;
+
+param requiredTools: Kletterausrüstung  :=
+            1        0                  ;
+
+param stockTools :=
+      Kletterausrüstung    20;
+
+param maxWorkingHours := 8;
+param amountBoats := 8;
+end;
