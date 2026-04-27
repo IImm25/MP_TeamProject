@@ -12,14 +12,14 @@ param hasQuali : q_1   :=
          p_1          1     ;
 
 param requiredQualis: q_1   :=
-            ta_2     0     ;
+            ta_2     1     ;
 
 param requiredTools: to_1  :=
-            ta_2     0     ;
+            ta_2     3     ;
 
 param stockTools :=
       to_1       20;
 
-param maxWorkingHours := 0;
+param maxWorkingHours := 8;
 param amountBoats := 2;
 end;

@@ -46,7 +46,7 @@ public class GmplService
         {
             await ReadInRequestDto(request);
             
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools, Qualifications, request.MaxWorkingHours , request.BoatNumber);
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools, Qualifications, request.maxTime , request.BoatNumber);
 
             string datFileText = await datFileGenerator.CreateDataFile();
             string resp = await DataFileGenerator.SaveDataFile(datFileText);
@@ -56,6 +56,7 @@ public class GmplService
             if (!resp.Contains("Exception"))
             {
                 GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
+                //GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), DAT);
                 GmplOutput2Console.GetGmplResults(result);
                 return ResponseMapper.MapToResponse(result, TaskItems, People, Tools, People.SelectMany(x => x.Qualifications).ToList());
             }
@@ -122,7 +123,7 @@ public class GmplService
             var tasks = new List<TaskItem>();
             foreach (var id in taskIds)
             {
-                var task = await taskItemRepository.GetByIdAsync(id);
+                var task = await taskItemRepository.GetFullByIdAsync(id);
                 if (task is not null)
                     tasks.Add(task);
             }
