@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using Backend.Data.DTO;
-using Backend.Data.DTO.Create;
+﻿using Backend.Data.DTO;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
-
-using Backend.Data.DTO;
-using Backend.Data.Repositories;
 using Backend.GMPL;
+using System.Xml;
 namespace Backend.Web.Services;
 
 public class GmplService
@@ -41,7 +37,7 @@ public class GmplService
 
         GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), pathDat);
 
-        return ResponseMapper.MapToResponse(result);
+        return new List<PlanResponseDto>();
     }
 
     public async Task<List<PlanResponseDto>> CaculateGmplModel(PlanRequestDto request)
@@ -49,9 +45,8 @@ public class GmplService
         try
         {
             await ReadInRequestDto(request);
-            List<Qualification> qualifications;
             
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools, Qualifications);
+            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools, Qualifications, request.MaxWorkingHours , request.BoatNumber);
 
             string datFileText = await datFileGenerator.CreateDataFile();
             string resp = await DataFileGenerator.SaveDataFile(datFileText);
@@ -62,7 +57,7 @@ public class GmplService
             {
                 GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
                 GmplOutput2Console.GetGmplResults(result);
-                return ResponseMapper.MapToResponse(result);
+                return ResponseMapper.MapToResponse(result, TaskItems, People, Tools, People.SelectMany(x => x.Qualifications).ToList());
             }
 
         }

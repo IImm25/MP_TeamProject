@@ -8,19 +8,22 @@ namespace Backend.GMPL;
 
 public class DataFileGenerator
 {
-    const int maxWorkingHours = 8;
-    const int amoutBoats = 8;
+    private float MaxWorkingHours = 8;
+    private int NumberBoats = 8;
     private List<TaskItem> TaskItems {  get; set; }
     private List<Person> People {  get; set; }
     private List<Tool> Tools { get; set; }
     private List<Qualification> Qualifications { get; set; }
     
-    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people, List<Tool> tools, List<Qualification> qualifications)
+    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people, List<Tool> tools, List<Qualification> qualifications, float maxWorkingHours, int numberBoats)
     {
         TaskItems = taskItems;
         People = people;
         Tools = tools;
         Qualifications = qualifications;
+
+        MaxWorkingHours = maxWorkingHours;
+        NumberBoats = numberBoats;
     }
 
     public async static Task<string> SaveDataFile(string dataFileText)
@@ -50,10 +53,10 @@ public class DataFileGenerator
             sb.AppendLine("data;");
             sb.AppendLine();
 
-            WriteSet(sb, "TASKS", TaskItems.Select((_, i) => $"ta{i + 1}"));
-            WriteSet(sb, "QUALIS", Qualifications.Select((_, i) => $"q{i + 1}"));
-            WriteSet(sb, "PEOPLE", People.Select((_, i) => $"p{i + 1}"));
-            WriteSet(sb, "TOOLS", Tools.Select((_, i) => $"to{i + 1}" ));
+            WriteSet(sb, "TASKS", TaskItems.Select( x=> $"ta_{x.Id}"));
+            WriteSet(sb, "QUALIS", Qualifications.Select(x => $"q_{x.Id}"));
+            WriteSet(sb, "PEOPLE", People.Select(x => $"p_{x.Id}"));
+            WriteSet(sb, "TOOLS", Tools.Select(x => $"to_{x.Id}" ));
             sb.AppendLine();
 
             WriteParamDuration(sb, taskIds);
@@ -68,11 +71,11 @@ public class DataFileGenerator
             WriteParamRequiredTools(sb, taskIds);
             sb.AppendLine();
 
-            WriteParamStockTools(sb, Tools);
+            WriteParamStockTools(sb);
             sb.AppendLine();
 
-            sb.AppendLine($"param maxWorkingHours := {maxWorkingHours};");
-            sb.AppendLine($"param amountBoats := {amoutBoats};");
+            sb.AppendLine($"param maxWorkingHours := {MaxWorkingHours};");
+            sb.AppendLine($"param amountBoats := {NumberBoats};");
             sb.AppendLine("end;");
 
             return sb.ToString();
@@ -87,7 +90,7 @@ public class DataFileGenerator
     // ─── Extraction ───────────────────────────────────────────────────────────
 
     // NACHHER — liefert "ta1", "ta2", ... passend zum Set
-    private List<string> BuildTaskIds() => TaskItems.Select((_, i) => $"ta{i + 1}").ToList();
+    private List<string> BuildTaskIds() => TaskItems.Select(x => $"ta_{x.Id}").ToList();
 
     // ─── Set-Writer ────────────────────────────────────────────────────────
 
@@ -118,9 +121,10 @@ public class DataFileGenerator
 
         const int colWidth = 6;
 
+        // Spaltenüberschriften mit den echten Qualifikations-IDs
         sb.Append("param hasQuali :");
         for (int c = 0; c < Qualifications.Count; c++)
-            sb.Append($" {$"q{c + 1}".PadRight(colWidth)}");
+            sb.Append($" {$"q_{Qualifications[c].Id}".PadRight(colWidth)}");
         sb.AppendLine(":=");
 
         for (int pi = 0; pi < People.Count; pi++)
@@ -129,7 +133,8 @@ public class DataFileGenerator
                 .Select(pq => pq.QualificationId)
                 .ToHashSet();
 
-            sb.Append($"         {$"p{pi + 1}",-10}");
+            // Personen-Schlüssel mit echter ID
+            sb.Append($"         p_{People[pi].Id,-10}");
             for (int c = 0; c < Qualifications.Count; c++)
                 sb.Append($" {(qualIds.Contains(Qualifications[c].Id) ? "1" : "0").PadRight(colWidth)}");
 
@@ -145,7 +150,7 @@ public class DataFileGenerator
 
         sb.Append("param requiredQualis:");
         for (int c = 0; c < Qualifications.Count; c++)
-            sb.Append($" {$"q{c + 1}".PadRight(colWidth)}");
+            sb.Append($" {$"q_{Qualifications[c].Id}".PadRight(colWidth)}");
         sb.AppendLine(":=");
 
         for (int i = 0; i < TaskItems.Count; i++)
@@ -154,6 +159,7 @@ public class DataFileGenerator
                 .Select(tq => tq.QualificationId)
                 .ToHashSet();
 
+            // Task-Schlüssel ist bereits ta_{Id} in taskIds
             sb.Append($"            {taskIds[i],-8}");
             for (int c = 0; c < Qualifications.Count; c++)
                 sb.Append($" {(requiredIds.Contains(Qualifications[c].Id) ? "1" : "0").PadRight(colWidth)}");
@@ -170,7 +176,7 @@ public class DataFileGenerator
 
         sb.Append("param requiredTools:");
         for (int c = 0; c < Tools.Count; c++)
-            sb.Append($" {$"to{c + 1}".PadRight(colWidth)}");
+            sb.Append($" {$"to_{Tools[c].Id}".PadRight(colWidth)}");
         sb.AppendLine(":=");
 
         for (int i = 0; i < TaskItems.Count; i++)
@@ -191,18 +197,17 @@ public class DataFileGenerator
 
     // ─── Param: stockTools ────────────────────────────────────────────────────
 
-    private void WriteParamStockTools(StringBuilder sb, List<Tool> tools)
+    private void WriteParamStockTools(StringBuilder sb)
     {
         const int nameWidth = 8;
 
         sb.AppendLine("param stockTools :=");
-        for (int i = 0; i < tools.Count; i++)
+        for (int i = 0; i < Tools.Count; i++)
         {
-            string line = $"      {$"to{i + 1}".PadRight(nameWidth)}{tools[i].AvailableStock}";
-            sb.AppendLine(i < tools.Count - 1 ? line : line + ";");
+            string line = $"      to_{Tools[i].Id,-nameWidth}{Tools[i].AvailableStock}";
+            sb.AppendLine(i < Tools.Count - 1 ? line : line + ";");
         }
     }
-
 
     private string Sanitize(string name) => name.Replace(" ", "_");
 }

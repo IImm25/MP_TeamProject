@@ -3,7 +3,7 @@
 public class GmplResults
 {
     public GmplResults(float workHours, 
-        Dictionary<int, Dictionary<string, int>> taskOnBoat, 
+        Dictionary<int, Dictionary<string, float>> taskOnBoat, 
         Dictionary<int, int> boatUsage, 
         Dictionary<int, Dictionary<string, int>> personOnBoat, 
         Dictionary<int, Dictionary<string, int>> toolOnBoat)
@@ -17,7 +17,7 @@ public class GmplResults
     public float Workhours { get; set; }
     
     // taskOnBoat[boot][task]
-    public Dictionary<int, Dictionary<string, int>> TaskOnBoat {  get; set; }
+    public Dictionary<int, Dictionary<string, float>> TaskOnBoat {  get; set; }
 
     // boatUsage[boot]
     public Dictionary<int, int> BoatUsage { get; set; }

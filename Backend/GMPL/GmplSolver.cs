@@ -61,7 +61,7 @@ public static class GmplSolver
             //  GLPK internally creates columns doesn't matter.
             // ─────────────────────────────────────────────────
 
-            var taskOnBoat = new Dictionary<int, Dictionary<string, int>>();
+            var taskOnBoat = new Dictionary<int, Dictionary<string, float>>();
             var boatUsage = new Dictionary<int, int>();
             var personOnBoat = new Dictionary<int, Dictionary<string, int>>();
             var toolOnBoat = new Dictionary<int, Dictionary<string, int>>();
@@ -85,7 +85,7 @@ public static class GmplSolver
                             string aufgabe = indices[1];
 
                             if (!taskOnBoat.ContainsKey(boat))
-                                taskOnBoat[boat] = new Dictionary<string, int>();
+                                taskOnBoat[boat] = new Dictionary<string, float>();
 
                             taskOnBoat[boat][aufgabe] = val;
                             break;
