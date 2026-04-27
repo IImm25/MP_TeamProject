@@ -190,8 +190,6 @@ export class DialogTask implements OnInit {
       requiredTools: val.tools || [],
     };
 
-    console.log(payload);
-
     if (this.type === 'Edit' && this.currentTask) {
       this.http.updateTask(this.currentTask.id, payload).subscribe({
         next: () => {
@@ -294,7 +292,6 @@ export class DialogTask implements OnInit {
 
   getQualificationName(id: number): string {
     const q = this.allQualifications().find((item) => item.id === id);
-    console.log("q: ", q, "id: ", id);
     return q ? q.name : 'Unbekannt';
   }
 }

@@ -1,0 +1,271 @@
+<div class="content-wrapper">
+  <h1 class="title">{{ 'SCHEDULER.TITLE' | translate }}</h1>
+
+  <form [formGroup]="schedulerForm">
+    <p-stepper [value]="1" [linear]="true">
+      <p-step-list>
+        <p-step [value]="1">{{ 'SCHEDULER.STEPS.CORE' | translate }}</p-step>
+        <p-step [value]="2">{{ 'SCHEDULER.STEPS.TASKS' | translate }}</p-step>
+        <p-step [value]="3">{{ 'SCHEDULER.STEPS.EMPLOYEES' | translate }}</p-step>
+        <p-step [value]="4">{{ 'SCHEDULER.STEPS.TOOLS' | translate }}</p-step>
+      </p-step-list>
+
+      <p-step-panels>
+        <p-step-panel [value]="1">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div class="field">
+                <label>{{ 'SCHEDULER.CORE.MAX_WORK_TIME' | translate }}</label>
+                <p-inputNumber
+                  formControlName="maxTime"
+                  suffix=" h"
+                  [min]="1"
+                  [showButtons]="true"
+                  class="w-full"
+                />
+                @if (schedulerForm.controls.maxTime.invalid && schedulerForm.controls.maxTime.touched) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'SCHEDULER.VALIDATION.MAX_WORK_TIME_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+              <div class="field">
+                <label>{{ 'SCHEDULER.CORE.BOAT_AMOUNT' | translate }}</label>
+                <p-inputNumber
+                  formControlName="boatAmount"
+                  [min]="1"
+                  [showButtons]="true"
+                  class="w-full"
+                />
+                @if (schedulerForm.controls.boatAmount.invalid && schedulerForm.controls.boatAmount.touched) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'SCHEDULER.VALIDATION.BOAT_AMOUNT_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="step-footer">
+              <span></span>
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndNext(1, 2, activateCallback)"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <p-step-panel [value]="2">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div class="header-row">
+                <h3>{{ 'MENU.TASKS' | translate }}</h3>
+                <p-button
+                  icon="pi pi-plus"
+                  [text]="true"
+                  [label]="'TASKS.NEW_TASK' | translate"
+                  (onClick)="taskVisible.set(true); taskType.set('New')"
+                />
+                @if (schedulerForm.controls.selectedTasks.invalid && schedulerForm.controls.selectedTasks.touched && schedulerForm.controls.selectedTasks.value.length === 0) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'SCHEDULER.VALIDATION.TASKS_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+              <p-table
+                [value]="tasks()"
+                [(selection)]="schedulerForm.controls.selectedTasks.value"
+                (selectionChange)="schedulerForm.controls.selectedTasks.setValue($event)"
+                dataKey="id"
+                [rows]="5"
+                [paginator]="true"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+                    <th>{{ 'TASKS.NAME' | translate }}</th>
+                    <th>{{ 'TASKS.DURATION' | translate }}</th>
+                    <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-task>
+                  <tr>
+                    <td><p-tableCheckbox [value]="task" /></td>
+                    <td>{{ task.name }}</td>
+                    <td><span>{{ formatDuration(task.durationHours) }}</span></td>
+                    <td>
+                      <div class="action-buttons">
+                        <p-button
+                          icon="pi pi-ellipsis-h"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          class="btn-edit"
+                          (onClick)="openDetailTask(task)"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                (onClick)="activateCallback(1)"
+              />
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndNext(2, 3, activateCallback)"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <p-step-panel [value]="3">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div class="header-row">
+                <h3>{{ 'MENU.EMPLOYEES' | translate }}</h3>
+                <p-button
+                  icon="pi pi-plus"
+                  [text]="true"
+                  [label]="'EMPLOYEES.ADD_NEW' | translate"
+                  (onClick)="employeeVisible.set(true)"
+                />
+              @if (schedulerForm.controls.selectedEmployees.invalid && schedulerForm.controls.selectedEmployees.touched && schedulerForm.controls.selectedEmployees.value.length === 0) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'SCHEDULER.VALIDATION.EMPLOYEES_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+              <p-table
+                [value]="employees()"
+                [selection]="selectedEmployeesTable"
+                (selectionChange)="onEmployeeSelectionChange($event)"
+                dataKey="id"
+                [rows]="5"
+                [paginator]="true"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+                    <th>{{ 'EMPLOYEES.NAME' | translate }}</th>
+                    <th>{{ 'EMPLOYEES.QUALIFICATIONS' | translate }}</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-emp>
+                  <tr>
+                    <td><p-tableCheckbox [value]="emp" /></td>
+                    <td>{{ emp.firstname }} {{ emp.lastname }}</td>
+                    <td>
+                      @for (q of emp.qualifications; track q.id; let isLast = $last) {
+                        <p-chip>{{ q.name }}</p-chip>
+                      }
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                (onClick)="activateCallback(2)"
+              />
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndNext(3, 4, activateCallback)"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <p-step-panel [value]="4">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <div class="header-row">
+                <h3>{{ 'MENU.TOOLS' | translate }}</h3>
+                <p-button
+                  icon="pi pi-plus"
+                  [text]="true"
+                  [label]="'TOOLS.ADD_NEW' | translate"
+                  (onClick)="toolVisible.set(true)"
+                />
+                @if (schedulerForm.controls.selectedTools.invalid && schedulerForm.controls.selectedTools.touched && schedulerForm.controls.selectedTools.value.length === 0) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'SCHEDULER.VALIDATION.TOOLS_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
+              <p-table [value]="tools()" dataKey="id" [selection]="selectedToolTable"
+                (selectionChange)="onToolSelectionChange($event)"
+                dataKey="id" [rows]="5" [paginator]="true">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+                    <th>{{ 'TOOLS.NAME' | translate }}</th>
+                    <th>{{ 'TOOLS.AVAILABLE_STOCK' | translate }}</th>
+                    <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-tool>
+                  <tr>
+                    <td><p-tableCheckbox [value]="tool" /></td>
+                    <td>{{ tool.name }}</td>
+                    <td>{{ tool.availableStock }}</td>
+                    <td>
+                      <div class="action-buttons">
+                        <p-button
+                          icon="pi pi-pencil"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          class="btn-edit"
+                          (onClick)="toolEdit(tool, 'Edit')"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                (onClick)="activateCallback(3)"
+              />
+              <p-button
+                [label]="'SCHEDULER.GENERATE_PLAN' | translate"
+                icon="pi pi-check"
+                severity="success"
+                (onClick)="generatePlan()"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+      </p-step-panels>
+    </p-stepper>
+  </form>
+</div>
+
+<app-dialog-task [type]="taskType()" [selectedTask]="selectedTask()" [(visible)]="taskVisible" (taskSaved)="loadData()" />
+<app-dialog-employee
+  type="New"
+  [(visible)]="employeeVisible"
+  [allQualifications]="[]"
+  (onSave)="loadData()"
+/>
+<app-dialog-tool [type]="toolType()" [(visible)]="toolVisible"  (onSave)="loadData()" />

@@ -21,7 +21,7 @@
           <td>{{ employee.firstname }} {{ employee.lastname }}</td>
           <td>
             @for (q of employee.qualifications; track q.id; let isLast = $last) {
-              <span>{{ q.name }}{{ isLast ? '' : ', ' }}</span>
+               <p-chip>{{ q.name }}</p-chip>
             }
           </td>
           <td>

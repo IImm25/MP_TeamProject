@@ -112,5 +112,26 @@
       "NAME_PLACEHOLDER": "Gib eine Bezeichnung ein!",
       "AVAILABLE_STOCK_PLACEHOLDER": "Gib eine verfügbare Menge ein!"
     }
+  },
+  "SCHEDULER": {
+    "TITLE": "Einsatzplanung",
+    "STEPS": {
+      "CORE": "Allgemein",
+      "TASKS": "Aufgaben",
+      "EMPLOYEES": "Mitarbeiter",
+      "TOOLS": "Werkzeuge"
+    },
+    "CORE": {
+      "MAX_WORK_TIME": "Maximale Arbeitszeit (h)",
+      "BOAT_AMOUNT": "Anzahl der Boote"
+    },
+    "VALIDATION": {
+      "MAX_WORK_TIME_REQUIRED": "Maximale Arbeitszeit ist erforderlich",
+      "BOAT_AMOUNT_REQUIRED": "Anzahl der Boote ist erforderlich",
+      "TASKS_REQUIRED": "Mindestens eine Aufgabe wird benötigt",
+      "EMPLOYEES_REQUIRED": "Mindestens ein Mitarbeiter wird benötigt",
+      "TOOLS_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
+    },
+    "GENERATE_PLAN": "Plan generieren"
   }
 }

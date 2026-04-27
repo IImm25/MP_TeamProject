@@ -9,11 +9,12 @@ import { environment } from '../../../../environments/environment';
 import { Qualification } from '../../../Models/qualification';
 import { Employee as EmployeeModel, EmployeeSummary } from '../../../Models/employee';
 import { HttpService } from '../../../Services/http-service';
+import { ChipModule } from 'primeng/chip';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [TranslatePipe, ButtonModule, TableModule, ConfirmDialogModule, DialogEmployee],
+  imports: [TranslatePipe, ButtonModule, TableModule, ConfirmDialogModule, DialogEmployee,ChipModule],
   providers: [ConfirmationService],
   templateUrl: './employees.html',
   styleUrl: './employees.css',
