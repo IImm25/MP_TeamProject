@@ -6,19 +6,19 @@ set PEOPLE := p1;
 set TOOLS := to1;
 
 param duration :=
-      1         4;
+      ta1       4;
 
-param hasQuali : Electrical_Systems_Basics  :=
-         p1         1                          ;
+param hasQuali : q1    :=
+         p1         1     ;
 
-param requiredQualis: Electrical_Systems_Basics  :=
-            1        0                          ;
+param requiredQualis: q1    :=
+            ta1      0     ;
 
-param requiredTools: Kletterausrüstung  :=
-            1        0                  ;
+param requiredTools: to1   :=
+            ta1      0     ;
 
 param stockTools :=
-      Kletterausrüstung    20;
+      to1     20;
 
 param maxWorkingHours := 8;
 param amountBoats := 8;
