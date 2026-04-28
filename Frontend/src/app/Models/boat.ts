@@ -5,7 +5,7 @@ import { Tool } from "./tool";
 export interface Boat {
   id: number;
   taskItems: Task[];
-  persons: Employee[];
+  people: Employee[];
   tools: TaskTool[];
 }
 

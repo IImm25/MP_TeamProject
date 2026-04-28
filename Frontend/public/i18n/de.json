@@ -65,6 +65,7 @@
     "DIALOG": {
       "NEW": "Neuer Mitarbeiter",
       "EDIT": "Mitarbeiter bearbeiten",
+      "DETAIL": "Mitarbeiter anzeigen",
       "DELETE_TITLE": "Mitarbeiter löschen",
       "DELETE_MESSAGE": "Möchten Sie den Mitarbeiter {{firstname}} {{lastname}} wirklich löschen?",
       "FIRSTNAME_PLACEHOLDER": "Gib einen Vornamen ein!",
@@ -89,6 +90,7 @@
     "DIALOG":{
       "NEW": "Neue Qualifikation",
       "EDIT": "Qualifikation bearbeiten",
+      "DETAIL": "Qualifikation anzeigen",
       "DELETE_TITLE": "Qualifikation löschen",
       "DELETE_MESSAGE": "Möchten Sie die Qualifikation \"{{name}}\" wirklich löschen?",
       "NAME_PLACEHOLDER": "Gib eine Bezeichnung ein!",
@@ -107,6 +109,7 @@
     "DIALOG":{
       "NEW": "Neues Werkzeug",
       "EDIT": "Werkzeug bearbeiten",
+      "DETAIL": "Werkzeug anzeigen",
       "DELETE_TITLE": "Werkzeug löschen",
       "DELETE_MESSAGE": "Möchten Sie das Werkzeug {{name}} wirklich löschen?",
       "NAME_PLACEHOLDER": "Gib eine Bezeichnung ein!",
@@ -133,5 +136,8 @@
       "TOOLS_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
     },
     "GENERATE_PLAN": "Plan generieren"
+  },
+  "SCHEDULE": {
+    "TITLE": "Planung"
   }
 }

@@ -31,6 +31,10 @@ label {
   color: var(--text-color) !important;
 }
 
+.right {
+  text-align: right !important;
+}
+
 .content-wrapper {
   padding: 3rem;
   background-color: var(--bg-color);
@@ -123,6 +127,12 @@ label {
   color: var(--text-color);
 }
 
+.p-chip {
+  background: var(--primary-color) !important;
+  color: var(--text-color);
+  margin: 0.2rem
+}
+
 
 /*Dialog*/
 
@@ -131,9 +141,11 @@ label {
   min-height: 40vh;
   flex: 1 1 auto;
   overflow-y: auto;
+  padding: 1.5rem;
 }
 
 .step-footer, .p-dialog-footer {
+  flex-shrink: 0;
   position: relative;
   display: flex;
   justify-content: space-between !important;
@@ -206,4 +218,8 @@ p-inputnumber,
   opacity: 1 !important;
 }
 
-
+@media (max-width: 768px) {
+  .p-dialog {
+    width: 95vw !important;
+  }
+}

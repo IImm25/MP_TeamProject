@@ -6,9 +6,14 @@
   margin-bottom: 1rem;
 }
 
-:host ::ng-deep .step-footer {
-  padding-top: auto;
-  background-color: var(--bg-color) !important;
+.header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-
+:host ::ng-deep .step-footer {
+  background-color: var(--bg-color) !important;
+}

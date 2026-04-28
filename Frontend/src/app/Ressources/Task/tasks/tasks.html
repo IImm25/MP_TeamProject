@@ -13,7 +13,7 @@
   </header>
 
   <div class="table-container">
-    <p-table [value]="tasks()" [paginator]="true" [rows]="1" sortField="name" [sortOrder]="1">
+    <p-table [value]="tasks()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
       <ng-template pTemplate="header">
         <tr>
           <th pSortableColumn="name">{{ 'TASKS.NAME' | translate }} <p-sortIcon field="name"/></th>

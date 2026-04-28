@@ -1,1 +1,84 @@
-<p>schedule-view works!</p>
+<div class="content-wrapper">
+  <header class="section-header">
+    <div class="title-group">
+      <h1 class="title">{{ 'SCHEDULE.TITLE' | translate }}</h1>
+    </div>
+  </header>
+
+  <div class="schedule-container">
+    <div class="grid">
+      @for (boat of boats(); track $index) {
+        <div class="card-wrapper">
+          <p-card
+            [header]="'Boot ' + ($index + 1)"
+            [styleClass]="'custom-card ' + (isBoatEmpty(boat) ? 'empty-boat-card' : '')"
+          >
+            <p-accordion [multiple]="true">
+              <p-accordion-panel value="tasks" [disabled]="isBoatEmpty(boat)">
+                <p-accordion-header>
+                  <i class="pi pi-list mr-2"></i> {{ 'MENU.TASKS' | translate }}
+                </p-accordion-header>
+                <p-accordion-content>
+                  <div class="chips-container">
+                    @for (task of boat.taskItems; track task.id) {
+                      <p-chip
+                        [label]="task.name"
+                        icon="pi pi-list"
+                        (click)="openTask(task)"
+                        styleClass="clickable-chip"
+                      />
+                    }
+                  </div>
+                </p-accordion-content>
+              </p-accordion-panel>
+
+              <p-accordion-panel value="crew" [disabled]="isBoatEmpty(boat)">
+                <p-accordion-header>
+                  <i class="pi pi-users mr-2"></i> {{ 'MENU.EMPLOYEES' | translate }}
+                </p-accordion-header>
+                <p-accordion-content>
+                  <div class="chips-container">
+                    @for (person of boat.people; track person.id) {
+                      <p-chip
+                        [label]="person.firstname + ' ' + person.lastname"
+                        icon="pi pi-user"
+                        (click)="openEmployee(person)"
+                        styleClass="clickable-chip"
+                      />
+                    }
+                  </div>
+                </p-accordion-content>
+              </p-accordion-panel>
+
+              <p-accordion-panel value="tools" [disabled]="isBoatEmpty(boat)">
+                <p-accordion-header>
+                  <i class="pi pi-wrench mr-2"></i> {{ 'MENU.TOOLS' | translate }}
+                </p-accordion-header>
+                <p-accordion-content>
+                  <div class="chips-container">
+                    @for (t of boat.tools; track t.toolId) {
+                      <p-chip
+                        [label]="getToolName(t.toolId) + ' (' + t.requiredAmount + 'x)'"
+                        icon="pi pi-wrench"
+                        (click)="openTool(t.toolId)"
+                        styleClass="clickable-chip"
+                      />
+                    }
+                  </div>
+                </p-accordion-content>
+              </p-accordion-panel>
+            </p-accordion>
+          </p-card>
+        </div>
+      }
+    </div>
+  </div>
+
+  <app-dialog-task [type]="'Detail'" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
+  <app-dialog-employee
+    [type]="'Detail'"
+    [selectedEmployee]="selectedEmployee()"
+    [(visible)]="employeeVisible"
+  />
+  <app-dialog-tool [type]="'Detail'" [selectedTool]="selectedTool()" [(visible)]="toolVisible" />
+</div>

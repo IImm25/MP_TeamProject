@@ -67,7 +67,7 @@
                   icon="pi pi-plus"
                   [text]="true"
                   [label]="'TASKS.NEW_TASK' | translate"
-                  (onClick)="taskVisible.set(true); taskType.set('New')"
+                  (onClick)="taskVisible.set(true); taskType.set('New'); selectedTask.set(null)"
                 />
                 @if (schedulerForm.controls.selectedTasks.invalid && schedulerForm.controls.selectedTasks.touched && schedulerForm.controls.selectedTasks.value.length === 0) {
                   <div class="error-message">
@@ -83,11 +83,13 @@
                 dataKey="id"
                 [rows]="5"
                 [paginator]="true"
+                sortField="name"
+                [sortOrder]="1"
               >
                 <ng-template pTemplate="header">
                   <tr>
                     <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
-                    <th>{{ 'TASKS.NAME' | translate }}</th>
+                    <th pSortableColumn="name">{{ 'TASKS.NAME' | translate }} <p-sortIcon field="name"/></th>
                     <th>{{ 'TASKS.DURATION' | translate }}</th>
                     <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
                   </tr>
@@ -100,12 +102,20 @@
                     <td>
                       <div class="action-buttons">
                         <p-button
+                          icon="pi pi-pencil"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          class="btn-edit"
+                          (onClick)="openTask(task, 'Edit')"
+                        />
+                        <p-button
                           icon="pi pi-ellipsis-h"
                           [text]="true"
                           [rounded]="true"
                           severity="secondary"
                           class="btn-edit"
-                          (onClick)="openDetailTask(task)"
+                          (onClick)="openTask(task, 'Detail')"
                         />
                       </div>
                     </td>
@@ -154,12 +164,15 @@
                 dataKey="id"
                 [rows]="5"
                 [paginator]="true"
+                sortField="firstname"
+                [sortOrder]="1"
               >
                 <ng-template pTemplate="header">
                   <tr>
                     <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
-                    <th>{{ 'EMPLOYEES.NAME' | translate }}</th>
+                    <th pSortableColumn="firstname">{{ 'EMPLOYEES.NAME' | translate }} <p-sortIcon field="firstname"/></th>
                     <th>{{ 'EMPLOYEES.QUALIFICATIONS' | translate }}</th>
+                    <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-emp>
@@ -170,6 +183,26 @@
                       @for (q of emp.qualifications; track q.id; let isLast = $last) {
                         <p-chip>{{ q.name }}</p-chip>
                       }
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+                        <p-button
+                          icon="pi pi-pencil"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          class="btn-edit"
+                          (onClick)="openEmployee(emp, 'Edit')"
+                        />
+                        <p-button
+                          icon="pi pi-ellipsis-h"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          class="btn-edit"
+                          (onClick)="openEmployee(emp, 'Detail')"
+                        />
+                      </div>
                     </td>
                   </tr>
                 </ng-template>
@@ -211,11 +244,11 @@
               </div>
               <p-table [value]="tools()" dataKey="id" [selection]="selectedToolTable"
                 (selectionChange)="onToolSelectionChange($event)"
-                dataKey="id" [rows]="5" [paginator]="true">
+                dataKey="id" [rows]="5" [paginator]="true" sortField="name" [sortOrder]="1">
                 <ng-template pTemplate="header">
                   <tr>
                     <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
-                    <th>{{ 'TOOLS.NAME' | translate }}</th>
+                    <th pSortableColumn="name">{{ 'TOOLS.NAME' | translate }} <p-sortIcon field="name"/></th>
                     <th>{{ 'TOOLS.AVAILABLE_STOCK' | translate }}</th>
                     <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
                   </tr>
@@ -233,7 +266,15 @@
                           [rounded]="true"
                           severity="secondary"
                           class="btn-edit"
-                          (onClick)="toolEdit(tool, 'Edit')"
+                          (onClick)="toolVisible.set(true); selectedTool.set(tool); toolType.set('Edit')"
+                        />
+                        <p-button
+                          icon="pi pi-ellipsis-h"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          class="btn-detail"
+                          (onClick)="toolVisible.set(true); selectedTool.set(tool); toolType.set('Detail')"
                         />
                       </div>
                     </td>
@@ -261,11 +302,14 @@
   </form>
 </div>
 
-<app-dialog-task [type]="taskType()" [selectedTask]="selectedTask()" [(visible)]="taskVisible" (taskSaved)="loadData()" />
-<app-dialog-employee
-  type="New"
-  [(visible)]="employeeVisible"
-  [allQualifications]="[]"
-  (onSave)="loadData()"
-/>
-<app-dialog-tool [type]="toolType()" [(visible)]="toolVisible"  (onSave)="loadData()" />
+@if(taskVisible()){
+  <app-dialog-task [type]="taskType()" [selectedTask]="selectedTask()" [(visible)]="taskVisible" (taskSaved)="loadData()" />
+}
+
+@if(employeeVisible()){
+  <app-dialog-employee [type]="employeeType()" [(visible)]="employeeVisible", [selectedEmployee]="selectedEmployee()", (onSave)="loadData()"/>
+}
+
+@if(toolVisible()){
+  <app-dialog-tool [type]="toolType()" [selectedTool]="selectedTool()" [(visible)]="toolVisible"  (onSave)="loadData()" />
+}

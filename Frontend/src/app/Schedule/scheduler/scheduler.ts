@@ -21,6 +21,8 @@ import { DialogTask } from '../../Ressources/Task/dialog-task/dialog-task';
 import { DialogEmployee } from '../../Ressources/Employee/dialog-employee/dialog-employee';
 import { DialogTool } from '../../Ressources/Tool/dialog-tool/dialog-tool';
 import { ChipModule } from 'primeng/chip';
+import { ScheduleService } from '../schedule-service';
+import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-scheduler',
@@ -37,21 +39,19 @@ import { ChipModule } from 'primeng/chip';
     DialogTask,
     DialogEmployee,
     DialogTool,
-    ChipModule
+    ChipModule,
   ],
   templateUrl: './scheduler.html',
-  styleUrl: './scheduler.css'
+  styleUrl: './scheduler.css',
 })
 export class Scheduler implements OnInit {
-
-  @ViewChild(DialogTool) dialogComp!: DialogTool;
-
   private fb = inject(FormBuilder);
   private http = inject(HttpService);
   private router = inject(Router);
+  private planService = inject(ScheduleService);
 
   tasks: WritableSignal<TaskSummary[]> = signal<TaskSummary[]>([]);
-  employees: WritableSignal<EmployeeSummary[]> = signal<EmployeeSummary[]>([]);
+  employees: WritableSignal<Employee[]> = signal<Employee[]>([]);
   tools: WritableSignal<Tool[]> = signal<Tool[]>([]);
 
   taskVisible: WritableSignal<boolean> = signal(false);
@@ -62,7 +62,11 @@ export class Scheduler implements OnInit {
   selectedEmployeesTable: EmployeeSummary[] = [];
   selectedToolTable: Tool[] = [];
 
-  toolType: WritableSignal<'Edit' | 'New'> = signal('New');
+  toolType: WritableSignal<'Edit' | 'New' | 'Detail'> = signal('New');
+  selectedTool: WritableSignal<Tool | null> = signal(null);
+
+  employeeType: WritableSignal<'Edit' | 'New' | 'Detail'> = signal('New');
+  selectedEmployee: WritableSignal<Employee | null> = signal(null);
 
   selectedTask: WritableSignal<Task | null> = signal(null);
   taskType: WritableSignal<'Edit' | 'New' | 'Detail'> = signal('New');
@@ -70,11 +74,19 @@ export class Scheduler implements OnInit {
   schedulerForm = this.fb.group({
     maxTime: new FormControl<number>(8, [Validators.required, Validators.min(1)]),
     boatAmount: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
-    selectedTasks: new FormControl<TaskSummary[]>([], { nonNullable: true, validators: [Validators.required] }),
-    selectedEmployees: new FormControl<EmployeeSummary[]>([], { nonNullable: true, validators: [Validators.required] }),
-    selectedTools: new FormControl<Tool[]>([], { nonNullable: true, validators: [Validators.required] })
+    selectedTasks: new FormControl<TaskSummary[]>([], {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    selectedEmployees: new FormControl<EmployeeSummary[]>([], {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    selectedTools: new FormControl<Tool[]>([], {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
-
 
   ngOnInit() {
     this.loadData();
@@ -90,68 +102,62 @@ export class Scheduler implements OnInit {
     this.schedulerForm.patchValue({ selectedEmployees: event });
   }
 
-   onToolSelectionChange(event: Tool[]) {
+  onToolSelectionChange(event: Tool[]) {
     this.selectedToolTable = event;
     this.schedulerForm.patchValue({ selectedTools: event });
   }
 
   loadData() {
-    this.http.getTasks().subscribe(data => this.tasks.set(data));
-    this.http.getTools().subscribe(data => this.tools.set(data));
-    this.http.getEmployees().subscribe((summaries) => {
-    const employeeList = summaries as Employee[];
-    this.employees.set(employeeList);
-
-    employeeList.forEach(employee => {
-      this.http.getEmployeeById(employee.id).subscribe(fullDetails => {
-        this.employees.update(current =>
-          current.map(e => e.id === fullDetails.id ? fullDetails : e)
-        );
+    this.http.getTasks().subscribe((data) => this.tasks.set(data));
+    this.http.getTools().subscribe((data) => this.tools.set(data));
+    this.http
+      .getEmployees()
+      .pipe(
+        switchMap((summaries) => {
+          const detailRequests = summaries.map((emp) => this.http.getEmployeeById(emp.id));
+          return forkJoin(detailRequests);
+        }),
+      )
+      .subscribe((fullEmployees) => {
+        this.employees.set(fullEmployees);
       });
-    });
-  });
   }
 
-  openDetailTask(taskSummary: TaskSummary) {
-    this.taskType.set('Detail');
-    this.http.getTaskById(taskSummary.id).subscribe(fullTask => {
+  openTask(taskSummary: TaskSummary, mode: 'Edit' | 'Detail') {
+    this.taskType.set(mode);
+    this.http.getTaskById(taskSummary.id).subscribe((fullTask) => {
       this.selectedTask.set(fullTask);
       this.taskVisible.set(true);
     });
   }
 
+  openEmployee(taskSummary: Employee, mode: 'Edit' | 'Detail') {
+    this.employeeType.set(mode);
+    this.http.getEmployeeById(taskSummary.id).subscribe((fullEmployee) => {
+      this.selectedEmployee.set(fullEmployee);
+      this.employeeVisible.set(true);
+    });
+  }
+
   generatePlan() {
-    if (this.schedulerForm.invalid){
+    if (this.schedulerForm.invalid) {
       this.schedulerForm.markAllAsTouched();
       return;
     }
-
 
     const val = this.schedulerForm.value;
     const request: PlanRequest = {
       maxTime: val.maxTime!,
       boatNumber: val.boatAmount!,
-      taskItemIds: val.selectedTasks?.map(t => t.id) || [],
-      personIds: val.selectedEmployees?.map(e => e.id) || [],
-      toolIds: val.selectedTools?.map(t => t.id) || []
+      taskItemIds: val.selectedTasks?.map((t) => t.id) || [],
+      personIds: val.selectedEmployees?.map((e) => e.id) || [],
+      toolIds: val.selectedTools?.map((t) => t.id) || [],
     };
 
-    this.http.postPlan(request).subscribe(plan => {
-      console.log(plan);
-      this.router.navigate(['/schedule-view']);
+    this.http.postPlan(request).subscribe((plan) => {
+      this.planService.setPlan(plan);
+      this.router.navigate(['/schedule-view'], { skipLocationChange: true });
     });
-  }
-
-  toolEdit(selectedTool: Tool, type: 'Edit' | 'New'): void {
-    if(type === 'Edit') {
-      this.toolVisible.set(true);
-      this.toolType.set(type);
-      this.dialogComp.patchForm(selectedTool);
-    } else {
-      this.toolVisible.set(true);
-      this.toolType.set(type);
-      this.dialogComp.patchForm(null);
-    }
   }
 
   validateStep(step: number): boolean {
@@ -168,18 +174,18 @@ export class Scheduler implements OnInit {
       case 2:
         const tasks = this.schedulerForm.controls.selectedTasks;
         tasks.markAsTouched();
-        return tasks.valid && tasks.value.length > 0;;
+        return tasks.valid && tasks.value.length > 0;
 
       case 3:
         const employees = this.schedulerForm.controls.selectedEmployees;
         employees.markAsTouched();
-        return employees.valid && employees.value.length > 0;;
+        return employees.valid && employees.value.length > 0;
 
       case 4:
         const tools = this.schedulerForm.controls.selectedTools;
         tools.markAsTouched();
         tools.value.length > 0;
-        return tools.valid && tools.value.length > 0;;
+        return tools.valid && tools.value.length > 0;
 
       default:
         return true;

@@ -3,7 +3,7 @@
     <div class="title-group">
       <h1 class="title">{{ 'EMPLOYEES.TITLE' | translate }}</h1>
     </div>
-    <p-button [label]="'EMPLOYEES.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="openNew()" severity="secondary" [raised]="true"/>
+    <p-button [label]="'EMPLOYEES.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="dialogVisible.set(true); dialogType.set('New'); selectedEmployee.set(null);" severity="secondary" [raised]="true"/>
   </header>
 
   <div class="table-container">
@@ -26,8 +26,9 @@
           </td>
           <td>
             <div class="action-buttons">
-              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="openEdit(employee)" />
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="dialogType.set('Edit'); selectedEmployee.set(employee); dialogVisible.set(true);" />
               <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="secondary" (onClick)="deleteEmployee(employee)" />
+              <p-button icon="pi pi-ellipsis-h" [text]="true" [rounded]="true" severity="secondary" (onClick)="dialogType.set('Detail'); selectedEmployee.set(employee); dialogVisible.set(true);" />
             </div>
           </td>
         </tr>
@@ -38,8 +39,8 @@
 
 <app-dialog-employee
   [(visible)]="dialogVisible"
-  [type]="dialogType"
-  [allQualifications]="qualifications()"
+  [type] = "dialogType()"
+  [selectedEmployee]="this.selectedEmployee()"
   (onSave)="loadEmployees()"
 />
 

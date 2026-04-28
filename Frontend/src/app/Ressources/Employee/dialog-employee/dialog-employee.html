@@ -1,8 +1,8 @@
 <p-dialog
-  [visible]="visible()"
-  (visibleChange)="close()"
+  [(visible)]="visible"
   [header]="
-    type === 'New' ? ('EMPLOYEES.DIALOG.NEW' | translate) : ('EMPLOYEES.DIALOG.EDIT' | translate)
+    type === 'New' ? ('EMPLOYEES.DIALOG.NEW' | translate) :
+    type === 'Detail' ? ('EMPLOYEES.DIALOG.DETAIL' | translate) : ('EMPLOYEES.DIALOG.EDIT' | translate)
   "
   [modal]="true"
   [draggable]="false"
@@ -37,7 +37,7 @@
     <div class="field">
       <label>{{ 'EMPLOYEES.QUALIFICATIONS' | translate }}*</label>
       <p-multiselect
-        [options]="allQualifications"
+        [options]="allQualifications()"
         formControlName="qualifications"
         optionLabel="name"
         display="chip"
@@ -58,13 +58,15 @@
       [label]="'COMMON.CANCEL' | translate"
       [text]="true"
       severity="secondary"
-      (onClick)="close()"
+      (onClick)="visible.set(false)"
     />
-    <p-button
+    @if(type !== 'Detail') {
+      <p-button
       [label]="'COMMON.SAVE' | translate"
       icon="pi pi-check"
       (onClick)="save()"
       [disabled]="employeeForm.invalid"
     />
+    }
   </ng-template>
 </p-dialog>

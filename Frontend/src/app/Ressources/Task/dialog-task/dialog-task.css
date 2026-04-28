@@ -10,3 +10,15 @@
 .duration-row p-inputNumber {
   flex: 1;
 }
+
+:host ::ng-deep .step-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #18181b !important;
+}
+
+:host ::ng-deep .step-content {
+  padding-bottom: 6rem !important;
+}
