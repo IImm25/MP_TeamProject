@@ -151,7 +151,7 @@ export class Scheduler implements OnInit {
     };
 
     this.http.postPlan(request).subscribe((plan) => {
-      this.planService.setPlan(plan);
+      this.planService.setPlan(plan, request);
       this.router.navigate(['/schedule-view']);
     });
   }
