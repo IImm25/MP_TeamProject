@@ -1,21 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Backend.Data.Repositories;
+using Backend.Web.Services;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.Xml;
 using System.Text;
 
 namespace Backend.GMPL;
 
 public class DataFileGenerator
 {
-    const int maxWorkingHours = 8;
-    const int amoutBoats = 8;
+    private float MaxWorkingHours = 8;
+    private int NumberBoats = 8;
     private List<TaskItem> TaskItems {  get; set; }
     private List<Person> People {  get; set; }
     private List<Tool> Tools { get; set; }
-
-    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people, List<Tool> tools)
+    private List<Qualification> Qualifications { get; set; }
+    
+    public DataFileGenerator(List<TaskItem> taskItems, List<Person> people, List<Tool> tools, List<Qualification> qualifications, float maxWorkingHours, int numberBoats)
     {
         TaskItems = taskItems;
         People = people;
         Tools = tools;
+        Qualifications = qualifications;
+
+        MaxWorkingHours = maxWorkingHours;
+        NumberBoats = numberBoats;
     }
 
     public async static Task<string> SaveDataFile(string dataFileText)
@@ -34,61 +42,55 @@ public class DataFileGenerator
     }
     public async Task<string> CreateDataFile()
     {
-        var allQualifications = ExtractQualifications();
-        var allTools = ExtractTools();
-        var taskIds = BuildTaskIds();
+        try
+        {
+            //var qualifications = await ExtractQualifications();
+            //var tools = await ExtractTools();
+            var taskIds = BuildTaskIds();
 
-        var sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-        sb.AppendLine("data;");
-        sb.AppendLine();
+            sb.AppendLine("data;");
+            sb.AppendLine();
 
-        WriteSet(sb, "TASKS", taskIds);
-        WriteSet(sb, "QUALIS", allQualifications.Select(q => Sanitize(q.Name)));
-        WriteSet(sb, "PEOPLE", People.Select((_, i) => $"p{i + 1}"));
-        WriteSet(sb, "TOOLS", allTools.Select(t => Sanitize(t.Name)));
-        sb.AppendLine();
+            WriteSet(sb, "TASKS", TaskItems.Select( x=> $"ta_{x.Id}"));
+            WriteSet(sb, "QUALIS", Qualifications.Select(x => $"q_{x.Id}"));
+            WriteSet(sb, "PEOPLE", People.Select(x => $"p_{x.Id}"));
+            WriteSet(sb, "TOOLS", Tools.Select(x => $"to_{x.Id}" ));
+            sb.AppendLine();
 
-        WriteParamDuration(sb, taskIds);
-        sb.AppendLine();
+            WriteParamDuration(sb, taskIds);
+            sb.AppendLine();
 
-        WriteParamHasQuali(sb, People, allQualifications);
-        sb.AppendLine();
+            WriteParamHasQuali(sb);
+            sb.AppendLine();
 
-        WriteParamRequiredQualis(sb, taskIds, allQualifications);
-        sb.AppendLine();
+            WriteParamRequiredQualis(sb, taskIds);
+            sb.AppendLine();
 
-        WriteParamRequiredTools(sb, taskIds, allTools);
-        sb.AppendLine();
+            WriteParamRequiredTools(sb, taskIds);
+            sb.AppendLine();
 
-        WriteParamStockTools(sb, allTools);
-        sb.AppendLine();
+            WriteParamStockTools(sb);
+            sb.AppendLine();
 
-        sb.AppendLine($"param maxWorkingHours := {maxWorkingHours};");
-        sb.AppendLine($"param amountBoats := {amoutBoats};");
-        sb.AppendLine("end;");
+            sb.AppendLine($"param maxWorkingHours := {MaxWorkingHours};");
+            sb.AppendLine($"param amountBoats := {NumberBoats};");
+            sb.AppendLine("end;");
 
-        return sb.ToString();
+            return sb.ToString();
+        }
+        catch(Exception ex)
+        {
+            throw ex;
+        }
+        return "";
     }
 
     // ─── Extraction ───────────────────────────────────────────────────────────
 
-    private List<string> BuildTaskIds()
-        => TaskItems.Select((_, i) => $"a{i + 1}").ToList();
-
-    private List<Qualification> ExtractQualifications()
-        => TaskItems
-            .SelectMany(t => t.RequiredQualifications.Select(tq => tq.Qualification))
-            .DistinctBy(q => q.Id)
-            .OrderBy(q => q.Name)
-            .ToList();
-
-    private List<Tool> ExtractTools()
-        => TaskItems
-            .SelectMany(t => t.RequiredTools.Select(tt => tt.Tool))
-            .DistinctBy(t => t.Id)
-            .OrderBy(t => t.Name)
-            .ToList();
+    // NACHHER — liefert "ta1", "ta2", ... passend zum Set
+    private List<string> BuildTaskIds() => TaskItems.Select(x => $"ta_{x.Id}").ToList();
 
     // ─── Set-Writer ────────────────────────────────────────────────────────
 
@@ -109,52 +111,46 @@ public class DataFileGenerator
 
     // ─── Param: hasQuali ──────────────────────────────────────────────────────
 
-    private static void WriteParamHasQuali(
-        StringBuilder sb,
-        List<Person> people,
-        List<Qualification> qualifications)
+    private void WriteParamHasQuali(StringBuilder sb)
     {
-        if (people.Count == 0)
+        if (People.Count == 0)
         {
             sb.AppendLine("# param hasQuali: keine Personen übergeben");
             return;
         }
 
-        // calc ColumnWidth 
-        var colWidths = qualifications.Select(q => Sanitize(q.Name).Length + 2).ToList();
+        const int colWidth = 6;
 
-        // Header
+        // Spaltenüberschriften mit den echten Qualifikations-IDs
         sb.Append("param hasQuali :");
-        for (int c = 0; c < qualifications.Count; c++)
-            sb.Append($" {Sanitize(qualifications[c].Name).PadRight(colWidths[c])}");
+        for (int c = 0; c < Qualifications.Count; c++)
+            sb.Append($" {$"q_{Qualifications[c].Id}".PadRight(colWidth)}");
         sb.AppendLine(":=");
 
-        for (int pi = 0; pi < people.Count; pi++)
+        for (int pi = 0; pi < People.Count; pi++)
         {
-            var qualIds = (people[pi].Qualifications ?? [])
+            var qualIds = (People[pi].Qualifications ?? [])
                 .Select(pq => pq.QualificationId)
                 .ToHashSet();
 
-            sb.Append($"         {$"p{pi + 1}",-10}");
-            for (int c = 0; c < qualifications.Count; c++)
-                sb.Append($" {(qualIds.Contains(qualifications[c].Id) ? "1" : "0").PadRight(colWidths[c])}");
+            // Personen-Schlüssel mit echter ID
+            sb.Append($"         p_{People[pi].Id,-10}");
+            for (int c = 0; c < Qualifications.Count; c++)
+                sb.Append($" {(qualIds.Contains(Qualifications[c].Id) ? "1" : "0").PadRight(colWidth)}");
 
-            sb.AppendLine(pi < people.Count - 1 ? "" : ";");
+            sb.AppendLine(pi < People.Count - 1 ? "" : ";");
         }
     }
 
     // ─── Param: requiredQualis ────────────────────────────────────────────────
 
-    private void WriteParamRequiredQualis(
-        StringBuilder sb,
-        List<string> taskIds,
-        List<Qualification> qualifications)
+    private void WriteParamRequiredQualis(StringBuilder sb, List<string> taskIds)
     {
-        var colWidths = qualifications.Select(q => Sanitize(q.Name).Length + 2).ToList();
+        const int colWidth = 6;
 
         sb.Append("param requiredQualis:");
-        for (int c = 0; c < qualifications.Count; c++)
-            sb.Append($" {Sanitize(qualifications[c].Name).PadRight(colWidths[c])}");
+        for (int c = 0; c < Qualifications.Count; c++)
+            sb.Append($" {$"q_{Qualifications[c].Id}".PadRight(colWidth)}");
         sb.AppendLine(":=");
 
         for (int i = 0; i < TaskItems.Count; i++)
@@ -163,9 +159,10 @@ public class DataFileGenerator
                 .Select(tq => tq.QualificationId)
                 .ToHashSet();
 
+            // Task-Schlüssel ist bereits ta_{Id} in taskIds
             sb.Append($"            {taskIds[i],-8}");
-            for (int c = 0; c < qualifications.Count; c++)
-                sb.Append($" {(requiredIds.Contains(qualifications[c].Id) ? "1" : "0").PadRight(colWidths[c])}");
+            for (int c = 0; c < Qualifications.Count; c++)
+                sb.Append($" {(requiredIds.Contains(Qualifications[c].Id) ? "1" : "0").PadRight(colWidth)}");
 
             sb.AppendLine(i < TaskItems.Count - 1 ? "" : ";");
         }
@@ -173,16 +170,13 @@ public class DataFileGenerator
 
     // ─── Param: requiredTools ─────────────────────────────────────────────────
 
-    private void WriteParamRequiredTools(
-        StringBuilder sb,
-        List<string> taskIds,
-        List<Tool> tools)
+    private void WriteParamRequiredTools(StringBuilder sb, List<string> taskIds)
     {
-        var colWidths = tools.Select(t => Sanitize(t.Name).Length + 2).ToList();
+        const int colWidth = 6;
 
         sb.Append("param requiredTools:");
-        for (int c = 0; c < tools.Count; c++)
-            sb.Append($" {Sanitize(tools[c].Name).PadRight(colWidths[c])}");
+        for (int c = 0; c < Tools.Count; c++)
+            sb.Append($" {$"to_{Tools[c].Id}".PadRight(colWidth)}");
         sb.AppendLine(":=");
 
         for (int i = 0; i < TaskItems.Count; i++)
@@ -191,10 +185,10 @@ public class DataFileGenerator
                 .ToDictionary(tt => tt.ToolId, tt => tt.RequiredAmount);
 
             sb.Append($"            {taskIds[i],-8}");
-            for (int c = 0; c < tools.Count; c++)
+            for (int c = 0; c < Tools.Count; c++)
             {
-                int amount = toolAmounts.TryGetValue(tools[c].Id, out var amt) ? amt : 0;
-                sb.Append($" {amount.ToString().PadRight(colWidths[c])}");
+                int amount = toolAmounts.TryGetValue(Tools[c].Id, out var amt) ? amt : 0;
+                sb.Append($" {amount.ToString().PadRight(colWidth)}");
             }
 
             sb.AppendLine(i < TaskItems.Count - 1 ? "" : ";");
@@ -203,18 +197,17 @@ public class DataFileGenerator
 
     // ─── Param: stockTools ────────────────────────────────────────────────────
 
-    private static void WriteParamStockTools(StringBuilder sb, List<Tool> tools)
+    private void WriteParamStockTools(StringBuilder sb)
     {
-        int nameWidth = tools.Max(t => Sanitize(t.Name).Length) + 4;
+        const int nameWidth = 8;
 
         sb.AppendLine("param stockTools :=");
-        for (int i = 0; i < tools.Count; i++)
+        for (int i = 0; i < Tools.Count; i++)
         {
-            string line = $"      {Sanitize(tools[i].Name).PadRight(nameWidth)}{tools[i].AvailableStock}";
-            sb.AppendLine(i < tools.Count - 1 ? line : line + ";");
+            string line = $"      to_{Tools[i].Id,-nameWidth}{Tools[i].AvailableStock}";
+            sb.AppendLine(i < Tools.Count - 1 ? line : line + ";");
         }
     }
 
-
-    private static string Sanitize(string name) => name.Replace(" ", "_");
+    private string Sanitize(string name) => name.Replace(" ", "_");
 }

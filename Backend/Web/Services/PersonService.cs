@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Backend.Data.DTO;
 using Backend.Data.DTO.Create;
-using Backend.Data.Mappers;
 using Backend.Data.Repositories;
 
 namespace Backend.Web.Services
