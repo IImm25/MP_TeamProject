@@ -30,7 +30,6 @@ let qualifications: Qualification[] = [
 export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
   const { url, method, body } = req;
 
-  // Hilfsfunktion für IDs
   const getId = () => parseInt(url.split('/').pop() || '0');
   const generateId = () => Math.floor(Math.random() * 1000) + 10;
 

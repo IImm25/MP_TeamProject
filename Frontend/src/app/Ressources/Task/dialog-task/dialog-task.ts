@@ -57,6 +57,7 @@ export class DialogTask implements OnInit {
     this.currentTask = val;
 
     if (val) {
+      console.log(val);
       const dHours = Math.floor(val.durationHours);
       const dMinutes = Math.round((val.durationHours - dHours) * 60);
       this.taskForm.patchValue({

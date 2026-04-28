@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScheduleService } from '../schedule-service';
 import { HttpService } from '../../Services/http-service';
-import { Task } from '../../Models/task';
+import { Task, TaskSummary } from '../../Models/task';
 import { Employee } from '../../Models/employee';
 import { Tool } from '../../Models/tool';
 import { CardModule } from 'primeng/card';
@@ -34,7 +34,7 @@ export class ScheduleView {
   private planService = inject(ScheduleService);
   private http = inject(HttpService);
 
-  boats = computed(() => this.planService.currentPlan() || []);
+  boats = computed(() => this.planService.loadBoatsFromStorage() || []);
   allTools = signal<Tool[]>([]);
 
   selectedTask = signal<Task | null>(null);
@@ -50,9 +50,11 @@ export class ScheduleView {
     this.http.getTools().subscribe((tools) => this.allTools.set(tools));
   }
 
-  openTask(task: Task) {
-    this.selectedTask.set(task);
-    this.taskVisible.set(true);
+  openTask(taskSummary: Task) {
+    this.http.getTaskById(taskSummary.id).subscribe((fullTask) => {
+      this.selectedTask.set(fullTask);
+      this.taskVisible.set(true);
+    });
   }
 
   openEmployee(emp: Employee) {

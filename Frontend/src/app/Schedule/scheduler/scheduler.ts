@@ -8,15 +8,11 @@ import { PlanRequest } from '../../Models/boat';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
-// PrimeNG
 import { StepperModule } from 'primeng/stepper';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CardModule } from 'primeng/card';
-
-// Dialoge
 import { DialogTask } from '../../Ressources/Task/dialog-task/dialog-task';
 import { DialogEmployee } from '../../Ressources/Employee/dialog-employee/dialog-employee';
 import { DialogTool } from '../../Ressources/Tool/dialog-tool/dialog-tool';
@@ -156,7 +152,7 @@ export class Scheduler implements OnInit {
 
     this.http.postPlan(request).subscribe((plan) => {
       this.planService.setPlan(plan);
-      this.router.navigate(['/schedule-view'], { skipLocationChange: true });
+      this.router.navigate(['/schedule-view']);
     });
   }
 
@@ -172,20 +168,20 @@ export class Scheduler implements OnInit {
         return maxTime.valid && boatAmount.valid;
 
       case 2:
-        const tasks = this.schedulerForm.controls.selectedTasks;
-        tasks.markAsTouched();
-        return tasks.valid && tasks.value.length > 0;
-
-      case 3:
-        const employees = this.schedulerForm.controls.selectedEmployees;
-        employees.markAsTouched();
-        return employees.valid && employees.value.length > 0;
-
-      case 4:
         const tools = this.schedulerForm.controls.selectedTools;
         tools.markAsTouched();
         tools.value.length > 0;
         return tools.valid && tools.value.length > 0;
+
+      case 3:
+        const tasks = this.schedulerForm.controls.selectedTasks;
+        tasks.markAsTouched();
+        return tasks.valid && tasks.value.length > 0;
+
+      case 4:
+        const employees = this.schedulerForm.controls.selectedEmployees;
+        employees.markAsTouched();
+        return employees.valid && employees.value.length > 0;
 
       default:
         return true;
