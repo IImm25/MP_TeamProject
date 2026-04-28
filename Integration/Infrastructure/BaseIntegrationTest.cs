@@ -1,5 +1,4 @@
-﻿
-using Backend.Data;
+﻿using Backend.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Respawn;
