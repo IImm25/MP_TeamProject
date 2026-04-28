@@ -138,6 +138,8 @@
     "GENERATE_PLAN": "Plan generieren"
   },
   "SCHEDULE": {
-    "TITLE": "Planung"
+    "TITLE": "Planung",
+    "BOAT": "Boot",
+    "UNUSED": "Nicht genutzte Ressourcen"
   }
 }

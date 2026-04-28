@@ -10,7 +10,7 @@
       @for (boat of boats(); track $index) {
         <div class="card-wrapper">
           <p-card
-            [header]="'Boot ' + ($index + 1)"
+            [header]="$index === 0 ? ('SCHEDULE.UNUSED' | translate ) : ( 'SCHEDULE.BOAT' | translate ) + ' ' + ($index)"
             [styleClass]="'custom-card ' + (isBoatEmpty(boat) ? 'empty-boat-card' : '')"
           >
             <p-accordion [multiple]="true">

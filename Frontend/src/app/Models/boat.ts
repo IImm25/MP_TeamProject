@@ -3,7 +3,7 @@ import { Task, TaskTool } from "./task";
 import { Tool } from "./tool";
 
 export interface Boat {
-  id: number;
+  boatID: number;
   taskItems: Task[];
   people: Employee[];
   tools: TaskTool[];
