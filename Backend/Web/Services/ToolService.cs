@@ -9,11 +9,13 @@ namespace Backend.Web.Services
     public class ToolService
     {
         private readonly IRepository<Tool> tools;
+        private readonly ITaskItemRepository taskItems;
         private readonly IMapper mapper;
 
-        public ToolService(IRepository<Tool> tools, IMapper mapper)
+        public ToolService(IRepository<Tool> tools, ITaskItemRepository taskItems, IMapper mapper)
         {
             this.tools = tools;
+            this.taskItems = taskItems;
             this.mapper = mapper;
         }
 
@@ -49,6 +51,24 @@ namespace Backend.Web.Services
         public async Task<bool> DeleteTool(int id)
         {
             return await tools.DeleteAsync(id);
+        }
+
+        public async Task<List<int>> GetTaskToolRequirements(int taskId)
+        {
+            var task = await taskItems.GetFullByIdAsync(taskId);
+            if (task == null) return [];
+
+            var requiredTools = new Dictionary<int, int>();
+
+            foreach (var taskTools in task.RequiredTools)
+            {
+                requiredTools.Add(taskTools.ToolId, taskTools.RequiredAmount);
+            }
+
+            var quals = await tools.GetAllAsync();
+            var allQualIds = quals.Select(qual => qual.Id).ToList();
+
+            return allQualIds.Select(id => requiredTools.GetValueOrDefault(id)).ToList();
         }
     }
 }

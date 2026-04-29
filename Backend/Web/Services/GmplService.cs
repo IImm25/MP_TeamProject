@@ -1,164 +1,200 @@
-﻿using Backend.Data.DTO;
-using Backend.Data.Mappers;
-using Backend.Data.Repositories;
+﻿namespace Backend.Web.Services;
+using System.IO;
+using System.Text.RegularExpressions;
+using AutoMapper;
+using Backend.Data.DTO;
 using Backend.GMPL;
-using System.Xml;
-namespace Backend.Web.Services;
 
 public class GmplService
 {
-    private readonly IRepository<Tool> repository;
-    private readonly IPersonRepository personRepository;
-    private readonly ITaskItemRepository taskItemRepository;
-    private readonly IRepository<Qualification> qualificationRepository;
-    private readonly IRepository<PersonQualification> qualificationPersonRepository;
+    private IntPtr prob = nint.Zero;
+    private IntPtr tran = nint.Zero;
 
-    private List<TaskItem> TaskItems = new List<TaskItem>();
-    private List<Person> People = new List<Person>();
-    private List<Tool> Tools = new List<Tool>();
-    private List<Qualification> Qualifications = new List<Qualification>();
-    public GmplService(
-        IRepository<Tool> repo,
-        IPersonRepository personRepo,
-        ITaskItemRepository taskItemRepo,
-        IRepository<Qualification> qualiRepo,
-        IRepository<PersonQualification> qualiPersonRepo
-        )
+    private static string columnRegex = @"^([A-Za-z_]\w*)(?:\[(.*?)\])?$";
+    private static string modFile = @"..\GMPL\modell.mod";
+
+    private readonly DataFileGeneratorService dataFileGeneratorService;
+    private readonly PersonService personService;
+    private readonly TaskItemService taskItemService;
+    private readonly IMapper mapper;
+
+    private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
-        repository = repo;
-        personRepository = personRepo;
-        taskItemRepository = taskItemRepo;
-    }
+        var match = Regex.Match(colName,columnRegex);
 
-    public async Task<List<PlanResponseDto>> TestGLPK()
-    {
-        string pathMod = @"..\..\GMPL\modell.mod";
-        string pathDat = @"..\GMPL\data.dat";
+        if (!match.Success)
+            return ("", []);
 
-        GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), pathDat);
+        string name = match.Groups[1].Value;
+        string indexRaw = match.Groups[2].Value;
 
-        return new List<PlanResponseDto>();
-    }
+        var indices = new List<int>();
 
-    public async Task<List<PlanResponseDto>> CaculateGmplModel(PlanRequestDto request)
-    {
-        try
+        if (!string.IsNullOrWhiteSpace(indexRaw))
         {
-            await ReadInRequestDto(request);
-            
-            DataFileGenerator datFileGenerator = new DataFileGenerator(TaskItems, People, Tools, Qualifications, request.maxTime , request.BoatNumber);
-
-            string datFileText = await datFileGenerator.CreateDataFile();
-            string resp = await DataFileGenerator.SaveDataFile(datFileText);
-              
-            GmplValidator.Test(resp);            
-
-            if (!resp.Contains("Exception"))
+            foreach (var part in indexRaw.Split(','))
             {
-                GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), resp);
-                //GmplResults result = GmplSolver.Solve(Path.Combine(Directory.GetCurrentDirectory(), "..", "GMPL", "modell.mod"), DAT);
-                GmplOutput2Console.GetGmplResults(result);
-                return ResponseMapper.MapToResponse(result, TaskItems, People, Tools, People.SelectMany(x => x.Qualifications).ToList());
-            }
+                var cleaned = Regex.Replace(part.Trim(), @"^[A-Za-z]+_", "");
 
-        }
-        catch (ValidationError ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [Validation-Error] {ex.Message}");
-            Console.ResetColor();
-        }
-        catch (NotSolvableError ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [Invalid] {ex.Message}");
-            Console.ResetColor();
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [unexpected Error] {ex.Message}");
-            Console.ResetColor();
-        }
-        return null;
-    }
-
-    private async Task ReadInRequestDto(PlanRequestDto request)
-    {
-        this.TaskItems = await GetTasksFromIds(request.TaskItemIds);
-        this.People = await GetPeopleFromIds(request.PersonIds);
-        this.Tools = await GetToolsFromIds(request.ToolIds);
-        this.Qualifications = await GetQualificationsFromPeople();
-    }
-    
-    private async Task<List<Qualification>> GetQualificationsFromPeople()
-    {
-        List<Qualification> qualifications = People.SelectMany(x => x.Qualifications.Select(y => y.Qualification)).ToList();
-        
-        return qualifications;
-    }
-    private async Task<List<Tool>> GetToolsFromIds(List<int> toolIds)
-    {
-        try
-        {
-            var tools = new List<Tool>();
-            foreach (var id in toolIds)
-            {
-                var tool = await repository.GetByIdAsync(id);
-                if (tool is not null)
-                    tools.Add(tool);
-            }
-            return tools.Any() ? tools : null;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return null;
-        }
-    }
-    private async Task<List<TaskItem>> GetTasksFromIds(List<int> taskIds)
-    {
-        try
-        {
-            var tasks = new List<TaskItem>();
-            foreach (var id in taskIds)
-            {
-                var task = await taskItemRepository.GetFullByIdAsync(id);
-                if (task is not null)
-                    tasks.Add(task);
-            }
-            return tasks.Any() ? tasks : null;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return null;
-        }
-    }
-    private async Task<List<Person>> GetPeopleFromIds(List<int> personIds)
-    {
-        try
-        {
-            var people = new List<Person>();
-            foreach (var id in personIds)
-            {
-                var person = await personRepository.GetFullByIdAsync(id);
-                if (person is not null)
-                    people.Add(person);
-            }
-            if (people.Any())
-            {
-                return people.ToList();
+                if (int.TryParse(cleaned, out int id))
+                    indices.Add(id-1); // From GMPL 1 indexed to 0 indexed
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-
-        }
-        return null;
+        return (name, indices);
     }
 
-    private const string MOD = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\modell.mod";
-    private const string DAT = @"C:\Users\ALEX\source\repos\MP_TeamProject\GMPL\data.dat";
+    public GmplService(DataFileGeneratorService dataFileGeneratorService, PersonService personService, TaskItemService taskItemService, IMapper mapper)
+    {
+        this.dataFileGeneratorService = dataFileGeneratorService;
+        this.personService = personService;
+        this.taskItemService = taskItemService;
+        this.mapper = mapper;
+        prob = GLPKDllWrapper.glp_create_prob();
+        tran = GLPKDllWrapper.glp_mpl_alloc_wksp();
+
+        if (GLPKDllWrapper.glp_mpl_read_model(tran, modFile, 0) != 0)
+        {
+            throw new Exception($"Error while reading GMPL model file: '{Path.GetFullPath(modFile)}'");
+        }
+    }
+
+    ~GmplService()
+    {
+        GLPKDllWrapper.glp_mpl_free_wksp(tran);
+        GLPKDllWrapper.glp_delete_prob(prob);
+        //Glpk.glp_free_env();
+    }
+
+    public async Task<PlanResponseDto> Solve(PlanRequestDto request)
+    {
+        string datFileText = await dataFileGeneratorService.CreateDataFileAsync(request);
+        string datFile = Path.GetTempFileName();
+        File.WriteAllText(datFile, datFileText);
+
+        if (GLPKDllWrapper.glp_mpl_read_data(tran, datFile) != 0)
+        {
+            throw new Exception($"Error while reading GMPL data File: '{Path.GetFullPath(datFile)}'");
+        }
+        File.Delete(datFile);   // cleanup temp dat file on sucess
+
+        if (GLPKDllWrapper.glp_mpl_generate(tran, nint.Zero) != 0)
+        {
+            throw new Exception($"Error generating GMPL Modell.");
+        }
+
+        GLPKDllWrapper.glp_mpl_build_prob(tran, prob);
+
+        // Simplex
+        var smcp = new GLPKDllWrapper.glp_smcp();
+        GLPKDllWrapper.glp_init_smcp(ref smcp);
+        smcp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
+
+        int simplexErr = GLPKDllWrapper.glp_simplex(prob, ref smcp);
+        if (simplexErr != 0)
+        {
+            throw new Exception($"Simplex-Error : {simplexErr}");
+        }
+
+        // MIP
+        var iocp = new GLPKDllWrapper.glp_iocp();
+        GLPKDllWrapper.glp_init_iocp(ref iocp);
+        iocp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
+
+        int mipError = GLPKDllWrapper.glp_intopt(prob, ref iocp);
+        if (mipError != 0)
+        {
+            throw new Exception($"MIP-Error : {mipError}");
+        }
+        GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
+
+        bool[,] taskOnBoat = new bool[request.BoatNumber, request.TaskItemIds.Count];
+        bool[,] personOnBoat = new bool[request.BoatNumber, request.PersonIds.Count];
+        int[,] toolsOnBoat = new int[request.BoatNumber, request.ToolIds.Count];
+        bool[] boatUsage = new bool[request.BoatNumber];
+
+        int numCols = GLPKDllWrapper.glp_get_num_cols(prob);
+
+        for (int j = 1; j <= numCols; j++)
+        {
+            string colName = GLPKDllWrapper.GetColName(prob, j);
+            int val = (int)Math.Round(GLPKDllWrapper.glp_mip_col_val(prob, j));
+
+            var (varName, indices) = parseColumnName(colName);
+
+            switch (varName)
+            {
+                case "taskOnBoat":
+                    {
+                        int boatId = indices[0];
+                        int taskId = indices[1];
+                        taskOnBoat[boatId,taskId] = val != 0;
+                        break;
+                    }
+                case "personOnBoat":
+                    {
+                        int boatId = indices[0];
+                        int personId = indices[1];
+                        personOnBoat[boatId, personId] = val != 0;
+                        break;
+                    }
+                case "toolOnBoat":
+                    {
+                        int boatId = indices[0];
+                        int toolId = indices[1];
+                        toolsOnBoat[boatId, toolId] = val;
+                        break;
+                    }
+                case "boatUsage":
+                    {
+                        int boatId = indices[0];
+                        boatUsage[boatId] = val != 0;
+                        break;
+                    }
+                default:
+                    throw new Exception($"Unknown column name id GMPL Solver results: {varName}[{indices}]");
+            }
+        }
+
+        List<BoatPlanDto> boats = new List<BoatPlanDto>();
+
+        for (int i = 0; i < request.BoatNumber; i++)
+        {
+            if (!boatUsage[i]) continue;
+
+            List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
+            for (int j = 0; j < request.PersonIds.Count; j++)
+            {
+                if (personOnBoat[i,j])
+                {
+                    int id = j + 1; // ids start at 1 (ugly fix)
+                    persons.Add(mapper.Map<PersonSummaryDto>(await personService.GetPerson(id)));
+                }
+            }
+
+            List<TaskToolDto> tools = new List<TaskToolDto>();
+            for (int j = 0; j < request.ToolIds.Count; j++)
+            {
+                int amount = toolsOnBoat[i, j];
+                int id = j + 1; // ids start at 1 (ugly fix)
+                if (amount > 0) {
+                    tools.Add(new TaskToolDto { ToolId = id, RequiredAmount = amount });
+                }
+            }
+
+            List<TaskItemSummaryDto> tasks = new List<TaskItemSummaryDto>();
+            for (int j = 0; j < request.TaskItemIds.Count; j++)
+            {
+                if (taskOnBoat[i,j])
+                {
+                    int id = j + 1; // ids start at 1 (ugly fix)
+                    tasks.Add(mapper.Map<TaskItemSummaryDto>(await taskItemService.GetTaskItem(id)));
+                }
+            }
+
+            boats.Add(new BoatPlanDto(tasks, persons, tools));
+        }
+
+        double workingHours = GLPKDllWrapper.glp_mip_obj_val(prob);
+        return new PlanResponseDto(workingHours, boats);
+    }
 }
