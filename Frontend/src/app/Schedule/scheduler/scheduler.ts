@@ -4,7 +4,7 @@ import { HttpService } from '../../Services/http-service';
 import { TaskSummary, Task } from '../../Models/task';
 import { EmployeeSummary, Employee } from '../../Models/employee';
 import { Tool } from '../../Models/tool';
-import { PlanRequest } from '../../Models/boat';
+import { PlanRequest, PlanResponse } from '../../Models/boat';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -150,7 +150,7 @@ export class Scheduler implements OnInit {
       toolIds: val.selectedTools?.map((t) => t.id) || [],
     };
 
-    this.http.postPlan(request).subscribe((plan) => {
+    this.http.postPlan(request).subscribe((plan: PlanResponse) => {
       this.planService.setPlan(plan, request);
       this.router.navigate(['/schedule-view']);
     });

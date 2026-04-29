@@ -139,9 +139,8 @@ export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
   // --- PLAN ---
   if (url.endsWith('/plan') && method === 'POST') {
     const mockSchedule: Boat[] = [{
-      boatID: 101,
       taskItems: tasks.filter(t => (body as any).taskItemIds.includes(t.id)),
-      people: people.filter(p => (body as any).personIds.includes(p.id)),
+      persons: people.filter(p => (body as any).personIds.includes(p.id)),
       tools: [],
     }];
     return of(new HttpResponse({ status: 200, body: mockSchedule })).pipe(delay(500));

@@ -1,12 +1,15 @@
-import { Employee } from "./employee";
-import { Task, TaskTool } from "./task";
-import { Tool } from "./tool";
+import { Employee, EmployeeSummary } from "./employee";
+import { Task, TaskSummary, TaskTool } from "./task";
 
 export interface Boat {
-  boatID: number;
-  taskItems: Task[];
-  people: Employee[];
+  taskItems: TaskSummary[];
+  persons: EmployeeSummary[];
   tools: TaskTool[];
+}
+
+export interface PlanResponse {
+  totalTime: number;
+  boats: Boat[];
 }
 
 export interface PlanRequest {

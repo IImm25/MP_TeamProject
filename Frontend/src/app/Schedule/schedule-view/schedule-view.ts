@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ScheduleService } from '../schedule-service';
 import { HttpService } from '../../Services/http-service';
 import { Task, TaskSummary } from '../../Models/task';
-import { Employee } from '../../Models/employee';
+import { Employee, EmployeeSummary } from '../../Models/employee';
 import { Tool } from '../../Models/tool';
 import { CardModule } from 'primeng/card';
 import { AccordionModule } from 'primeng/accordion';
@@ -12,7 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DialogTask } from '../../Ressources/Task/dialog-task/dialog-task';
 import { DialogEmployee } from '../../Ressources/Employee/dialog-employee/dialog-employee';
 import { DialogTool } from '../../Ressources/Tool/dialog-tool/dialog-tool';
-import { Boat, PlanRequest } from '../../Models/boat';
+import { Boat, PlanRequest, PlanResponse } from '../../Models/boat';
 import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
@@ -35,6 +35,9 @@ export class ScheduleView {
   private planService = inject(ScheduleService);
   private http = inject(HttpService);
 
+  planResponse = signal<PlanResponse>(
+    this.planService.loadBoatsFromStorage() ?? { totalTime: 0, boats: [] },
+  );
   boats: WritableSignal<Boat[]> = signal([]);
   allTasks = signal<Task[]>([]);
   allEmployees = signal<Employee[]>([]);
@@ -47,6 +50,7 @@ export class ScheduleView {
   employeeVisible = signal(false);
 
   selectedTool = signal<Tool | null>(null);
+  requiredAmount = signal(0);
   toolVisible = signal(false);
 
   ngOnInit(): void {
@@ -65,30 +69,40 @@ export class ScheduleView {
       this.allTools.set(tools);
       this.allEmployees.set(employees);
 
-      const currentPlan = this.planService.loadBoatsFromStorage() ?? [];
+      const raw = this.planService.loadBoatsFromStorage();
+      console.log('raw plan response:', raw);
+
       const unusedBoat = this.getUnusedRessources();
-      this.boats.set([unusedBoat(), ...currentPlan]);
+
+      this.boats.set([unusedBoat, ...this.planResponse().boats]);
 
       console.log(this.boats());
     });
   }
 
-  openTask(taskSummary: Task) {
-    this.http.getTaskById(taskSummary.id).subscribe((fullTask) => {
+  openTask(taskSummary: TaskSummary) {
+    const fullTask = this.allTasks().find((t) => t.id === taskSummary.id);
+
+    if (fullTask) {
       this.selectedTask.set(fullTask);
       this.taskVisible.set(true);
-    });
+    }
   }
 
-  openEmployee(emp: Employee) {
-    this.selectedEmployee.set(emp);
-    this.employeeVisible.set(true);
+  openEmployee(emp: EmployeeSummary) {
+    const fullEmployee = this.allEmployees().find((e) => e.id === emp.id);
+    if (fullEmployee) {
+      this.selectedEmployee.set(fullEmployee);
+      this.employeeVisible.set(true);
+    }
   }
 
-  openTool(toolId: number) {
+  openTool(toolId: number, requiredAmount: number) {
     const tool = this.allTools().find((t) => t.id === toolId);
+
     if (tool) {
       this.selectedTool.set(tool);
+      this.requiredAmount.set(requiredAmount);
       this.toolVisible.set(true);
     }
   }
@@ -98,39 +112,40 @@ export class ScheduleView {
   }
 
   isBoatEmpty(boat: Boat): boolean {
-    return boat.taskItems.length === 0 && boat.people.length === 0 && boat.tools.length === 0;
+    return boat.taskItems.length === 0 && boat.persons.length === 0 && boat.tools.length === 0;
   }
 
-  getUnusedRessources(): WritableSignal<Boat> {
-    const boats = this.planService.loadBoatsFromStorage() ?? [];
+  getUnusedRessources(): Boat {
+    const boats = this.planResponse().boats;
     const request = this.planService.loadRequestFromStorage();
 
-    if (!request) return signal({ boatID: 0, taskItems: [], people: [], tools: [] });
+    if (!request) return { taskItems: [], persons: [], tools: [] };
 
     const used = {
-      tasks: new Set(boats.flatMap((b) => b.taskItems.map((t) => t.id))),
-      people: new Set(boats.flatMap((b) => b.people.map((p) => p.id))),
-      tools: new Set(boats.flatMap((b) => b.tools.map((t) => t.toolId))),
+      tasks: new Set(boats.flatMap((b) => (b.taskItems ?? []).map((t) => t.id))),
+      people: new Set(boats.flatMap((b) => (b.persons ?? []).map((p) => p.id))),
+      tools: new Set(boats.flatMap((b) => (b.tools ?? []).map((t) => t.toolId))),
     };
 
-    return signal({
-      boatID: 0,
+    console.log(used);
+
+    return {
       taskItems: this.allTasks().filter(
         (t) => request.taskItemIds.includes(t.id) && !used.tasks.has(t.id),
       ),
-      people: this.allEmployees().filter(
+      persons: this.allEmployees().filter(
         (e) => request.personIds.includes(e.id) && !used.people.has(e.id),
       ),
       tools: this.allTools()
         .filter((t) => request.toolIds.includes(t.id))
         .map((t) => {
           const usedAmount = boats
-            .flatMap((b) => b.tools)
+            .flatMap((b) => b.tools ?? [])
             .filter((bt) => bt.toolId === t.id)
             .reduce((sum, bt) => sum + bt.requiredAmount, 0);
           return { toolId: t.id, requiredAmount: t.availableStock - usedAmount };
         })
         .filter((t) => t.requiredAmount > 0),
-    });
+    };
   }
 }

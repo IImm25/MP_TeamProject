@@ -150,6 +150,8 @@ label {
   border-top: 1px solid var(--text-color);
   background-color: #18181b;
   margin-top: auto;
+  z-index: 1;
+  border-radius:  0 0 0 var(--border-radius);
 }
 
 .field {

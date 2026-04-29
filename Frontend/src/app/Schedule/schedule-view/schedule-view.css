@@ -67,9 +67,9 @@
   justify-content: flex-start;
 }
 
-:host ::ng-deep .clickable-chip .p-chip {
+:host ::ng-deep .p-chip {
   background: var(--primary-color) !important;
-  color: #fff !important;
+  color: var(--text-color) !important;
   cursor: pointer;
 }
 

@@ -22,7 +22,7 @@
                   <div class="chips-container">
                     @for (task of boat.taskItems; track task.id) {
                       <p-chip
-                        [label]="task.name"
+                        [label]="task.name "
                         icon="pi pi-list"
                         (click)="openTask(task)"
                         styleClass="clickable-chip"
@@ -38,9 +38,9 @@
                 </p-accordion-header>
                 <p-accordion-content>
                   <div class="chips-container">
-                    @for (person of boat.people; track person.id) {
+                    @for (person of boat.persons; track person.id) {
                       <p-chip
-                        [label]="person.firstname + ' ' + person.lastname"
+                        [label]="person.firstname + ' ' + person.lastname "
                         icon="pi pi-user"
                         (click)="openEmployee(person)"
                         styleClass="clickable-chip"
@@ -58,9 +58,9 @@
                   <div class="chips-container">
                     @for (t of boat.tools; track t.toolId) {
                       <p-chip
-                        [label]="getToolName(t.toolId) + ' (' + t.requiredAmount + 'x)'"
+                        [label]="getToolName(t.toolId) + ' (' + t.requiredAmount + 'x)' "
                         icon="pi pi-wrench"
-                        (click)="openTool(t.toolId)"
+                        (click)="openTool(t.toolId, t.requiredAmount)"
                         styleClass="clickable-chip"
                       />
                     }
@@ -74,11 +74,19 @@
     </div>
   </div>
 
-  <app-dialog-task [type]="'Detail'" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
-  <app-dialog-employee
-    [type]="'Detail'"
-    [selectedEmployee]="selectedEmployee()"
-    [(visible)]="employeeVisible"
-  />
-  <app-dialog-tool [type]="'Detail'" [selectedTool]="selectedTool()" [(visible)]="toolVisible" />
+  @if(taskVisible()) {
+    <app-dialog-task [type]="'Detail'" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
+  }
+
+  @if(employeeVisible()) {
+    <app-dialog-employee
+      [type]="'Detail'"
+      [selectedEmployee]="selectedEmployee()"
+      [(visible)]="employeeVisible"
+    />
+  }
+
+  @if(toolVisible()) {
+    <app-dialog-tool [type]="'Detail'" [selectedTool]="selectedTool()" [requiredAmount]="requiredAmount()" [(visible)]="toolVisible" />
+  }
 </div>

@@ -1,7 +1,12 @@
 <p-dialog
   [(visible)]="visible"
-  [header]="type === 'New' ? ('TOOLS.DIALOG.NEW' | translate) :
-  type === 'Detail' ? ('TOOLS.DIALOG.DETAIL' | translate) : ('TOOLS.DIALOG.EDIT' | translate)"
+  [header]="
+    type === 'New'
+      ? ('TOOLS.DIALOG.NEW' | translate)
+      : type === 'Detail'
+        ? ('TOOLS.DIALOG.DETAIL' | translate)
+        : ('TOOLS.DIALOG.EDIT' | translate)
+  "
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
@@ -33,6 +38,7 @@
         [showButtons]="true"
         [placeholder]="'TOOLS.DIALOG.AVAILABLE_STOCK_PLACEHOLDER' | translate"
       />
+
       @if (toolForm.controls.availableStock.invalid && toolForm.controls.availableStock.touched) {
         <div class="error-message">
           <i class="pi pi-exclamation-circle"></i>
@@ -40,6 +46,15 @@
         </div>
       }
     </div>
+
+    @if (requiredAmount && requiredAmount > 0 &&
+      type === 'Detail'
+    ) {
+      <div class="field">
+        <label for="requiredAmount">{{ 'TOOLS.REQUIRED_AMOUNT' | translate }}*</label>
+        <p-inputNumber id="requiredAmount" formControlName="requiredAmount" [showButtons]="true" />
+      </div>
+    }
   </form>
 
   <ng-template pTemplate="footer">
