@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -9,17 +9,18 @@ import { environment } from '../../../../environments/environment';
 import { Qualification } from '../../../Models/qualification';
 import { Employee as EmployeeModel, EmployeeSummary } from '../../../Models/employee';
 import { HttpService } from '../../../Services/http-service';
+import { ChipModule } from 'primeng/chip';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [TranslatePipe, ButtonModule, TableModule, ConfirmDialogModule, DialogEmployee],
+  imports: [TranslatePipe, ButtonModule, TableModule, ConfirmDialogModule, DialogEmployee,ChipModule],
   providers: [ConfirmationService],
   templateUrl: './employees.html',
   styleUrl: './employees.css',
 })
 export class Employees implements OnInit {
-  @ViewChild(DialogEmployee) dialogComp!: DialogEmployee;
+
 
   http = inject(HttpService);
   private translate = inject(TranslateService);
@@ -28,13 +29,15 @@ export class Employees implements OnInit {
   employees = signal<EmployeeModel[]>([]);
   qualifications = signal<Qualification[]>([]);
 
-  dialogVisible = false;
-  dialogType: 'Edit' | 'New' = 'New';
+  dialogVisible: WritableSignal<boolean> = signal(false);
+  dialogType: WritableSignal<'Edit' | 'New' | 'Detail'> =  signal('New');
+  selectedEmployee: WritableSignal<EmployeeModel | null> = signal(null);
 
   ngOnInit() {
-    this.loadEmployees();
     this.http.getQualifications().subscribe((data) => this.qualifications.set(data));
+    this.loadEmployees();
   }
+
 
 loadEmployees() {
   this.http.getEmployees().subscribe((summaries) => {
@@ -50,20 +53,6 @@ loadEmployees() {
     });
   });
 }
-
-  openNew() {
-    this.dialogType = 'New';
-    this.dialogComp.patchForm(null);
-    this.dialogVisible = true;
-  }
-
-  openEdit(summary: EmployeeSummary) {
-    this.dialogType = 'Edit';
-    this.http.getEmployeeById(summary.id).subscribe((fullEmployee) => {
-      this.dialogComp.patchForm(fullEmployee);
-      this.dialogVisible = true;
-    });
-  }
 
   deleteEmployee(employee: EmployeeModel) {
     this.confirmationService.confirm({

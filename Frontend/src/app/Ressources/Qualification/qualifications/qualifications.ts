@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -39,8 +39,9 @@ export class Qualifications implements OnInit {
 
   qualifications = signal<Qualification[]>([]);
 
-  dialogVisible = false;
-  dialogType: 'Edit' | 'New' = 'New';
+  dialogVisible: WritableSignal<boolean> = signal(false);
+  dialogType: WritableSignal<'Edit' | 'New' | 'Detail'> = signal('New');
+  selectedQualification: WritableSignal<Qualification | null> = signal(null);
 
   ngOnInit() {
     this.loadQualifications();
@@ -48,17 +49,6 @@ export class Qualifications implements OnInit {
 
   loadQualifications() {
     this.http.getQualifications().subscribe((data) => this.qualifications.set(data));
-  }
-
-  openDialog(type: 'Edit' | 'New', qualification?: Qualification) {
-    if (type === 'New' || !qualification) {
-      this.dialogType = 'New';
-      this.dialogComp.patchForm(null);
-    } else {
-      this.dialogType = 'Edit';
-      this.dialogComp.patchForm(qualification);
-    }
-    this.dialogVisible = true;
   }
 
   deleteQualification(qualification: Qualification) {

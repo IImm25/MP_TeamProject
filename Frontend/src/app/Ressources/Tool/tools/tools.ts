@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild, WritableSignal } from '@angular/core';
 import { DialogTool } from '../dialog-tool/dialog-tool';
 import { HttpService } from '../../../Services/http-service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -17,15 +17,15 @@ import { TableModule } from 'primeng/table';
   styleUrl: './tools.css',
 })
 export class Tools {
-  @ViewChild(DialogTool) dialogComp!: DialogTool;
   http = inject(HttpService);
   private translate = inject(TranslateService);
   private confirmationService = inject(ConfirmationService);
 
   tools = signal<Tool[]>([]);
 
-  dialogVisible = false;
-  dialogType: 'Edit' | 'New' = 'New';
+  dialogVisible: WritableSignal<boolean> = signal(false);
+  dialogType: WritableSignal<'Edit' | 'New' | 'Detail'> = signal('New');
+  selectedTool: WritableSignal<Tool | null> = signal(null);
 
   ngOnInit() {
     this.loadTools();
@@ -33,17 +33,6 @@ export class Tools {
 
   loadTools() {
     this.http.getTools().subscribe((data) => this.tools.set(data));
-  }
-
-  openDialog(type: 'Edit' | 'New', tool?: Tool) {
-    if (type === 'New' || !tool) {
-      this.dialogType = 'New';
-      this.dialogComp.patchForm(null);
-    } else {
-      this.dialogType = 'Edit';
-      this.dialogComp.patchForm(tool);
-    }
-    this.dialogVisible = true;
   }
 
   deleteTool(tool: Tool) {

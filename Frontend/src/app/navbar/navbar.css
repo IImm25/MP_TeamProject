@@ -17,3 +17,7 @@
   margin-right: 1.5rem;
   display: block;
 }
+
+img {
+  cursor: pointer;
+}

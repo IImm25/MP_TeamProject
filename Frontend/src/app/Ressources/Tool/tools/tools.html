@@ -3,7 +3,7 @@
     <div class="title-group">
       <h1 class="title">{{ 'TOOLS.TITLE' | translate }}</h1>
     </div>
-    <p-button [label]="'TOOLS.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="openDialog('New')" severity="secondary" [raised]="true"/>
+    <p-button [label]="'TOOLS.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="selectedTool.set(null); dialogVisible.set(true); dialogType.set('New');" severity="secondary" [raised]="true"/>
   </header>
 
   <div class="table-container">
@@ -22,8 +22,9 @@
           <td>{{ tool.availableStock }}</td>
           <td>
             <div class="action-buttons">
-              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="openDialog('Edit', tool)" />
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="selectedTool.set(tool); dialogVisible.set(true); dialogType.set('Edit');" />
               <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="secondary" (onClick)="deleteTool(tool)" />
+              <p-button icon="pi pi-ellipsis-h" [text]="true" [rounded]="true" severity="secondary" (onClick)="selectedTool.set(tool); dialogVisible.set(true); dialogType.set('Detail');" />
             </div>
           </td>
         </tr>
@@ -32,10 +33,13 @@
   </div>
 </div>
 
-<app-dialog-tool
+@if(dialogVisible()) {
+  <app-dialog-tool
   [(visible)]="dialogVisible"
-  [type]="dialogType"
+  [type]="dialogType()"
+  [selectedTool]="selectedTool()"
   (onSave)="loadTools()"
 />
+}
 
 <p-confirmDialog />

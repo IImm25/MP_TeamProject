@@ -3,14 +3,28 @@
     <div class="title-group">
       <h1 class="title">{{ 'QUALIFICATIONS.TITLE' | translate }}</h1>
     </div>
-    <p-button [label]="'QUALIFICATIONS.ADD_NEW' | translate" icon="pi pi-plus" (onClick)="openDialog('New')" severity="secondary" [raised]="true"/>
+    <p-button
+      [label]="'QUALIFICATIONS.ADD_NEW' | translate"
+      icon="pi pi-plus"
+      (onClick)="selectedQualification.set(null); dialogVisible.set(true); dialogType.set('New');"
+      severity="secondary"
+      [raised]="true"
+    />
   </header>
 
   <div class="table-container">
-    <p-table [value]="qualifications()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
+    <p-table
+      [value]="qualifications()"
+      [paginator]="true"
+      [rows]="5"
+      sortField="name"
+      [sortOrder]="1"
+    >
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="name">{{ 'QUALIFICATIONS.NAME' | translate }} <p-sortIcon field="name"/></th>
+          <th pSortableColumn="name">
+            {{ 'QUALIFICATIONS.NAME' | translate }} <p-sortIcon field="name" />
+          </th>
           <th>{{ 'QUALIFICATIONS.DESCRIPTION' | translate }}</th>
           <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
         </tr>
@@ -22,8 +36,27 @@
           <td>{{ qualification.description }}</td>
           <td>
             <div class="action-buttons">
-              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="secondary" (onClick)="openDialog('Edit', qualification)" />
-              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="secondary" (onClick)="deleteQualification(qualification)" />
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="this.dialogVisible.set(true); this.selectedQualification.set(qualification); this.dialogType.set('Edit');"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="deleteQualification(qualification)"
+              />
+              <p-button
+                icon="pi pi-ellipsis-h"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="this.dialogVisible.set(true); this.selectedQualification.set(qualification); this.dialogType.set('Detail');"
+              />
             </div>
           </td>
         </tr>
@@ -32,10 +65,13 @@
   </div>
 </div>
 
-<app-dialog-qualification
-  [(visible)]="dialogVisible"
-  [type]="dialogType"
-  (onSave)="loadQualifications()"
-/>
+@if (dialogVisible()) {
+  <app-dialog-qualification
+    [(visible)]="dialogVisible"
+    [type]="dialogType()"
+    [selectedQualification]="selectedQualification()"
+    (onSave)="loadQualifications()"
+  />
+}
 
 <p-confirmDialog />

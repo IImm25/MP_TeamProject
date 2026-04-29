@@ -1,0 +1,92 @@
+.schedule-container {
+  padding: 2rem;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.75rem;
+}
+
+.card-wrapper {
+  flex: 0 0 auto;
+  width: 100%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .p-card {
+  background: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--text-color) !important;
+}
+
+.empty-section {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.empty-boat-card {
+  border: 2px dashed var(--secondary-text) !important;
+}
+
+:host ::ng-deep .p-accordionheader {
+  background: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 1.25rem !important;
+}
+
+:host ::ng-deep .p-accordionheader:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+:host ::ng-deep .p-accordionpanel-active .p-accordionheader {
+  border-bottom-color: var(--primary-color) !important;
+}
+
+:host ::ng-deep .p-accordionpanel-active .p-accordionheader svg {
+  color: var(--primary-color) !important;
+}
+
+:host ::ng-deep .p-accordioncontent-content {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-height: 80px;
+  padding: 1rem !important;
+  background-color: var(--bg-color) !important;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+:host ::ng-deep .p-chip {
+  background: var(--primary-color) !important;
+  color: var(--text-color) !important;
+  cursor: pointer;
+}
+
+:host ::ng-deep .clickable-chip:hover .p-chip {
+  background: var(--primary-hover) !important;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+  .card-wrapper {
+    width: 50%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-wrapper {
+    width: 33.333333%;
+  }
+}
+

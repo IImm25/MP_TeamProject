@@ -23,7 +23,7 @@
         <p-step-panel [value]="1">
           <ng-template #content let-activateCallback="activateCallback">
             <div class="step-content">
-               <h3>{{ 'TASKS.DIALOG.CORE' | translate }}</h3>
+              <h3>{{ 'TASKS.DIALOG.CORE' | translate }}</h3>
               <div class="field">
                 <label for="name">{{ 'TASKS.NAME' | translate }}*</label>
                 <input
@@ -94,6 +94,7 @@
 
         <p-step-panel [value]="2">
           <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
               <div>
                 <h3>{{ 'TASKS.DIALOG.QUALIFICATIONS' | translate }}</h3>
                 @if (type !== 'Detail') {
@@ -157,22 +158,23 @@
                   </ng-template>
                 </p-table>
               </div>
+            </div>
 
-              <div class="step-footer">
-                <p-button
-                  [label]="'COMMON.BACK' | translate"
-                  [text]="true"
-                  severity="secondary"
-                  (onClick)="activateCallback(1)"
-                />
-                <p-button
-                  [label]="'COMMON.NEXT' | translate"
-                  icon="pi pi-arrow-right"
-                  iconPos="right"
-                  (onClick)="validateAndGoToNext(2, 3, activateCallback)"
-                />
-              </div>
-            </ng-template>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                severity="secondary"
+                (onClick)="activateCallback(1)"
+              />
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndGoToNext(2, 3, activateCallback)"
+              />
+            </div>
+          </ng-template>
         </p-step-panel>
 
         <p-step-panel [value]="3">

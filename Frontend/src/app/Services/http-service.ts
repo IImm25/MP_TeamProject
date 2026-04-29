@@ -6,7 +6,7 @@ import { Qualification } from '../Models/qualification';
 import { Tool } from '../Models/tool';
 import { Employee, EmployeeSummary, EmployeeCreateUpdate } from '../Models/employee';
 import { Task, TaskSummary } from '../Models/task';
-import { Boat, PlanRequest } from '../Models/boat';
+import { Boat, PlanRequest, PlanResponse } from '../Models/boat';
 
 @Injectable({
   providedIn: 'root',
@@ -100,7 +100,7 @@ export class HttpService {
   }
 
   // --- Scheduler ---
-  postPlan(planData: PlanRequest): Observable<Boat[]> {
-    return this.http.post<Boat[]>(`${this.apiUrl}/plan`, planData);
+  postPlan(planData: PlanRequest): Observable<PlanResponse> {
+    return this.http.post<PlanResponse>(`${this.apiUrl}/plan`, planData);
   }
 }

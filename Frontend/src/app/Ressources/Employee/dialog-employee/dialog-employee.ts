@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject, model } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, WritableSignal, inject, model, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -7,71 +7,89 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { environment } from '../../../../environments/environment';
-import { EmployeeCreateUpdate, Employee as EmployeeModel } from '../../../Models/employee';
+import { EmployeeCreateUpdate, Employee } from '../../../Models/employee';
 import { Qualification } from '../../../Models/qualification';
 import { HttpService } from '../../../Services/http-service';
 
 @Component({
   selector: 'app-dialog-employee',
   imports: [
-    CommonModule, FormsModule, ReactiveFormsModule, TranslateModule,
-    DialogModule, ButtonModule, InputTextModule, MultiSelectModule
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    DialogModule,
+    ButtonModule,
+    InputTextModule,
+    MultiSelectModule,
   ],
   templateUrl: './dialog-employee.html',
   styleUrl: './dialog-employee.css',
 })
-export class DialogEmployee {
+export class DialogEmployee implements OnInit {
   private fb = inject(FormBuilder);
   private httpService = inject(HttpService);
 
-  @Input() type: 'Edit' | 'New' = 'New';
-  @Input() allQualifications: Qualification[] = [];
+  @Input({required: true}) type: 'Edit' | 'New' | 'Detail' = 'New';
+  @Input() set selectedEmployee (emp: Employee | null) {
+    this.currentEmployee = emp;
+    if (emp) {
+      this.employeeForm.patchValue({
+        firstname: emp.firstname,
+        lastname: emp.lastname,
+        qualifications: emp.qualifications || [],
+      });
+      if (this.type === 'Detail') {
+        this.employeeForm.disable();
+      } else {
+        this.employeeForm.enable();
+      }
+    } else {
+      this.employeeForm.reset({
+        firstname: '',
+        lastname: '',
+        qualifications: [],
+      });
+      if (this.type !== 'Detail') {
+        this.employeeForm.enable();
+      }
+    }
+  };
   visible = model<boolean>(false);
 
   @Output() onSave = new EventEmitter<void>();
 
-  selectedId: number | null = null;
+  currentEmployee: Employee | null = null;
+  allQualifications: WritableSignal<Qualification[]> = signal([]);
 
   employeeForm = this.fb.group({
     firstname: ['', Validators.required],
     lastname: ['', Validators.required],
-    qualifications: [[] as Qualification[], Validators.required]
+    qualifications: [[] as Qualification[], Validators.required],
   });
 
-
-  patchForm(employee: EmployeeModel | null) {
-    if (employee) {
-      this.selectedId = employee.id;
-      this.employeeForm.patchValue({
-        firstname: employee.firstname,
-        lastname: employee.lastname,
-        qualifications: employee.qualifications
-      });
-    } else {
-      this.selectedId = null;
-      this.employeeForm.reset();
-    }
-  }
-
-  close() {
-    this.visible.set(false);
+  ngOnInit(): void {
+    this.httpService.getQualifications().subscribe((qualifications) => {
+      this.allQualifications.set(qualifications);
+    });
   }
 
   save() {
     if (this.employeeForm.invalid) return;
 
     const payload: EmployeeCreateUpdate = {
-       firstname: this.employeeForm.value.firstname || '',
-       lastname: this.employeeForm.value.lastname || '',
-       qualificationIds: this.employeeForm.value.qualifications?.map(q => q.id) || [],
+      firstname: this.employeeForm.value.firstname || '',
+      lastname: this.employeeForm.value.lastname || '',
+      qualificationIds: this.employeeForm.value.qualifications?.map((q) => q.id) || [],
     };
-    const request = this.type === 'Edit' && this.selectedId
-      ? this.httpService.updateEmployee(this.selectedId, payload)
-      : this.httpService.createEmployee(payload);
+    const request =
+      this.type === 'Edit' && this.currentEmployee
+        ? this.httpService.updateEmployee(this.currentEmployee.id, payload)
+        : this.httpService.createEmployee(payload);
 
     request.subscribe(() => {
       this.onSave.emit();
-      this.close();
+      this.visible.set(false);
     });
   }
 }
