@@ -78,7 +78,7 @@ namespace Backend.Web.Services
 
             if (update.RequiredQualifications != null)
             {
-                update.RequiredQualifications.Clear();
+                taskItem.RequiredQualifications.Clear();
                 foreach (var reqQual in update.RequiredQualifications)
                 {
                     taskItem.RequiredQualifications.Add(new TaskQualification
