@@ -91,7 +91,7 @@ public class DataFileGeneratorService
         }
         sb.AppendLine(";");
 
-        sb.AppendLine($"param maxWorkingHours := {info.maxTime};");
+        sb.AppendLine($"param maxWorkingHours := {info.MaxTime};");
         sb.AppendLine($"param amountBoats := {info.BoatNumber};");
         sb.AppendLine("end;");
 
