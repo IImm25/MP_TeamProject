@@ -14,7 +14,7 @@ public class GmplService
     private IntPtr tran = nint.Zero;
 
     private static string columnRegex = @"^([A-Za-z_]\w*)(?:\[(.*?)\])?$";
-    private static string modFile = @"..\GMPL\modell.mod";
+    private static string modFile = Path.Combine(AppContext.BaseDirectory, "GMPL", "modell.mod");
 
     //private readonly DataFileGeneratorService dataFileGeneratorService;
     private readonly PersonService personService;
