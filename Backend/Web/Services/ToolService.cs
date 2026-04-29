@@ -53,22 +53,17 @@ namespace Backend.Web.Services
             return await tools.DeleteAsync(id);
         }
 
-        public async Task<List<int>> GetTaskToolRequirements(int taskId)
+        public async Task<List<int>> GetTaskToolRequirements(int taskId, List<int> toolIds)
         {
             var task = await taskItems.GetFullByIdAsync(taskId);
-            if (task == null) return [];
+            if (task == null) return toolIds.Select(_ => 0).ToList();
 
-            var requiredTools = new Dictionary<int, int>();
+            var requiredTools = task.RequiredTools
+                .ToDictionary(x => x.ToolId, x => x.RequiredAmount);
 
-            foreach (var taskTools in task.RequiredTools)
-            {
-                requiredTools.Add(taskTools.ToolId, taskTools.RequiredAmount);
-            }
-
-            var quals = await tools.GetAllAsync();
-            var allQualIds = quals.Select(qual => qual.Id).ToList();
-
-            return allQualIds.Select(id => requiredTools.GetValueOrDefault(id)).ToList();
+            return toolIds
+                .Select(id => requiredTools.GetValueOrDefault(id))
+                .ToList();
         }
     }
 }
