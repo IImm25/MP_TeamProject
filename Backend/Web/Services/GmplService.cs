@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using AutoMapper;
 using Backend.Data.DTO;
 using Backend.GMPL;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 public class GmplService
 {
@@ -20,7 +21,7 @@ public class GmplService
 
     private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
-        var match = Regex.Match(colName,columnRegex);
+        var match = Regex.Match(colName, columnRegex);
 
         if (!match.Success)
             return ("", []);
@@ -37,7 +38,7 @@ public class GmplService
                 var cleaned = Regex.Replace(part.Trim(), @"^[A-Za-z]+_", "");
 
                 if (int.TryParse(cleaned, out int id))
-                    indices.Add(id-1); // From GMPL 1 indexed to 0 indexed
+                    indices.Add(id - 1); // From GMPL 1 indexed to 0 indexed
             }
         }
         return (name, indices);
@@ -107,10 +108,18 @@ public class GmplService
         }
         GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
 
-        bool[,] taskOnBoat = new bool[request.BoatNumber, request.TaskItemIds.Count];
-        bool[,] personOnBoat = new bool[request.BoatNumber, request.PersonIds.Count];
-        int[,] toolsOnBoat = new int[request.BoatNumber, request.ToolIds.Count];
-        bool[] boatUsage = new bool[request.BoatNumber];
+
+        var taskOnBoat = new HashSet<int>[request.BoatNumber];
+        var personOnBoat = new HashSet<int>[request.BoatNumber];
+        var toolOnBoat = new Dictionary<int, int>[request.BoatNumber];
+        var boatUsage = new bool[request.BoatNumber];
+
+        for (int i = 0; i < request.BoatNumber; i++)
+        {
+            taskOnBoat[i] = new HashSet<int>();
+            personOnBoat[i] = new HashSet<int>();
+            toolOnBoat[i] = new Dictionary<int, int>();
+        }
 
         int numCols = GLPKDllWrapper.glp_get_num_cols(prob);
 
@@ -127,21 +136,24 @@ public class GmplService
                     {
                         int boatId = indices[0];
                         int taskId = indices[1];
-                        taskOnBoat[boatId,taskId] = val != 0;
+                        if (val != 0)
+                            taskOnBoat[boatId].Add(taskId);
                         break;
                     }
                 case "personOnBoat":
                     {
                         int boatId = indices[0];
                         int personId = indices[1];
-                        personOnBoat[boatId, personId] = val != 0;
+                        if (val != 0)
+                            personOnBoat[boatId].Add(personId);
                         break;
                     }
                 case "toolOnBoat":
                     {
                         int boatId = indices[0];
                         int toolId = indices[1];
-                        toolsOnBoat[boatId, toolId] = val;
+                        if (val > 0)
+                            toolOnBoat[boatId][toolId] = val;
                         break;
                     }
                 case "boatUsage":
@@ -162,33 +174,31 @@ public class GmplService
             if (!boatUsage[i]) continue;
 
             List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
-            for (int j = 0; j < request.PersonIds.Count; j++)
+            foreach (var id in personOnBoat[i])
             {
-                if (personOnBoat[i,j])
-                {
-                    int id = j + 1; // ids start at 1 (ugly fix)
-                    persons.Add(mapper.Map<PersonSummaryDto>(await personService.GetPerson(id)));
-                }
+                persons.Add(
+                    mapper.Map<PersonSummaryDto>(
+                        await personService.GetPerson(id + 1) // very ugly fix
+                    )
+                );
             }
 
-            List<TaskToolDto> tools = new List<TaskToolDto>();
-            for (int j = 0; j < request.ToolIds.Count; j++)
-            {
-                int amount = toolsOnBoat[i, j];
-                int id = j + 1; // ids start at 1 (ugly fix)
-                if (amount > 0) {
-                    tools.Add(new TaskToolDto { ToolId = id, RequiredAmount = amount });
-                }
-            }
+            List<TaskToolDto> tools = toolOnBoat[i]
+                .Select(x => new TaskToolDto
+                {
+                    ToolId = x.Key,
+                    RequiredAmount = x.Value
+                })
+                .ToList();
 
             List<TaskItemSummaryDto> tasks = new List<TaskItemSummaryDto>();
-            for (int j = 0; j < request.TaskItemIds.Count; j++)
+            foreach (var id in taskOnBoat[i])
             {
-                if (taskOnBoat[i,j])
-                {
-                    int id = j + 1; // ids start at 1 (ugly fix)
-                    tasks.Add(mapper.Map<TaskItemSummaryDto>(await taskItemService.GetTaskItem(id)));
-                }
+                tasks.Add(
+                    mapper.Map<TaskItemSummaryDto>(
+                        await taskItemService.GetTaskItem(id + 1) // very ugly fix
+                    )
+                );
             }
 
             boats.Add(new BoatPlanDto(tasks, persons, tools));
