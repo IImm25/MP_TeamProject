@@ -21,7 +21,7 @@ namespace Backend.Web.Services
             this.mapper = mapper;
         }
 
-        public async Task<QualificationResponseDto> CreateQualification (QualificationCreateDto create)
+        public async Task<QualificationResponseDto> CreateQualification(QualificationCreateDto create)
         {
             Qualification qualification = new Qualification(create.Name, create.Description);
             return mapper.Map<QualificationResponseDto>(await qualifications.AddAsync(qualification));
@@ -55,35 +55,36 @@ namespace Backend.Web.Services
             return await qualifications.DeleteAsync(id);
         }
 
-        public async Task<List<bool>> GetPersonQualificationMask(int personId)
+        public async Task<List<bool>> GetPersonQualificationMask(int personId,List<int> qualIds)
         {
             var person = await persons.GetFullByIdAsync(personId);
-            if (person == null) return [];
+            if (person == null)
+                return qualIds.Select(_ => false).ToList();
 
-            var personQualIds = person.Qualifications.Select(qual => qual.QualificationId).ToHashSet();
+            var personQualIds = person.Qualifications
+                .Select(x => x.QualificationId)
+                .ToHashSet();
 
-            var quals = await qualifications.GetAllAsync();
-            var allQualIds = quals.Select(qual => qual.Id).ToList();
-
-            return allQualIds.Select(id => personQualIds.Contains(id)).ToList();
+            return qualIds
+                .Select(id => personQualIds.Contains(id))
+                .ToList();
         }
 
-        public async Task<List<int>> GetTaskQualificationRequirements(int taskId)
+        public async Task<List<int>> GetTaskQualificationRequirements(int taskId,List<int> qualIds)
         {
             var task = await taskItems.GetFullByIdAsync(taskId);
-            if (task == null) return [];
 
-            var requiredQuals = new Dictionary<int, int>();
+            if (task == null)
+                return qualIds.Select(_ => 0).ToList();
 
-            foreach (var taskQual in task.RequiredQualifications)
-            {
-                requiredQuals.Add(taskQual.QualificationId, taskQual.RequiredAmount);
-            }
+            var required = task.RequiredQualifications
+                .ToDictionary(
+                    x => x.QualificationId,
+                    x => x.RequiredAmount);
 
-            var quals = await qualifications.GetAllAsync();
-            var allQualIds = quals.Select(qual => qual.Id).ToList();
-
-            return allQualIds.Select(id => requiredQuals.GetValueOrDefault(id)).ToList();
+            return qualIds
+                .Select(id => required.GetValueOrDefault(id))
+                .ToList();
         }
 
         public async Task<List<int>> GetAllIds()
