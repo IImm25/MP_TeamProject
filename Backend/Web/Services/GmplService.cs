@@ -74,16 +74,6 @@ public class GmplService
 
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
-        var (toolDiff, qualDiff) = await Validate(request);
-
-        var toolInvalid = toolDiff.Any(t => t.Required > t.Available);
-        var qualInvalid = qualDiff.Any(q => q.Required > q.Available);
-
-        if (toolInvalid || qualInvalid)
-        {
-            return new PlanResponseDto(0.0, [], toolDiff, qualDiff);
-        }
-
         string datFileText = await CreateDataFileAsync(request);
         string datFile = Path.GetTempFileName();
         File.WriteAllText(datFile, datFileText);
@@ -107,10 +97,6 @@ public class GmplService
         smcp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
 
         int simplexErr = GLPKDllWrapper.glp_simplex(prob, ref smcp);
-        if (simplexErr != 0)
-        {
-            throw new Exception($"Simplex-Error : {simplexErr}");
-        }
 
         // MIP
         var iocp = new GLPKDllWrapper.glp_iocp();
@@ -118,9 +104,10 @@ public class GmplService
         iocp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
 
         int mipError = GLPKDllWrapper.glp_intopt(prob, ref iocp);
-        if (mipError != 0)
+        if (simplexErr != 0 || mipError != 0)
         {
-            throw new Exception($"MIP-Error : {mipError}");
+            var (toolDiff, qualDiff) = await Validate(request.TaskItemIds,request.PersonIds,request.ToolIds);
+            return new PlanResponseDto(0.0, [], toolDiff, qualDiff);
         }
         GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
 
@@ -184,10 +171,23 @@ public class GmplService
         }
 
         List<BoatPlanDto> boats = new List<BoatPlanDto>();
+        var allPersonIds = new HashSet<int>();
+        var allTaskIds = new HashSet<int>();
+        var allToolIds = new HashSet<int>();
+
 
         for (int i = 0; i < request.BoatNumber; i++)
         {
             if (!boatUsage[i]) continue;
+
+            foreach (var id in personOnBoat[i])
+                allPersonIds.Add(id+1);
+
+            foreach (var id in taskOnBoat[i])
+                allTaskIds.Add(id+1);
+
+            foreach (var id in toolOnBoat[i].Keys)
+                allToolIds.Add(id+1);
 
             List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
             foreach (var id in personOnBoat[i])
@@ -204,8 +204,8 @@ public class GmplService
                 {
                     ToolId = x.Key + 1,
                     RequiredAmount = x.Value
-                })
-                .ToList();
+                }).ToList();
+
 
             List<TaskItemSummaryDto> tasks = new List<TaskItemSummaryDto>();
             foreach (var id in taskOnBoat[i])
@@ -222,7 +222,9 @@ public class GmplService
 
         double workingHours = GLPKDllWrapper.glp_mip_obj_val(prob);
 
-        return new PlanResponseDto(workingHours, boats, toolDiff, qualDiff);
+        var (partialToolDiff, partialQualDiff) = await Validate(allTaskIds.ToList(), allPersonIds.ToList(), allToolIds.ToList());
+
+        return new PlanResponseDto(workingHours, boats, partialToolDiff, partialQualDiff);
     }
 
 
@@ -307,12 +309,29 @@ public class GmplService
         return sb.ToString();
     }
 
-    private async Task<(List<RequirementDiffDto> Tools, List<RequirementDiffDto> Quals)> Validate(PlanRequestDto info)
+    private async Task<(List<RequirementDiffDto> Tools, List<RequirementDiffDto> Quals)> Validate(List<int> taskIds, List<int> personIds, List<int> toolIds)
     {
-        var taskIds = info.TaskItemIds;
-        var personIds = info.PersonIds;
-        var toolIds = info.ToolIds;
-        var qualIds = await qualificationService.GetAllIds();
+        var qualIdSet = new HashSet<int>();
+
+        foreach (var taskId in taskIds)
+        {
+            var req = await qualificationService.GetTaskQualificationRequirements(taskId);
+            for (int i = 0; i < req.Count; i++)
+            {
+                if (req[i] > 0) qualIdSet.Add(i + 1); // if ordered by DB id
+            }
+        }
+
+        foreach (var personId in personIds)
+        {
+            var mask = await qualificationService.GetPersonQualificationMask(personId);
+            for (int i = 0; i < mask.Count; i++)
+            {
+                if (mask[i]) qualIdSet.Add(i + 1);
+            }
+        }
+
+        var qualIds = qualIdSet.ToList();
 
         var requiredQuals = qualIds.ToDictionary(id => id, _ => 0);
 
@@ -356,21 +375,9 @@ public class GmplService
             availableTools[toolId] += tool!.AvailableStock;
         }
 
-        var toolDiff = toolIds
-            //.Where(id => requiredTools[id] > 0)
-            .Select(id => new RequirementDiffDto(
-                id,
-                requiredTools[id],
-                availableTools[id]
-            ));
+        var toolDiff = toolIds.Select(id => new RequirementDiffDto(id,requiredTools[id],availableTools[id]));
 
-        var qualDiff = qualIds
-            //.Where(id => requiredQuals[id] > 0)
-            .Select(id => new RequirementDiffDto(
-                id,
-                requiredQuals[id],
-                availableQuals[id]
-            ));
+        var qualDiff = qualIds.Select(id => new RequirementDiffDto(id,requiredQuals[id],availableQuals[id]));
 
         return (toolDiff.ToList(), qualDiff.ToList());
     }
