@@ -90,10 +90,6 @@ s.t. ToolAvailable{b in BOATS, ta in TASKS, t in TOOLS: requiredTools[ta,t] > 0}
 s.t. GlobalToolStock{t in TOOLS}:
     sum{b in BOATS} toolOnBoat[b,t] <= stockTools[t];
 
-#at least one task must be done (plannen on a boat)
-s.t. AtLeastOneTaskGlobal:
-        sum{b in BOATS, ta in TASKS} (taskOnBoat[b,ta]) >= 1;
-
 /**
 * maximize function
 */
