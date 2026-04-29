@@ -1,0 +1,152 @@
+{
+  "COMMON": {
+    "CANCEL": "Cancel",
+    "NEXT": "Next",
+    "SAVE": "Save",
+    "BACK": "Back",
+    "DELETE": "Delete",
+    "ADD": "Add",
+    "ACTIONS": "Actions"
+  },
+  "MENU": {
+    "SCHEDULER": "Scheduler",
+    "ADMINISTRATION": "Administration",
+    "TASKS": "Tasks",
+    "EMPLOYEES": "Employees",
+    "QUALIFICATIONS": "Qualifications",
+    "TOOLS": "Tools"
+  },
+  "TASKS": {
+    "TASKS": "Tasks",
+    "NEW_TASK": "New Task",
+    "NAME": "Name",
+    "DURATION": "Duration",
+    "QUALIFICATION": "Qualification",
+    "DIALOG": {
+      "NEW": "New Task",
+      "EDIT": "Edit Task",
+      "DETAIL": "View Task",
+      "CORE": "General",
+      "NAME_PLACEHOLDER": "Enter a task name!",
+      "QUALIFICATIONS": "Qualifications",
+      "QUALIFICATION": {
+        "NEW": "New Qualification",
+        "EDIT": "Edit Qualification",
+        "QUALIFICATION": "Qualification",
+        "REQUIRED_AMOUNT": "Amount",
+        "DURATION": "Duration",
+        "PLACEHOLDER": "Select a qualification!"
+      },
+      "TOOLS": "Tools",
+      "TOOL": {
+        "NEW": "New Tool",
+        "EDIT": "Edit Tool",
+        "TOOL": "Tool",
+        "REQUIRED_AMOUNT": "Amount",
+        "PLACEHOLDER": "Select a tool!"
+      },
+      "DELETE_TITLE": "Delete Task",
+      "DELETE_MESSAGE": "Are you sure you want to permanently delete this task?"
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name is required",
+      "DURATION_REQUIRED": "Duration is required",
+      "QUALIFICATION_REQUIRED": "At least one qualification is required",
+      "TOOL_REQUIRED": "At least one tool is required"
+    }
+  },
+  "EMPLOYEES": {
+    "TITLE": "Employees",
+    "NAME": "Name",
+    "QUALIFICATIONS": "Qualifications",
+    "ADD_NEW": "New Employee",
+    "FIRSTNAME": "First Name",
+    "LASTNAME": "Last Name",
+    "DIALOG": {
+      "NEW": "New Employee",
+      "EDIT": "Edit Employee",
+      "DETAIL": "View Employee",
+      "DELETE_TITLE": "Delete Employee",
+      "DELETE_MESSAGE": "Are you sure you want to delete employee {{firstname}} {{lastname}}?",
+      "FIRSTNAME_PLACEHOLDER": "Enter a first name!",
+      "LASTNAME_PLACEHOLDER": "Enter a last name!",
+      "SELECT_QUALIFICATIONS": "Select one or more qualifications!"
+    },
+    "VALIDATION": {
+      "FIRSTNAME_REQUIRED": "First name is required",
+      "LASTNAME_REQUIRED": "Last name is required",
+      "QUALIFICATION_REQUIRED": "At least one qualification is required"
+    }
+  },
+  "QUALIFICATIONS": {
+    "TITLE": "Qualifications",
+    "NAME": "Name",
+    "DESCRIPTION": "Description",
+    "ADD_NEW": "New Qualification",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name is required",
+      "DESCRIPTION_REQUIRED": "Description is required"
+    },
+    "DIALOG": {
+      "NEW": "New Qualification",
+      "EDIT": "Edit Qualification",
+      "DETAIL": "View Qualification",
+      "DELETE_TITLE": "Delete Qualification",
+      "DELETE_MESSAGE": "Are you sure you want to delete the qualification \"{{name}}\"?",
+      "NAME_PLACEHOLDER": "Enter a name!",
+      "DESCRIPTION_PLACEHOLDER": "Enter a description!"
+    }
+  },
+  "TOOLS": {
+    "TITLE": "Tools",
+    "NAME": "Name",
+    "AVAILABLE_STOCK": "Available Stock",
+    "REQUIRED_AMOUNT": "Required Amount",
+    "ADD_NEW": "New Tool",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name is required",
+      "AVAILABLE_STOCK_REQUIRED": "Available stock is required"
+    },
+    "DIALOG": {
+      "NEW": "New Tool",
+      "EDIT": "Edit Tool",
+      "DETAIL": "View Tool",
+      "DELETE_TITLE": "Delete Tool",
+      "DELETE_MESSAGE": "Are you sure you want to delete the tool {{name}}?",
+      "NAME_PLACEHOLDER": "Enter a name!",
+      "AVAILABLE_STOCK_PLACEHOLDER": "Enter available stock!"
+    }
+  },
+  "SCHEDULER": {
+    "TITLE": "Scheduler",
+    "STEPS": {
+      "CORE": "General",
+      "TASKS": "Tasks",
+      "EMPLOYEES": "Employees",
+      "TOOLS": "Tools"
+    },
+    "CORE": {
+      "MAX_WORK_TIME": "Maximum Working Time (h)",
+      "BOAT_AMOUNT": "Number of Boats"
+    },
+    "VALIDATION": {
+      "MAX_WORK_TIME_REQUIRED": "Maximum working time is required",
+      "BOAT_AMOUNT_REQUIRED": "Number of boats is required",
+      "TASKS_REQUIRED": "At least one task is required",
+      "EMPLOYEES_REQUIRED": "At least one employee is required",
+      "TOOLS_REQUIRED": "At least one tool is required"
+    },
+    "GENERATE_PLAN": "Generate Plan"
+  },
+  "SCHEDULE": {
+    "TITLE": "Schedule",
+    "BOAT": "Boat",
+    "UNUSED": "Unused Resources"
+  },
+  "MESSAGES": {
+    "MISSING_QUALIFICATION": "Missing Qualification",
+    "MISSING_TOOL": "Missing Tool",
+    "ERROR": "Error",
+    "ERROR_GENERATING_PLAN": "Error generating plan"
+  }
+}

@@ -217,6 +217,15 @@ p-inputnumber,
   opacity: 1 !important;
 }
 
+:host ::ng-deep .p-toast {
+  opacity: 0.95;
+}
+
+:host ::ng-deep .p-toast-message {
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
 @media (max-width: 768px) {
   .p-dialog {
     width: 95vw !important;
