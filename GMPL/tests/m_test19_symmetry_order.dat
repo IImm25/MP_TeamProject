@@ -1,0 +1,23 @@
+# Description: Symmetry breaking and boat utilization.
+# Scenario: 5 boats available, single task A1 (1h).
+# Reasoning: The Order constraint should enforce that A1 is assigned to boat 1 to break symmetry.
+# If implemented incorrectly (e.g., reversed inequality in boatUsage constraint), the solver may produce invalid or suboptimal assignments.
+# Additionally, the constraint maxWorkingHours * boatUsage[b] must correctly gate whether a boat is active.
+# Expected result: A1 is assigned to boat 1 only, and boatUsage[1] = 1 enables its utilization.
+# Maximize WorkHours: 1.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 5;
+param maxWorkingHours := 8;
+
+param duration := A1 1;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+end;

@@ -1,0 +1,27 @@
+# Description: Infeasible case – task A1 (10h) exceeds maxWorkingHours (8h).
+# Expected result: WorkHours = 0. No tasks are completed.
+# Reasoning: The DoneAtMostOnce constraint allows tasks to be skipped. Since A1 does not fit within the time limit,
+# it is not scheduled in order to satisfy the time constraint (sum ≤ maxWorkingHours).
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Techniker;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+
+param duration := A1 10;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Techniker 1;
+
+param requiredQualis :=
+A1 Techniker 1;
+
+param requiredTools :=
+A1 W1 1;
+
+param stockTools := W1 1;
+end;

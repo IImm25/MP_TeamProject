@@ -1,0 +1,41 @@
+# Description: Shared tool optimization.
+# Scenario: A1 and A2 each require 1 unit of tool T1, but only 1 unit of T1 is available globally.
+# Expected result: A1 (5h) on boat 1; A2 is not scheduled; A3 (3h) is also assigned to boat 1.
+# Reasoning: Since A1 and A2 cannot share time on the same boat (5h + 4h > 8h) and only one T1 exists,
+# only one of them can be selected. A1 is chosen, and A3 fits within the remaining 3h capacity,
+# resulting in a total of 8h on boat 1.
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2 A3;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := T1 T2;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 5
+    A2 4
+    A3 3;
+
+param hasQuali :=
+    P1 Tech 1;
+
+param requiredQualis :=
+    A1 Tech 1
+    A2 Tech 1
+    A3 Tech 1;
+
+param requiredTools :=
+    A1 T1 1
+    A1 T2 0
+    A2 T1 1
+    A2 T2 0
+    A3 T1 0
+    A3 T2 1;
+
+param stockTools := 
+    T1 1
+    T2 5;
+end;

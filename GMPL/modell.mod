@@ -59,10 +59,14 @@ s.t. TimeLimit{b in BOATS}:
 #complete each task at most one time (or not at all)
 s.t. DoneAtMostOnce{ta in TASKS}:
 		sum{b in BOATS} (taskOnBoat[b,ta]) <= 1;
+
+#at least one task must be done (plannen on a boat)
+s.t. AtLeastOneTaskGlobal:
+		sum{b in BOATS, ta in TASKS} (taskOnBoat[b,ta]) >= 1;
 		
 #use boat in ascending order (breaking the symmetry)
 s.t. Order{b in BOATS: b > 1}:
-		boatUsage[b] <= boatUsage[b-1];
+		boatUsage[b] <= sum{ta in TASKS} (taskOnBoat[b-1,ta]);
 
 
 /*people relevante constrains*/
@@ -85,8 +89,6 @@ s.t. ToolAvailable{b in BOATS, ta in TASKS, t in TOOLS: requiredTools[ta,t] > 0}
 #total stock across all boats
 s.t. GlobalToolStock{t in TOOLS}:
     sum{b in BOATS} toolOnBoat[b,t] <= stockTools[t];
-
-
 
 /**
 * maximize function

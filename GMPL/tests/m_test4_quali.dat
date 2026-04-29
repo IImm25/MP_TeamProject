@@ -1,0 +1,34 @@
+# Description: Qualification check – A1 requires Tech1 and Tech2 simultaneously. P1 has Tech1, P2 has Tech2.
+# Expected result: A1 and A2 are completed on boat 1. P1 and P2 are also assigned to boat 1.
+# Reasoning: A1 requires both Tech1 and Tech2. Since P1 has Tech1 and P2 has Tech2, both must be on the same boat as A1.
+# A2 only requires Tech2, which is also satisfied by P2 on boat 1.
+# Maximize WorkHours: 2.
+data;
+set TASKS := A1 A2;
+set QUALIS := Tech1 Tech2;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+
+param duration := A1 1 A2 1;
+param maxWorkingHours := 10;
+
+param hasQuali :=
+P1 Tech1 1
+P1 Tech2 0
+P2 Tech1 0
+P2 Tech2 1;
+
+param requiredQualis :=
+A1 Tech1 1
+A1 Tech2 1
+A2 Tech1 0
+A2 Tech2 1;
+
+param requiredTools :=
+A1 W1 1
+A2 W1 1;
+
+param stockTools := W1 2;
+end;

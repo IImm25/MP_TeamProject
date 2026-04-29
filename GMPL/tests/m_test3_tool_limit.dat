@@ -1,0 +1,32 @@
+# Description: Resource limit – only 2 units of W1 are available.
+# Expected result: All tasks (A1, A2, A3) are completed on boat 1.
+# Reasoning: Since the total duration (3h) is below the limit (10h), all tasks fit on one boat.
+# As they are on the same boat, 1 unit of W1 is sufficient (toolOnBoat[1,W1] ≥ 1), which is within the available stock (2).
+# Maximize WorkHours: 3.
+data;
+set TASKS := A1 A2 A3;
+set QUALIS := Techniker;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 3;
+
+param duration := A1 1 A2 1 A3 1;
+param maxWorkingHours := 10;
+
+param hasQuali :=
+P1 Techniker 1
+P2 Techniker 1;
+
+param requiredQualis :=
+A1 Techniker 1
+A2 Techniker 1
+A3 Techniker 1;
+
+param requiredTools :=
+A1 W1 1
+A2 W1 1
+A3 W1 1;
+
+param stockTools := W1 2;
+end;

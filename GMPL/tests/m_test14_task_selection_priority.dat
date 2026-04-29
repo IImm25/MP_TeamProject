@@ -1,0 +1,42 @@
+# Description: Optimal task selection priority.
+# Scenario: Multiple tasks with different durations and limited resources (2 specialists, 2 boats with 8h each).
+# Expected result: Total WorkHours = 15h.
+# Reasoning: The best feasible combination is A1 (7h) on boat 1 and A3 (5h) + A5 (3h) on boat 2.
+# This respects both the boat capacity constraint and specialist limitation, yielding the maximum total of 15h.
+# Maximize WorkHours: 15.
+data;
+set TASKS := A1 A2 A3 A4 A5;
+set QUALIS := Spezialist;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 7
+    A2 6
+    A3 5
+    A4 4
+    A5 3;
+
+param hasQuali :=
+    P1 Spezialist 1
+    P2 Spezialist 1;
+
+param requiredQualis :=
+    A1 Spezialist 1
+    A2 Spezialist 1
+    A3 Spezialist 1
+    A4 Spezialist 1
+    A5 Spezialist 1;
+
+param requiredTools :=
+    A1 W1 0
+    A2 W1 0
+    A3 W1 0
+    A4 W1 0
+    A5 W1 0;
+
+param stockTools := W1 0;
+end;

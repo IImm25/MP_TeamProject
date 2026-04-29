@@ -1,0 +1,24 @@
+# Description: Tool sharing / missing physical constraints.
+# Scenario: Tools are globally limited but assigned per boat for the full planning horizon.
+# Reasoning: The model enforces only global stock limits, not spatial/physical constraints (weight/volume per boat).
+# It also assumes static tool allocation per boat and no intra-day redistribution.
+# Expected result: 0 in a realistic model with boat capacity constraints.
+# Note: Current model may still return WorkHours = 10 due to missing physical constraints.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1;
+set QUALIS := Tech;
+set PEOPLE := P1;
+set TOOLS := HeavyTool;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 10;
+
+param hasQuali := P1 Tech 1;
+param requiredQualis := A1 Tech 1;
+param requiredTools := A1 HeavyTool 10;
+param stockTools := HeavyTool 10;
+
+end;

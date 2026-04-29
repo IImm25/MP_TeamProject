@@ -1,0 +1,29 @@
+# Description: Capacity limit – the total duration (10h) exceeds the time limit (8h) of a single boat.
+# Expected result: Tasks A1 and A2 are distributed across two different boats (boat 1 and boat 2).
+# Reasoning: Duration A1 (5h) + A2 (5h) = 10h > 8h. Therefore, splitting across two boats is necessary.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1 A2;
+set QUALIS := Techniker;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+
+param duration := A1 5 A2 5;
+param maxWorkingHours := 8;
+
+param hasQuali :=
+P1 Techniker 1
+P2 Techniker 1;
+
+param requiredQualis :=
+A1 Techniker 1
+A2 Techniker 1;
+
+param requiredTools :=
+A1 W1 0
+A2 W1 0;
+
+param stockTools := W1 0;
+end;

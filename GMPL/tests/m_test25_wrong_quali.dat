@@ -1,0 +1,22 @@
+# Description: Qualification mismatch (wrong person).
+# Scenario: A1 requires qualification Q1. P1 only has qualification Q2 and is assigned to the boat.
+# Reasoning: Presence on the boat is not sufficient; the QualiCheck requires matching qualifications.
+# Since no assigned person satisfies Q1, the requirement cannot be met.
+# Expected result: A1 cannot be executed.
+# Maximize WorkHours: 0.
+data;
+set TASKS := A1;
+set QUALIS := Q1 Q2;
+set PEOPLE := P1;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 10;
+
+param duration := A1 5;
+
+param hasQuali := P1 Q1 0 P1 Q2 1;
+param requiredQualis := A1 Q1 1 A1 Q2 0;
+param requiredTools := A1 W1 0;
+param stockTools := W1 0;
+end;

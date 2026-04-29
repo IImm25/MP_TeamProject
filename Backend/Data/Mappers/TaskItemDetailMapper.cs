@@ -7,6 +7,7 @@ namespace Backend.Data.Mappers
     {
         public TaskItemDetailMapper() { 
             CreateMap<TaskItem,TaskItemDetailDto>();
+            CreateMap<TaskItemDetailDto, TaskItemSummaryDto>();
         }
     }
 }

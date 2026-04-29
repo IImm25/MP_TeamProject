@@ -1,0 +1,46 @@
+# Description: Mix of small and large tasks – many 1h/2h tasks and two 8h tasks.
+# Expected result: A1 on boat 1, A2 on boat 2, S1–S4 on boat 3.
+# Reasoning: A1 and A2 each fully occupy a boat with 8h. The remaining tasks S1–S4 (total 6h)
+# fit together on the third boat. Since 3 boats are available (amountBoats = 3), all tasks can be completed.
+# Maximize WorkHours: 22.
+data;
+set TASKS := A1 A2 S1 S2 S3 S4;
+set QUALIS := Tech;
+set PEOPLE := P1 P2 P3;
+set TOOLS := W1;
+
+param amountBoats := 3;
+
+param duration := 
+    A1 8
+    A2 8
+    S1 1
+    S2 2
+    S3 1
+    S4 2;
+
+param maxWorkingHours := 8;
+
+param hasQuali := 
+    P1 Tech 1
+    P2 Tech 1
+    P3 Tech 1;
+
+param requiredQualis := 
+    A1 Tech 1
+    A2 Tech 1
+    S1 Tech 1
+    S2 Tech 1
+    S3 Tech 1
+    S4 Tech 1;
+
+param requiredTools := 
+    A1 W1 1
+    A2 W1 1
+    S1 W1 1
+    S2 W1 1
+    S3 W1 1
+    S4 W1 1;
+
+param stockTools := W1 10;
+end;

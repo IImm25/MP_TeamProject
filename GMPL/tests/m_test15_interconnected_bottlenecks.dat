@@ -1,0 +1,44 @@
+# Description: Interconnected Bottlenecks (Global Tool + Personnel)
+# Resources act globally and per boat: A1/A2 block each other (T1 & time), A3/A4 compete for experts.
+# Model checks qualifications per task only → the same experts can cover both A3 AND A4 on the same boat.
+# Therefore optimal solution: A1 (6h) on boat 1, A3+A4 (4h) on boat 2 ⇒ total 10h instead of 8h.
+# Maximize WorkHours: 10.
+data;
+set TASKS := A1 A2 A3 A4;
+set QUALIS := Experte;
+set PEOPLE := P1 P2;
+set TOOLS := T1 T2;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 6
+    A2 6
+    A3 2
+    A4 2;
+
+param hasQuali :=
+    P1 Experte 1
+    P2 Experte 1;
+
+param requiredQualis :=
+    A1 Experte 0
+    A2 Experte 0
+    A3 Experte 2
+    A4 Experte 1;
+
+param requiredTools :=
+    A1 T1 2
+    A1 T2 0
+    A2 T1 2
+    A2 T2 0
+    A3 T1 0
+    A3 T2 1
+    A4 T1 0
+    A4 T2 1;
+
+param stockTools := 
+    T1 3
+    T2 10;
+end;

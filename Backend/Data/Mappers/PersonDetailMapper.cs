@@ -7,6 +7,7 @@ namespace Backend.Data.Mappers
     {
         public PersonDetailMapper() {
             CreateMap<Person, PersonDetailDto>();
+            CreateMap<PersonDetailDto, PersonSummaryDto>();
         }
     }
 }

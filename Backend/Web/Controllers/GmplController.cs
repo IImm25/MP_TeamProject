@@ -3,45 +3,33 @@ using Backend.GMPL;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 namespace Backend.Web.Controllers;
 
 [ApiController]
 [Route("api/plan")]
-public class GmplController : ControllerBase
+public class GMPLController : ControllerBase
 {
-    GmplService _gmplService;
-    public GmplController(GmplService gmplService)
+    private readonly GmplService gmplService;
+    public GMPLController(GmplService gmplService)
     {
-        _gmplService = gmplService;
+        this.gmplService = gmplService;
     }
 
     [HttpPost("")]
-    public async Task<ActionResult<List<PlanResponseDto>>> Plan([FromBody] PlanRequestDto request)
+    public async Task<ActionResult<PlanResponseDto>> Plan([FromBody] PlanRequestDto request)
     {
-
-        if (request == null) return BadRequest("Wrong Inpout");
-
-        List<PlanResponseDto> response = await _gmplService.CaculateGmplModel(request);
-
-        if (response != null)
+        // TODO : Prevalidate
+        try
         {
+            PlanResponseDto response = await gmplService.Solve(request);
             return Ok(response);
         }
-        else return Ok("Planning failed.");
+        catch (Exception ex) { 
+            Console.WriteLine(ex.Message);
+            return StatusCode(500,ex.Message);
+        }
     }
-
-
-    [HttpGet("/test")]
-    public async Task<ActionResult<GmplResults>> Test()
-    {
-
-        var res = await _gmplService.TestGLPK();
-
-        string path = await DataFileGenerator.SaveDataFile("sometext");
-        return Ok(res);
-
-    }
-
 
 }

@@ -1,0 +1,34 @@
+# Description: Global tool stock vs. boat allocation.
+# Scenario: 2 boats, 3 tasks (A1–A3), each requiring 5 units of tool W1 and 4h duration.
+# Reasoning: Each boat must be equipped independently, requiring 5 units of W1 per boat.
+# Thus two boats would require 10 units total (5 + 5), but only 9 units are available (stockTools).
+# Therefore not all tasks can be scheduled; only two tasks can be selected while respecting both time and tool constraints.
+# Expected result: Either (A1 + A2), (A1 + A3), or (A2 + A3), each yielding 8h total WorkHours.
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2 A3;
+set QUALIS := Tech;
+set PEOPLE := P1 P2;
+set TOOLS := W1;
+
+param amountBoats := 2;
+param maxWorkingHours := 8;
+
+param duration := A1 4 A2 4 A3 4;
+
+param hasQuali :=
+P1 Tech 1
+P2 Tech 1;
+
+param requiredQualis :=
+A1 Tech 1
+A2 Tech 1
+A3 Tech 1;
+
+param requiredTools :=
+A1 W1 5
+A2 W1 5
+A3 W1 5;
+
+param stockTools := W1 9;
+end;

@@ -1,0 +1,40 @@
+# Description: Multi-skilled workers efficiency.
+# Scenario: A1 requires 2 mechanics; P1 is mechanic+electrician, P2 is mechanic, P3 is electrician.
+# Expected result: A1 and A2 are assigned to boat 1 with P1 and P2.
+# Reasoning: A1 needs two mechanics, so P1 + P2 are required despite P1’s extra skills.
+# A2 needs 1 mechanic + 1 electrician, which P1 can fully cover due to both skills being available on the boat.
+# Thus P1 and P2 together satisfy all constraints, enabling both tasks on boat 1.
+# Maximize WorkHours: 8.
+data;
+set TASKS := A1 A2;
+set QUALIS := Mech Elek;
+set PEOPLE := P1 P2 P3;
+set TOOLS := W1;
+
+param amountBoats := 1;
+param maxWorkingHours := 8;
+
+param duration := 
+    A1 4
+    A2 4;
+
+param hasQuali :=
+    P1 Mech 1
+    P1 Elek 1
+    P2 Mech 1
+    P2 Elek 0
+    P3 Mech 0
+    P3 Elek 1;
+
+param requiredQualis :=
+    A1 Mech 2
+    A1 Elek 0
+    A2 Mech 1
+    A2 Elek 1;
+
+param requiredTools :=
+    A1 W1 1
+    A2 W1 1;
+
+param stockTools := W1 10;
+end;

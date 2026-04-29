@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 namespace Backend.GMPL;
 
-public static class Glpk
+public static class GLPKDllWrapper
 {
     private const string Lib = "lib/glpk_4_65"; // Windows: "glpk_4_65" | Linux/macOS: "glpk"
 
