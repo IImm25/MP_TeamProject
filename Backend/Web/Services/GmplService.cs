@@ -186,7 +186,7 @@ public class GmplService
             List<TaskToolDto> tools = toolOnBoat[i]
                 .Select(x => new TaskToolDto
                 {
-                    ToolId = x.Key,
+                    ToolId = x.Key + 1,
                     RequiredAmount = x.Value
                 })
                 .ToList();
