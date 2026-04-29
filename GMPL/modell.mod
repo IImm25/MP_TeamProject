@@ -67,6 +67,9 @@ s.t. AtLeastOneTaskGlobal:
 #use boat in ascending order (breaking the symmetry)
 s.t. Order{b in BOATS: b > 1}:
 		boatUsage[b] <= sum{ta in TASKS} (taskOnBoat[b-1,ta]);
+		
+s.t. UsageRequiresTask{b in BOATS: b > 1}:
+		boatUsage[b] <= sum{ta in TASKS} (taskOnBoat[b,ta]);
 
 
 /*people relevante constrains*/

@@ -172,23 +172,10 @@ public class GmplService
         }
 
         List<BoatPlanDto> boats = new List<BoatPlanDto>();
-        var allPersonIds = new HashSet<int>();
-        var allTaskIds = new HashSet<int>();
-        var allToolIds = new HashSet<int>();
-
-
+      
         for (int i = 0; i < request.BoatNumber; i++)
         {
             if (!boatUsage[i]) continue;
-
-            foreach (var id in personOnBoat[i])
-                allPersonIds.Add(id+1);
-
-            foreach (var id in taskOnBoat[i])
-                allTaskIds.Add(id+1);
-
-            foreach (var id in toolOnBoat[i].Keys)
-                allToolIds.Add(id+1);
 
             List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
             foreach (var id in personOnBoat[i])
@@ -223,7 +210,7 @@ public class GmplService
 
         double workingHours = GLPKDllWrapper.glp_mip_obj_val(prob);
 
-        var (partialToolDiff, partialQualDiff) = await Validate(allTaskIds.ToList(), allPersonIds.ToList(), allToolIds.ToList(), qualIds);
+        var (partialToolDiff, partialQualDiff) = await Validate(request.TaskItemIds, request.PersonIds, request.ToolIds, qualIds);
 
         return new PlanResponseDto(workingHours, boats, partialToolDiff, partialQualDiff);
     }
@@ -337,55 +324,94 @@ public class GmplService
         return used.OrderBy(x => x).ToList();
     }
 
-    private async Task<(List<RequirementDiffDto> Tools, List<RequirementDiffDto> Quals)> Validate(List<int> taskIds, List<int> personIds, List<int> toolIds, List<int> qualIds)
+    private async Task<(List<RequirementDiffDto> Tools, List<RequirementDiffDto> Quals)> Validate(
+        List<int> taskIds,
+        List<int> personIds,
+        List<int> toolIds,
+        List<int> qualIds)
     {
+        toolIds = toolIds.Distinct().ToList();
+
+        // -------------------------
+        // REQUIRED QUALIFICATIONS
+        // -------------------------
         var requiredQuals = qualIds.ToDictionary(id => id, _ => 0);
 
         foreach (var taskId in taskIds)
         {
-            var req = await qualificationService.GetTaskQualificationRequirements(taskId, qualIds);
+            var req = await qualificationService
+                .GetTaskQualificationRequirements(taskId, qualIds);
 
             for (int i = 0; i < qualIds.Count; i++)
+            {
                 requiredQuals[qualIds[i]] += req[i];
+            }
         }
 
+        // -------------------------
+        // AVAILABLE QUALIFICATIONS
+        // -------------------------
+        var availableQuals = qualIds.ToDictionary(id => id, _ => 0);
+
+        foreach (var personId in personIds)
+        {
+            var mask = await qualificationService
+                .GetPersonQualificationMask(personId, qualIds);
+
+            for (int i = 0; i < qualIds.Count; i++)
+            {
+                if (mask[i])
+                    availableQuals[qualIds[i]] += 1;
+            }
+        }
+
+        // -------------------------
+        // REQUIRED TOOLS
+        // -------------------------
         var requiredTools = toolIds.ToDictionary(id => id, _ => 0);
 
         foreach (var taskId in taskIds)
         {
-            var req = await toolService.GetTaskToolRequirements(taskId, toolIds);
+            var req = await toolService
+                .GetTaskToolRequirements(taskId, toolIds);
 
             for (int i = 0; i < toolIds.Count; i++)
-                requiredTools[toolIds[i]] += req[i];
-        }
-
-        var availableQuals = qualIds.ToDictionary(id => id, _ => 0);
-
-        for (int i = 0; i < personIds.Count; i++)
-        {
-            var qualMask =
-                await qualificationService.GetPersonQualificationMask(personIds[i], qualIds);
-
-            for (int q = 0; q < qualIds.Count; q++)
             {
-                if (qualMask[q])
-                    availableQuals[qualIds[q]]++;
+                requiredTools[toolIds[i]] += req[i];
             }
         }
 
+        // -------------------------
+        // AVAILABLE TOOLS
+        // -------------------------
         var availableTools = toolIds.ToDictionary(id => id, _ => 0);
 
-        foreach (var toolId in toolIds.Distinct())
+        foreach (var toolId in toolIds)
         {
             var tool = await toolService.GetTool(toolId);
-            availableTools[toolId] += tool!.AvailableStock;
+            availableTools[toolId] = tool!.AvailableStock;
         }
 
-        var toolDiff = toolIds.Select(id => new RequirementDiffDto(id,requiredTools[id],availableTools[id]));
+        // -------------------------
+        // DIFF OUTPUT (FILTERED)
+        // -------------------------
+        var toolDiff = toolIds
+            .Select(id => new RequirementDiffDto(
+                id,
+                requiredTools[id],
+                availableTools[id]))
+            .Where(x => x.Required > 0 || x.Available > 0)
+            .ToList();
 
-        var qualDiff = qualIds.Select(id => new RequirementDiffDto(id,requiredQuals[id],availableQuals[id]));
+        var qualDiff = qualIds
+            .Select(id => new RequirementDiffDto(
+                id,
+                requiredQuals[id],
+                availableQuals[id]))
+            .Where(x => x.Required > 0 || x.Available > 0)
+            .ToList();
 
-        return (toolDiff.ToList(), qualDiff.ToList());
+        return (toolDiff, qualDiff);
     }
 
 
