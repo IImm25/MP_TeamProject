@@ -6,10 +6,21 @@ public class TasksTest : PageTest
 {
     private static readonly String InitialTaskName = "000_TaskName";
     private static readonly String InitialQualificationName = "Electrical Systems Basics";
-    private static readonly String InitialToolName = "000_ToolPersisted";
+    private static readonly int InitialQualificationAmount = 1;
+    private static readonly String InitialToolName = "000_ToolPersisted1";
+    private static readonly int InitialToolAmount = 1;
     private static readonly int InitialDurationHours = 2;
     private static readonly int InitialDurationMinutes = 2;
     private static readonly String InitialDuration = InitialDurationHours.ToString() + " h "+ InitialDurationMinutes.ToString() + " min";
+
+    private static readonly String ChangedTaskName = "000_TaskName";
+    private static readonly String ChangedQualificationName = "High Voltage Safety";
+    private static readonly int ChangedQualificationAmount = 2;
+    private static readonly String ChangedToolName = "000_ToolPersisted2";
+    private static readonly int ChangedToolAmount = 2;
+    private static readonly int ChangedDurationHours = 3;
+    private static readonly int ChangedDurationMinutes = 3;
+    private static readonly String ChangedDuration = ChangedDurationHours.ToString() + " h " + ChangedDurationMinutes.ToString() + " min";
 
     [TestMethod]
     [Priority(1)]
@@ -60,13 +71,64 @@ public class TasksTest : PageTest
     [Priority(2)]
     public async Task ModifyTask_SuccessfulFlow()
     {
-        Assert.Fail();
+        await Page.GotoAsync($"http://localhost:4200/tasks");
+
+        var row = Page.Locator("tr").Filter(new() { HasText = InitialTaskName });
+        await row.Locator(".pi-pencil").ClickAsync();
+
+        await Page.GetByLabel("Bezeichnung*").FillAsync(ChangedTaskName);
+        var hourIncrement = Page.Locator("#durationHours .p-inputnumber-increment-button");
+        await hourIncrement.ClickAsync();
+        var minuteIncrement = Page.Locator("#durationMinutes .p-inputnumber-increment-button");
+        await minuteIncrement.ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Weiter" }).ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Hinzufügen" }).ClickAsync();
+
+        var qualificationSelectTrigger = Page.Locator("p-select[formcontrolname='selectedQualificationForm']");
+        await qualificationSelectTrigger.ClickAsync();
+        var qualificationOverlay = Page.Locator(".p-select-overlay");
+        await qualificationOverlay.GetByText(ChangedQualificationName).ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Speichern" }).ClickAsync();
+
+        var initialQualificationRow = Page.Locator("tr").Filter(new() { HasText = InitialQualificationName });
+        await initialQualificationRow.Locator(".pi-trash").ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Weiter" }).ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Hinzufügen" }).ClickAsync();
+
+        var toolSelectTrigger = Page.Locator("p-select[formcontrolname='selectedToolForm']");
+        await toolSelectTrigger.ClickAsync();
+        var toolOverlay = Page.Locator(".p-select-overlay");
+        await toolOverlay.GetByText(ChangedToolName).ClickAsync();
+
+        var dialog = Page.Locator(".p-dialog-footer");
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Speichern" }).ClickAsync();
+
+        var initialToolRow = Page.Locator("tr").Filter(new() { HasText = InitialToolName });
+        await initialToolRow.Locator(".pi-trash").ClickAsync();
+
+        await Page.GetByLabel("Aufgabe bearbeiten").GetByRole(AriaRole.Button, new() { Name = "Speichern" }).ClickAsync();
+
+        row = Page.Locator("tr").Filter(new() { HasText = ChangedTaskName });
+        await Expect(row.GetByText(ChangedDuration)).ToBeVisibleAsync();
     }
 
     [TestMethod]
     [Priority(3)]
     public async Task RemoveTask_SuccessfulFlow()
     {
-        Assert.Fail();
+        await Page.GotoAsync($"http://localhost:4200/tasks");
+
+        var row = Page.Locator("tr").Filter(new() { HasText = ChangedTaskName });
+        await row.Locator(".pi-trash").ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Löschen" }).ClickAsync();
+
+        await Expect(Page.GetByRole(AriaRole.Cell, new() { Name = ChangedTaskName }))
+        .ToBeHiddenAsync(new() { Timeout = 1000 });
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Playwright;
 using Microsoft.Playwright.MSTest;
 
-[Ignore]
 [TestClass]
 public class EmployeesTest : PageTest
 {

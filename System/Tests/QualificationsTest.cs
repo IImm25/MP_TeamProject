@@ -1,9 +1,8 @@
 ﻿using Microsoft.Playwright;
 using Microsoft.Playwright.MSTest;
 
-[Ignore]
 [TestClass]
-public class QualificationTests : PageTest
+public class QualificationTest : PageTest
 {
     private static readonly String InitialQualificationName = "000_QualificationName1";
     private static readonly String ChangedQualificationName = "000_QualificationName2";
