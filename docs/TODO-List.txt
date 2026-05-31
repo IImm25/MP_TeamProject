@@ -1,0 +1,55 @@
+### TO-DO-Liste (nach Architektur-Schichten)
+
+#### Frontend (UI / Ein- & Ausgabe)
+
+Aufgaben-Verwaltung (UC-03):
+* Erweiterung der Eingabemaske für Aufgaben (Task) um ein Feld für X/Y-Koordinaten (oder eine Auswahlliste spezifischer Windkraftanlagen).
+* Erweiterung der Eingabemaske um Datumsfelder für den "Gültigkeitszeitraum (Start Day, End Day)".
+
+Planung & Visualisierung (UC-04, UC-05, UC-06):
+* Umsetzung der Fahrplananzeige als chronologische Timeline (Gantt-Chart) pro Boot mit exakten Abfahrts-, Fahr- und Ankunftszeiten.
+* Integration (Erhalt) einer separaten, übersichtlichen Liste direkt unter/neben der Planung, die alle nicht genutzten Aufgaben, Mitarbeiter und Werkzeuge anzeigt.
+
+Dynamische Ereignismeldungen (UC-05 & UC-06):
+* Einbau des Buttons "Report Weather Change" mitsamt einer Eingabeaufforderung, um die geänderte Boot-Fahrgeschwindigkeit direkt einzugeben oder anzupassen.
+* Einbau des Buttons "Report Havarie" zur Bereitstellung eines Ad-hoc-Formulars oder Nutzung der Vorhandenen Maske zur Aufgabenerstellung (Eingabe von Location, benötigten Qualifikationen und Werkzeugen).
+* Optional: Live-Update der UI-Timeline bei Havariemeldungen: Visuelle Hervorhebung des neuen Zwischenstopps mittels einer eindeutigen Farbe ("distinct color highlight").
+
+
+
+#### Backend (Schnittstelle & Vorverarbeitung)
+
+Datenmodell & Datenstrukturen (UC-03):
+* Anpassung der Klassen im Backend zur Speicherung von X/Y-Koordinaten, Start- und Endtagen.
+
+Geografische Kern-Logik (UC-04):
+* Implementierung einer Berechnungskomponente für Distanzen zwischen dem Hafen und den Koordinaten der Windräder zur Laufzeit.
+* Bereitstellung dieser Werte in Form einer zweidimensionalen Entfernungsmatrix an den Algorithmus (das Modell).
+
+Filterung & Priorisierung (UC-04):
+* Entwicklung einer automatischen Vorfilterungs-Logik, die alle Aufgaben aussortiert, die außerhalb des aktuellen Planungstages liegen oder noch nicht gestartet sind.
+* Implementierung einer Sortierungs- und Gewichtungskomponente, die nahende Deadlines (End Day) analysiert und in numerische Prioritäten für das Optimierungsmodell übersetzt.
+
+Live-Zustandsüberwachung & Historisierung (UC-05 & UC-06):
+* Implementierung einer Logik zur Echtzeit-Identifikation aller am aktuellen Tag bereits beendeten oder gerade in Ausführung befindlichen Aufgaben.
+* Systemfunktion zum automatischen Setzen des Status `FIXED` für diese aktiven Elemente, damit sie separat aggregiert werden können.
+* Modifikation des Zuweisungs-Endpunkts, um bei einer Havarie oder einem Wetterumschwung die geänderten Geschwindigkeitsparameter und die `FIXED`-Einschränkungen synchron als Input-Daten bereitzustellen.
+
+
+
+#### GMPL-Modell (Optimierung)
+
+Parameter & Matrizen (UC-04):
+* Definition der Kanten-Matrix für Distanzen (`param dist`).
+* Definition der Parameter für die Aufgabenprioritäten (`param prio`).
+
+Routen- & Zeit-Constraints (UC-04):
+* Implementierung der geografischen Nebenbedingungen zur Wahrung der Fluss- und Routenkonstanz (Start am Hafen -> zyklischer Besuch von Anlagen -> Rückkehr zum Hafen).
+* Integration der zeitlichen Abfolge-Constraints (Zeitfenster-Verknüpfung) mittels Big-M-Methode, um Subtouren mathematisch auszuschließen.
+
+Zielfunktion (UC-04):
+* Anpassung der Zielfunktion zur Maximierung der produktiven Arbeitszeit, wobei die Fahrzeiten der Boote korrekt als verbrauchte Arbeitszeit gegengerechnet werden.
+* Verknüpfung der Zielfunktion mit dem Parameter `prio`, sodass Aufgaben mit nahender Deadline mathematisch bevorzugt allokiert werden.
+
+Warm-Up-Steuerung (UC-05 & UC-06):
+* Formulierung von dynamischen Bedingungen, die es dem Solver erlauben, die vom Backend übergebenen `FIXED`-Aufgaben als unumstößliche, fest einbetonierte Start-Entscheidungen zu behandeln. Der Solver darf Routen und Zeiten nur für die noch offenen, ungestarteten Resten optimieren.
