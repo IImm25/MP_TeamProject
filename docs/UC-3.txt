@@ -1,7 +1,7 @@
 ### UC-03: Manage Tasks
 
 * Name and Identification Number: UC-03 Manage Tasks
-* Description: Definition and lifecycle management (create, edit, delete) of maintenance tasks, including their precise requirements for specific tools (with quantities) and personnel qualifications (including multi-person requirements).
+* Description: Definition and lifecycle management (create, edit, delete) of maintenance tasks, including their precise requirements for specific tools (with quantities), personnel qualifications (including multi-person requirements), geographic coordinates, and validity timeframes.
 * Participating Actors:
 * Primary Actor: Project/Tour Planner
 * Secondary Actor: none
@@ -10,9 +10,9 @@
 * Status: to be approved
 * Used Use Cases (includes): none
 * Trigger: New maintenance demands, reported turbine failures or adjustments to standard operation procedures.
-* Preconditions: The Project Planner is authenticated. Tool types and qualification types must exist in the system(?).
-* Invariants: Task resource requirements cannot be negative(?).
-* Postcondition/Result: The task pool is updated and contains detailed resource constraint profiles ready for scheduling.
+* Preconditions: The Project Planner is authenticated. Tool types and qualification types must exist in the system.
+* Invariants: Task resource requirements cannot be negative.
+* Postcondition/Result: The task pool is updated and contains detailed resource constraint profiles, coordinates, and validity timeframes ready for scheduling.
 
 
 * Normal Flow:
@@ -20,13 +20,14 @@
 2. The system displays all currently defined tasks in the pool.
 3. The Project Planner selects "Create New Task".
 4. The Project Planner defines the task details and adds required qualifications, specifying the exact count needed for each qualification type.
-5. The Project Planner selects the required tools from the inventory and assigns a required quantity for each.
-6. The system saves the task definition into the open task pool.
-
+5. The Project Planner enters the X/Y-coordinates (or selects a specific wind turbine from a list) for the task.
+6. The Project Planner enters the validity timeframe (Start Day, End Day) for the task.
+7. The Project Planner selects the required tools from the inventory and assigns a required quantity for each.
+8. The system saves the task definition into the open task pool.
 
 * Alternative Flows:
 * 3a. Edit an existing task:
-1. The Project Planner selects a task and modifies its duration, tool requirements, or qualification counts.
+1. The Project Planner selects a task and modifies its duration, tool requirements, qualification counts, coordinates, or validity timeframe.
 2. The system updates the task.
 
 
@@ -40,3 +41,4 @@
 use case history:
 Versionierung, Name des Autors, Datum, Beschreibung
 1.0, Leonie Skala, 29.05.2026, Initial creation
+2.0, Leonie Skala, 29.05.2026, Adjustment due to an expansion of tasks (geographical and temporal components)

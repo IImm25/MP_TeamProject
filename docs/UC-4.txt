@@ -1,7 +1,7 @@
 ### UC-04: Create Schedule
 
 * Name and Identification Number: UC-04 Create Schedule
-* Description: Generation of an optimized daily work plan based on a user-defined working time limit and a selected subset of tasks, followed by a comprehensive visualization of allocated and unallocated resources.
+* Description: Generation of an optimized daily work plan based on a user-defined working time limit and a sytem selected subset of tasks, followed by a comprehensive visualization of unallocated resources and a chronological visualization of the routes via a Gantt Chart.
 * Participating Actors:
 * Primary Actor: Project Planner
 * Secondary Actor: Scheduler (System)
@@ -11,26 +11,27 @@
 * Used Use Cases (includes): none
 * Trigger: Operational need to plan the next day's offshore maintenance activities.
 * Preconditions: Active personnel (UC-01), available tools (UC-02), and defined tasks (UC-03) are present in the system database.
-* Invariants: Hard constraints (working hours, worker qualification matches, physical tool availability limits) must never be violated for any scheduled item.
-* Postcondition/Result: An optimized schedule is shown. The user receives a detailed breakdown of successfully scheduled tasks per boat, as well as an explicit list of left-over resources and tasks.
+* Invariants: Hard constraints (working hours including travel times, worker qualification matches, physical tool availability limits) must never be violated for any scheduled item.
+* Postcondition/Result: An optimized schedule is shown. The user receives a detailed breakdown of successfully scheduled tasks per boat displayed on a chronological timeline, as well as an explicit list of left-over resources and tasks.
 
 
 * Normal Flow:
 1. The Project Planner initiates a new scheduling session.
 2. The Project Planner enters the maximum allowable daily working hours.
-3. The Project Planner selects a set of tasks from the pool that should be considered for today's plan.
-4. The Project Planner commands the system to generate the schedule.
-5. The system processes the input variables against available workers, tools, and boats to maximize productivity.
-6. The system displays the scheduled tasks grouped by the specific boat they are assigned to, listing the utilized tools and personnel.
+3. The Project Planner commands the system to generate the schedule.
+4. The system automatically filters out tasks outside the current planning day (that didn't start yet), calculates distances, and weights task priorities based on deadlines.
+5. The system processes the input variables against available workers, tools, boats, ... to maximize productivity.
+6. The system displays the scheduled tasks as a chronological timeline (Gantt Chart) per boat, showing precise departure, travel, and arrival times along with utilized tools and personnel.
 7. The system explicitly displays a separate list showing all tasks, employees, and tools that were not utilized or scheduled for this plan.
 
 
 * Alternative Flows:
 * 5a. Mathematically impossible requirements:
-1. The system identifies that no selected task can be scheduled under any circumstance (e.g., missing crucial qualifications in the entire team).
-2. The system flags the conflict and prompts the Project Planner to adjust the selection or working time (Return to step 2). (?)
+1. The system identifies that no task can be scheduled under any circumstance (e.g., missing crucial qualifications in the entire team).
+2. The system flags the conflict and prompts the Project Planner to adjust the selection or working time (Return to step 2).
 
 
 use case history:
 Versionierung, Name des Autors, Datum, Beschreibung
 1.0, Leonie Skala, 29.05.2026, Initial creation
+2.0, Leonie Skala, 29.05.2026, Adjustment due to an expansion of tasks (geographical and temporal components)

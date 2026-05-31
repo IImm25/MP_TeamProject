@@ -1,0 +1,34 @@
+### UC-06: Report Weather Change
+
+* Name and Identification Number: UC-06 Report Weather Change
+* Description: Reporting an unforeseen shift in weather conditions during active sea operations, forcing an immediate update of boat travel speeds and a re-calculation of the remaining daily schedule.
+* Participating Actors:
+* Primary Actor: Project Planner
+* Secondary Actor: Scheduler (System)
+
+
+* Status: to be approved
+* Used Use Cases (includes): none
+* Trigger: Sudden weather degradation or improvement that impacts safe boat navigation speeds.
+* Preconditions: A daily schedule is active, and boats are currently executing tasks on sea.
+* Invariants: Already completed tasks or tasks currently in progress (FIXED status) must be completed and cannot be canceled by the system.
+* Postcondition/Result: The travel speeds of the boats are updated in the system, remaining travel times are recalculated, and tasks that can no longer be completed within the working hours limit are dynamically handled.
+
+
+* Normal Flow:
+1. The Project Planner clicks the "Report Weather Change" button.
+2. The system prompts the Project Planner to enter or adjust the boat travel speed.
+3. The Project Planner enters the new speed and confirms the weather event.
+4. The system identifies all completed and currently running tasks and locks them into the FIXED state.
+5. The system updates the travel speed parameters, enforcing the FIXED tasks as unchangeable constraints and feeds the modified data into the optimization model.
+6. The system updates the live Gantt Chart view.
+
+
+* Alternative Flows: none
+
+
+* Notes: Running tasks are atomic and are always finished even if the reduced speed causes delayed returns to the harbor.
+
+use case history:
+Versionierung, Name des Autors, Datum, Beschreibung
+1.0, Leonie Skala, 29.05.2026, Initial creation
