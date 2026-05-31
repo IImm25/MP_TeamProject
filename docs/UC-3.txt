@@ -1,0 +1,42 @@
+### UC-03: Manage Tasks
+
+* Name and Identification Number: UC-03 Manage Tasks
+* Description: Definition and lifecycle management (create, edit, delete) of maintenance tasks, including their precise requirements for specific tools (with quantities) and personnel qualifications (including multi-person requirements).
+* Participating Actors:
+* Primary Actor: Project/Tour Planner
+* Secondary Actor: none
+
+
+* Status: to be approved
+* Used Use Cases (includes): none
+* Trigger: New maintenance demands, reported turbine failures or adjustments to standard operation procedures.
+* Preconditions: The Project Planner is authenticated. Tool types and qualification types must exist in the system(?).
+* Invariants: Task resource requirements cannot be negative(?).
+* Postcondition/Result: The task pool is updated and contains detailed resource constraint profiles ready for scheduling.
+
+
+* Normal Flow:
+1. The Project Planner opens the Task Management module.
+2. The system displays all currently defined tasks in the pool.
+3. The Project Planner selects "Create New Task".
+4. The Project Planner defines the task details and adds required qualifications, specifying the exact count needed for each qualification type.
+5. The Project Planner selects the required tools from the inventory and assigns a required quantity for each.
+6. The system saves the task definition into the open task pool.
+
+
+* Alternative Flows:
+* 3a. Edit an existing task:
+1. The Project Planner selects a task and modifies its duration, tool requirements, or qualification counts.
+2. The system updates the task.
+
+
+* 3b. Delete a task:
+1. The Project Planner deletes a task from the active pool, removing it from future planning consideration.
+
+
+* Notes: A single task can require multiple pieces of the same qualification (e.g., requiring 2 separate individuals holding the exact same certification).
+
+
+use case history:
+Versionierung, Name des Autors, Datum, Beschreibung
+1.0, Leonie Skala, 29.05.2026, Initial creation
