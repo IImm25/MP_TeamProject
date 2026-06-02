@@ -1,0 +1,39 @@
+### UC-05: Report Havarie
+
+* Name and Identification Number: UC-05 Report Havarie
+* Description: Ad-hoc reporting of a critical failure (havarie) during the current day's operations, triggering a partial re-optimization that integrates the new task while keeping already completed or running tasks locked.
+* Participating Actors:
+* Primary Actor: Project Planner
+* Secondary Actor: Scheduler (System)
+
+
+* Status: to be approved
+* Used Use Cases (includes): UC-3 to create a task
+* Trigger: A sudden, unforeseen critical technical failure occurs at an offshore wind turbine during the shift.
+* Preconditions: A daily schedule is currently active and being executed by the boats on sea.
+* Invariants: Tasks with the status FIXED (already completed or currently in progress) cannot be altered, moved, or removed by the system.
+* Postcondition/Result: The havarie task is integrated into the schedule of a suitable boat. The system's live timeline is updated, displaying the new intermediate stop (with a distinct color highlight).
+
+
+* Normal Flow:
+1. The Project Planner clicks the "Report Havarie" button.
+2. The system opens a task creation form.
+3. The Project Planner enters the location of the havarie, required personnel qualifications, and required tools.
+4. The Project Planner confirms and submits the havarie task.
+4. The system identifies all completed and currently running tasks and locks them into the FIXED state.
+5. The system updates the travel speed parameters, enforcing the FIXED tasks as unchangeable constraints and feeds the modified data into the optimization model.
+8. The system updates the live schedule and visually displays the updated timeline (highlighting the newly inserted emergency stop in a distinct color).
+
+
+* Alternative Flows:
+* 7a. Havarie cannot be scheduled:
+1. The system detects that no active boat carries the required tools or qualified personnel on sea, or the working time limit would be completely exhausted.
+2. The system aborts the re-optimization and displays a critical warning: "Emergency task cannot be assigned - insufficient resources on sea."
+
+
+* Notes: This use case ensures a fast, greedy-like insertion of critical tasks while protecting the integrity of work that is already underway.
+
+
+use case history:
+Versionierung, Name des Autors, Datum, Beschreibung
+1.0, Leonie Skala, 29.05.2026, Initial creation
