@@ -43,7 +43,7 @@ export const appConfig: ApplicationConfig = {
         prefix: './i18n/',
         suffix: '.json',
       }),
-      fallbackLang: 'de',
+      fallbackLang: 'en',
     }),
     providePrimeNG({
       theme: {

@@ -101,6 +101,7 @@
     "TITLE": "Werkzeuge",
 	  "NAME": "Bezeichnung",
 	  "AVAILABLE_STOCK": "Verfügbare Menge",
+    "REQUIRED_AMOUNT": "erforderliche Anzahl",
     "ADD_NEW": "Neues Werkzeug",
 	  "VALIDATION": {
 		  "NAME_REQUIRED": "Bezeichnung ist erforderlich",
@@ -141,5 +142,11 @@
     "TITLE": "Planung",
     "BOAT": "Boot",
     "UNUSED": "Nicht genutzte Ressourcen"
+  },
+  "MESSAGES": {
+    "MISSING_QUALIFICATION": "Fehlende Qualifikation",
+    "MISSING_TOOL": "Fehlendes Werkzeug",
+    "ERROR": "Fehler",
+    "ERROR_GENERATING_PLAN": "Fehler beim Generieren des Plans"
   }
 }

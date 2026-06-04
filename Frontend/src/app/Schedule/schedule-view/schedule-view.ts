@@ -2,18 +2,23 @@ import { Component, inject, signal, computed, WritableSignal } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { ScheduleService } from '../schedule-service';
 import { HttpService } from '../../Services/http-service';
-import { Task, TaskSummary } from '../../Models/task';
+import { Task, TaskSummary, TaskTool } from '../../Models/task';
 import { Employee, EmployeeSummary } from '../../Models/employee';
 import { Tool } from '../../Models/tool';
 import { CardModule } from 'primeng/card';
 import { AccordionModule } from 'primeng/accordion';
 import { ChipModule } from 'primeng/chip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DialogTask } from '../../Ressources/Task/dialog-task/dialog-task';
 import { DialogEmployee } from '../../Ressources/Employee/dialog-employee/dialog-employee';
 import { DialogTool } from '../../Ressources/Tool/dialog-tool/dialog-tool';
-import { Boat, PlanRequest, PlanResponse } from '../../Models/boat';
-import { forkJoin, switchMap } from 'rxjs';
+import { Boat, PlanResponse } from '../../Models/boat';
+import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { Qualification } from '../../Models/qualification';
 
 @Component({
   selector: 'app-schedule-view',
@@ -27,21 +32,33 @@ import { forkJoin, switchMap } from 'rxjs';
     DialogTask,
     DialogEmployee,
     DialogTool,
+    ButtonModule,
+    TagModule,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: './schedule-view.html',
   styleUrl: './schedule-view.css',
 })
 export class ScheduleView {
   private planService = inject(ScheduleService);
   private http = inject(HttpService);
+  private messageService = inject(MessageService);
+  private translate = inject(TranslateService);
 
   planResponse = signal<PlanResponse>(
-    this.planService.loadBoatsFromStorage() ?? { totalTime: 0, boats: [] },
+    this.planService.loadBoatsFromStorage() ?? {
+      totalTime: 0,
+      boats: [],
+      toolDiff: [],
+      qualificationDiff: [],
+    },
   );
   boats: WritableSignal<Boat[]> = signal([]);
   allTasks = signal<Task[]>([]);
   allEmployees = signal<Employee[]>([]);
   allTools = signal<Tool[]>([]);
+  allQualifications = signal<Qualification[]>([]);
 
   selectedTask = signal<Task | null>(null);
   taskVisible = signal(false);
@@ -64,21 +81,20 @@ export class ScheduleView {
         .pipe(
           switchMap((summaries) => forkJoin(summaries.map((e) => this.http.getEmployeeById(e.id)))),
         ),
-    }).subscribe(({ tasks, tools, employees }) => {
+      qualifications: this.http.getQualifications(),
+    }).subscribe(({ tasks, tools, employees, qualifications }) => {
       this.allTasks.set(tasks);
       this.allTools.set(tools);
       this.allEmployees.set(employees);
-
-      const raw = this.planService.loadBoatsFromStorage();
-      console.log('raw plan response:', raw);
+      this.allQualifications.set(qualifications);
 
       const unusedBoat = this.getUnusedRessources();
 
       this.boats.set([unusedBoat, ...this.planResponse().boats]);
-
-      console.log(this.boats());
     });
   }
+
+  LoadData() {}
 
   openTask(taskSummary: TaskSummary) {
     const fullTask = this.allTasks().find((t) => t.id === taskSummary.id);
@@ -111,13 +127,20 @@ export class ScheduleView {
     return this.allTools().find((t) => t.id === id)?.name || `Tool #${id}`;
   }
 
+  getQualificationName(id: number): string {
+    return this.allQualifications().find((q) => q.id === id)?.name || `Qualifikation #${id}`;
+  }
+
   isBoatEmpty(boat: Boat): boolean {
     return boat.taskItems.length === 0 && boat.persons.length === 0 && boat.tools.length === 0;
   }
 
   getUnusedRessources(): Boat {
-    const boats = this.planResponse().boats;
+    const boats = this.planResponse().boats || [];
     const request = this.planService.loadRequestFromStorage();
+
+    // Absolute Absicherung: Wenn toolDiff fehlt oder null ist, erzwinge ein leeres Array
+    const toolDiff = this.planResponse().toolDiff || [];
 
     if (!request) return { taskItems: [], persons: [], tools: [] };
 
@@ -127,25 +150,23 @@ export class ScheduleView {
       tools: new Set(boats.flatMap((b) => (b.tools ?? []).map((t) => t.toolId))),
     };
 
-    console.log(used);
-
     return {
       taskItems: this.allTasks().filter(
         (t) => request.taskItemIds.includes(t.id) && !used.tasks.has(t.id),
-      ),
+      ) as TaskSummary[],
       persons: this.allEmployees().filter(
         (e) => request.personIds.includes(e.id) && !used.people.has(e.id),
-      ),
+      ) as EmployeeSummary[],
       tools: this.allTools()
         .filter((t) => request.toolIds.includes(t.id))
         .map((t) => {
-          const usedAmount = boats
-            .flatMap((b) => b.tools ?? [])
-            .filter((bt) => bt.toolId === t.id)
-            .reduce((sum, bt) => sum + bt.requiredAmount, 0);
-          return { toolId: t.id, requiredAmount: t.availableStock - usedAmount };
+          return {
+            toolId: t.id,
+            // Hier kann es jetzt nicht mehr knallen, da toolDiff garantiert existiert
+            requiredAmount: toolDiff.find((d) => d.id === t.id)?.required || 0,
+          };
         })
-        .filter((t) => t.requiredAmount > 0),
+        .filter((t) => t.requiredAmount > 0) as TaskTool[],
     };
   }
 }

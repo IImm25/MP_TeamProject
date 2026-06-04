@@ -19,6 +19,8 @@ import { DialogTool } from '../../Ressources/Tool/dialog-tool/dialog-tool';
 import { ChipModule } from 'primeng/chip';
 import { ScheduleService } from '../schedule-service';
 import { forkJoin, switchMap } from 'rxjs';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-scheduler',
@@ -36,7 +38,9 @@ import { forkJoin, switchMap } from 'rxjs';
     DialogEmployee,
     DialogTool,
     ChipModule,
+    ToastModule
   ],
+  providers: [MessageService],
   templateUrl: './scheduler.html',
   styleUrl: './scheduler.css',
 })
@@ -45,6 +49,8 @@ export class Scheduler implements OnInit {
   private http = inject(HttpService);
   private router = inject(Router);
   private planService = inject(ScheduleService);
+  private messageService = inject(MessageService);
+  private translate = inject(TranslateService);
 
   tasks: WritableSignal<TaskSummary[]> = signal<TaskSummary[]>([]);
   employees: WritableSignal<Employee[]> = signal<Employee[]>([]);
@@ -150,9 +156,26 @@ export class Scheduler implements OnInit {
       toolIds: val.selectedTools?.map((t) => t.id) || [],
     };
 
-    this.http.postPlan(request).subscribe((plan: PlanResponse) => {
-      this.planService.setPlan(plan, request);
-      this.router.navigate(['/schedule-view']);
+    this.http.postPlan(request).subscribe({
+      next: (plan: PlanResponse) => {
+        if (plan.boats.length === 0) {
+          this.messageService.add({
+            severity: 'error',
+            summary: this.translate.instant('MESSAGES.ERROR'),
+            detail: this.translate.instant('MESSAGES.ERROR_GENERATING_PLAN'),
+          });
+          return;
+        }
+        this.planService.setPlan(plan, request);
+        this.router.navigate(['/schedule-view']);
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('MESSAGES.ERROR'),
+          detail: this.translate.instant('MESSAGES.ERROR_GENERATING_PLAN')
+        });
+      }
     });
   }
 
