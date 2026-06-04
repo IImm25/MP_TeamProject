@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, WritableSignal } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { ScheduleService } from '../schedule-service';
 import { HttpService } from '../../Services/http-service';
-import { Task, TaskSummary } from '../../Models/task';
+import { Task, TaskSummary, TaskTool } from '../../Models/task';
 import { Employee, EmployeeSummary } from '../../Models/employee';
 import { Tool } from '../../Models/tool';
 import { CardModule } from 'primeng/card';
@@ -91,8 +91,6 @@ export class ScheduleView {
       const unusedBoat = this.getUnusedRessources();
 
       this.boats.set([unusedBoat, ...this.planResponse().boats]);
-
-      this.getProblems();
     });
   }
 
@@ -138,9 +136,11 @@ export class ScheduleView {
   }
 
   getUnusedRessources(): Boat {
-    const boats = this.planResponse().boats;
+    const boats = this.planResponse().boats || [];
     const request = this.planService.loadRequestFromStorage();
-    const toolDiff = this.planResponse().toolDiff;
+
+    // Absolute Absicherung: Wenn toolDiff fehlt oder null ist, erzwinge ein leeres Array
+    const toolDiff = this.planResponse().toolDiff || [];
 
     if (!request) return { taskItems: [], persons: [], tools: [] };
 
@@ -153,46 +153,20 @@ export class ScheduleView {
     return {
       taskItems: this.allTasks().filter(
         (t) => request.taskItemIds.includes(t.id) && !used.tasks.has(t.id),
-      ),
+      ) as TaskSummary[],
       persons: this.allEmployees().filter(
         (e) => request.personIds.includes(e.id) && !used.people.has(e.id),
-      ),
+      ) as EmployeeSummary[],
       tools: this.allTools()
         .filter((t) => request.toolIds.includes(t.id))
         .map((t) => {
           return {
             toolId: t.id,
+            // Hier kann es jetzt nicht mehr knallen, da toolDiff garantiert existiert
             requiredAmount: toolDiff.find((d) => d.id === t.id)?.required || 0,
           };
         })
-        .filter((t) => t.requiredAmount > 0),
+        .filter((t) => t.requiredAmount > 0) as TaskTool[],
     };
-  }
-
-  getProblems() {
-    const diffQual = this.planResponse().qualificationDiff || [];
-    const diffTool = this.planResponse().toolDiff || [];
-
-    diffQual.forEach((qual) => {
-      if (qual.required > qual.available) {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('MESSAGES.MISSING_QUALIFICATION'),
-          detail: this.getQualificationName(qual.id),
-          sticky: true,
-        });
-      }
-    });
-
-    diffTool.forEach((tool) => {
-      if (tool.required > tool.available) {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('MESSAGES.MISSING_TOOL'),
-          detail: this.getToolName(tool.id),
-          sticky: true,
-        });
-      }
-    });
   }
 }
