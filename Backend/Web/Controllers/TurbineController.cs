@@ -26,7 +26,7 @@ namespace Backend.Web.Controllers
             return Ok(list);
         }
 
-        [HttpGet("")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<TurbineResponseDTO>> GetTurbineById(int id)
         {
             var turbine = new TurbineResponseDTO(1, "rolf", 51.15f, 15.01f);
