@@ -26,6 +26,7 @@ export class Navbar implements OnInit, OnDestroy {
         'MENU.EMPLOYEES',
         'MENU.QUALIFICATIONS',
         'MENU.TOOLS',
+        'MENU.TURBINES',
         'MENU.SCHEDULER',
       ])
       .subscribe({
@@ -39,6 +40,7 @@ export class Navbar implements OnInit, OnDestroy {
                 { label: translations['MENU.TOOLS'], icon: 'pi pi-wrench', routerLink: ['/tools'] },
                 { label: translations['MENU.EMPLOYEES'], icon: 'pi pi-users', routerLink: ['/employees'] },
                 { label: translations['MENU.TASKS'], icon: 'pi pi-list', routerLink: ['/tasks'] },
+                { label: translations['MENU.TURBINES'], icon: 'pi pi-map-marker', routerLink: ['/turbines'] },
               ],
             },
             {

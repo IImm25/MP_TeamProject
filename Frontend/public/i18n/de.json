@@ -14,6 +14,7 @@
     "TASKS": "Aufgaben",
     "EMPLOYEES": "Mitarbeiter",
     "QUALIFICATIONS": "Qualifikationen",
+    "TURBINES": "Windräder",
     "TOOLS": "Werkzeuge"
   },
   "TASKS": {
@@ -115,6 +116,30 @@
       "DELETE_MESSAGE": "Möchten Sie das Werkzeug {{name}} wirklich löschen?",
       "NAME_PLACEHOLDER": "Gib eine Bezeichnung ein!",
       "AVAILABLE_STOCK_PLACEHOLDER": "Gib eine verfügbare Menge ein!"
+    }
+  },
+  "TURBINES": {
+    "TURBINES": "Windräder",
+    "NAME": "Name",
+    "LATITUDE": "Breitengrad",
+    "LONGITUDE": "Längengrad",
+    "NEW_TURBINE": "Neues Windrad",
+    "COORDINATES": "Koordinaten",
+    "DIALOG": {
+      "NEW": "Neues Windrad",
+      "EDIT": "Windrad bearbeiten",
+      "DETAIL": "Windrad anzeigen",
+      "DELETE_TITLE": "Windrad löschen",
+      "DELETE_MESSAGE": "Möchten Sie das Windrad {{name}} wirklich löschen?",
+      "NAME_PLACEHOLDER": "Gib einen Namen ein!",
+      "LATITUDE_PLACEHOLDER": "Gib einen Breitengrad ein!",
+      "LONGITUDE_PLACEHOLDER": "Gib einen Längengrad ein!"
+
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name ist erforderlich",
+      "LATITUDE_REQUIRED": "Wert erforderlich (Bereich: -90.0 bis 90.0).",
+      "LONGITUDE_REQUIRED": "Wert erforderlich (Bereich: -180.0 bis 180.0)."
     }
   },
   "SCHEDULER": {

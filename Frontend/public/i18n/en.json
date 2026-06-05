@@ -14,7 +14,8 @@
     "TASKS": "Tasks",
     "EMPLOYEES": "Employees",
     "QUALIFICATIONS": "Qualifications",
-    "TOOLS": "Tools"
+    "TOOLS": "Tools",
+    "TURBINES": "Wind Turbines"
   },
   "TASKS": {
     "TASKS": "Tasks",
@@ -115,6 +116,29 @@
       "DELETE_MESSAGE": "Are you sure you want to delete the tool {{name}}?",
       "NAME_PLACEHOLDER": "Enter a name!",
       "AVAILABLE_STOCK_PLACEHOLDER": "Enter available stock!"
+    }
+  },
+  "TURBINES": {
+    "TURBINES": "Wind Turbines",
+    "NAME": "Name",
+    "LATITUDE": "Latitude",
+    "LONGITUDE": "Longitude",
+    "NEW_TURBINE": "New Wind Turbine",
+    "COORDINATES": "Coordinates",
+    "DIALOG": {
+      "NEW": "New Wind Turbine",
+      "EDIT": "Edit Wind Turbine",
+      "DETAIL": "View Wind Turbine",
+      "DELETE_TITLE": "Delete Wind Turbine",
+      "DELETE_MESSAGE": "Are you sure you want to delete the wind turbine {{name}}?",
+      "NAME_PLACEHOLDER": "Enter a name!",
+      "LATITUDE_PLACEHOLDER": "Enter a latitude!",
+      "LONGITUDE_PLACEHOLDER": "Enter a longitude!"
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name is required",
+      "LATITUDE_REQUIRED": "Value required (Range: -90.0 to 90.0).",
+      "LONGITUDE_REQUIRED": "Value required (Range: -180.0 to 180.0)."
     }
   },
   "SCHEDULER": {
