@@ -74,6 +74,7 @@ public class GmplService
 
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
+        return new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []);
         List<int> qualIds = await GetUsedQualificationIds(request.TaskItemIds, request.PersonIds);
         string datFileText = await CreateDataFileAsync(request, qualIds);
         string datFile = Path.GetTempFileName();
@@ -108,7 +109,7 @@ public class GmplService
         if (simplexErr != 0 || mipError != 0)
         {
             var (toolDiff, qualDiff) = await Validate(request.TaskItemIds,request.PersonIds,request.ToolIds,qualIds);
-            return new PlanResponseDto(0.0, [], toolDiff, qualDiff);
+            //return new PlanResponseDto(0.0, [], toolDiff, qualDiff);
         }
         GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
 
@@ -205,14 +206,14 @@ public class GmplService
                 );
             }
 
-            boats.Add(new BoatPlanDto(tasks, persons, tools));
+            //boats.Add(new BoatPlanDto(tasks, persons, tools));
         }
 
         double workingHours = GLPKDllWrapper.glp_mip_obj_val(prob);
 
         var (partialToolDiff, partialQualDiff) = await Validate(request.TaskItemIds, request.PersonIds, request.ToolIds, qualIds);
 
-        return new PlanResponseDto(workingHours, boats, partialToolDiff, partialQualDiff);
+        //return new PlanResponseDto(workingHours, boats, partialToolDiff, partialQualDiff);
     }
 
 
