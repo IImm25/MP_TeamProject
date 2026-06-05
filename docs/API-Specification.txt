@@ -2,17 +2,13 @@
 	Schema DetailTurbine:
 		id: int
 		name: string
-		latitude: float/ double
-		longitude: float/ double
-	
-	Schema SummaryTurbine:
-		id: int
-		name: string
-		
+		latitude: float
+		longitude: float
+
 	Schema CreateTurbine:
 		name: string
-		latitude: float/ double
-		longitude: float/ double
+		latitude: float
+		longitude: float
 	
 	get: /turbines/{id}
 		response 200:
@@ -21,7 +17,7 @@
 	
 	get: /turbines
 		response 200:
-			SummaryTurbine[]
+			DetailTurbine[]
 	
 	post: /turbines
 		body:
@@ -94,6 +90,29 @@
 		response 200: no Content 
 		
 - GMPL Plan:
+	Schema BoatTool:
+		tool : TaskTool
+		requiredAmount : int
+
+	Schema BoatSchedule:
+		departure : TimeOnly
+		arrival : TimeOnly
+
+	Schema TaskSchedule:
+		task : TaskSummary
+		startTime : TimeOnly
+
+	Schema BoatPlan:
+		persons: SummaryPerson[]
+		tools : BoatTool[]
+		taskSchedules : TaskSchedule[]
+		boatSchedules : BoatSchedules[]
+
+	Schema Plan:
+		date : DateOnly (ISO-8601)
+		createdAt : DateTime
+		boats : BoatPlan[]
+
 	post: /plan
 		body:
 			maxTime: float/ double
