@@ -1,13 +1,19 @@
 ﻿// Author: Erik Schellenberger
 
-public class TaskTool
+
+// Author: Erik Schellenberger
+
+namespace Backend.Data.Entitites
 {
-    public int TaskItemId { get; set; }
-    public TaskItem TaskItem { get; set; } = null!;
+    public class TaskTool
+    {
+        public int TaskItemId { get; set; }
+        public TaskItem TaskItem { get; set; } = null!;
 
-    public int ToolId { get; set; }
-    public Tool Tool { get; set; } = null!;
+        public int ToolId { get; set; }
+        public Tool Tool { get; set; } = null!;
 
-    public int RequiredAmount { get; set; }
+        public int RequiredAmount { get; set; }
 
+    } 
 }

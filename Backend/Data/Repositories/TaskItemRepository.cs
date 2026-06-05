@@ -1,5 +1,6 @@
 ﻿namespace Backend.Data.Repositories
 {
+    using Backend.Data.Entitites;
     using Microsoft.EntityFrameworkCore;
 
     public class TaskItemRepository : Repository<TaskItem>, ITaskItemRepository

@@ -1,4 +1,5 @@
 ﻿using Backend.Data;
+using Backend.Data.Entitites;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
 using Backend.Web.Services;
