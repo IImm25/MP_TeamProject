@@ -1,6 +1,6 @@
 ﻿namespace Backend.Data.Entitites
 {
-    public class BoatTools
+    public class BoatTool
     {
         public int PlanId { get; set; } // composite foreign key
         public int BoatNumber { get; set; }

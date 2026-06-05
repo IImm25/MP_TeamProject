@@ -3,7 +3,7 @@
     public class TaskSchedule
     {
         public int TaskId { get; set; }  // composite primary key (TaskId,(PlanId,BoatNumber))
-        public Task Task { get; set; } = null!;
+        public TaskItem TaskItem { get; set; } = null!;
 
         public int PlanId { get; set; } // composite foreign key (PlanId,BoatNumber)
         public int BoatNumber { get; set; }

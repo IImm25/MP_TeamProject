@@ -7,6 +7,8 @@ public class TaskItem
     public string Name { get; set; } = "";
     public float DurationHours { get; set; }
 
+    public DateOnly ExecutionIntervalStart { get; set; }
+    public DateOnly ExecutionIntervalEnd { get; set; }
     public ICollection<TaskQualification> RequiredQualifications { get; set; } = [];
     public ICollection<TaskTool> RequiredTools { get; set; } = [];
     public TaskItem(string name, float durationHours)

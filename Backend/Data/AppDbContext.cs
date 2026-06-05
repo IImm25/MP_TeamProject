@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Backend.Data.Entitites;
 
 namespace Backend.Data;
 
@@ -19,6 +20,15 @@ public class AppDbContext : DbContext
 	public DbSet<TaskQualification> TaskQualifications => Set<TaskQualification>();
 
 	public DbSet<TaskTool> TaskTools => Set<TaskTool>();
+	public DbSet<Turbine> Turbines => Set<Turbine>();
+
+	public DbSet<Plan> Plans => Set<Plan>();
+	public DbSet<PlanBoat> Boats => Set<PlanBoat>();
+
+	public DbSet<BoatPerson> BoatPersons => Set<BoatPerson>();
+	public DbSet<BoatTool> BoolTools => Set<BoatTool>();
+	public DbSet<BoatSchedule> BoatSchedules => Set<BoatSchedule>();
+	public DbSet<TaskSchedule> TaskSchedules => Set<TaskSchedule>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -27,19 +37,9 @@ public class AppDbContext : DbContext
 		modelBuilder.Entity<PersonQualification>()
 			.HasKey(x => new { x.PersonId, x.QualificationId });
 
-		#region test
-		// NEU – Beziehungen explizit definieren
-		modelBuilder.Entity<PersonQualification>()
-			.HasOne(pq => pq.Person)
-			.WithMany(p => p.Qualifications)
-			.HasForeignKey(pq => pq.PersonId);
 
-		modelBuilder.Entity<PersonQualification>()
-			.HasOne(pq => pq.Qualification)
-			.WithMany()
-			.HasForeignKey(pq => pq.QualificationId);
-		#endregion
-
+	
+		
 
 		modelBuilder.Entity<TaskQualification>()
 			.HasKey(x => new { x.TaskItemId, x.QualificationId });
@@ -47,7 +47,54 @@ public class AppDbContext : DbContext
 		modelBuilder.Entity<TaskTool>()
 			.HasKey(x => new { x.TaskItemId, x.ToolId });
 
-		modelBuilder.Entity<Qualification>().HasData(
+
+		modelBuilder.Entity<PlanBoat>()
+			.HasKey(x => new { x.PlanId, x.BoatNumber });
+
+        modelBuilder.Entity<PlanBoat>()
+			.HasOne(x => x.Plan)
+			.WithMany(x => x.Boats)
+			.HasForeignKey(x => x.PlanId);
+
+        // BoatPerson
+        modelBuilder.Entity<BoatPerson>()
+			.HasKey(x => new { x.PlanId, x.BoatNumber, x.PersonId });
+
+		modelBuilder.Entity<BoatPerson>()
+			.HasOne(x => x.Boat)
+			.WithMany(x => x.Persons)
+			.HasForeignKey(x => new { x.PlanId, x.BoatNumber });
+
+		// BoatTool
+		modelBuilder.Entity<BoatTool>()
+			.HasKey(x => new { x.PlanId, x.BoatNumber, x.ToolId});
+
+		modelBuilder.Entity<BoatTool>()
+            .HasOne(x => x.Boat)
+			.WithMany(x => x.Tools)
+			.HasForeignKey(x => new { x.PlanId, x.BoatNumber });
+
+		// BoatSchedule
+        modelBuilder.Entity<BoatSchedule>()
+			.HasKey(x => new { x.PlanId, x.BoatNumber, x.TripNumber });
+
+        modelBuilder.Entity<BoatSchedule>()
+			.HasOne(x => x.Boat)
+			.WithMany(x => x.BoatSchedules)
+			.HasForeignKey(x => new { x.PlanId, x.BoatNumber });
+
+		// TaskSchedule
+        modelBuilder.Entity<TaskSchedule>()
+			.HasKey(x => new { x.PlanId, x.BoatNumber, x.TaskId });
+
+		modelBuilder.Entity<TaskSchedule>()
+			.HasOne(x => x.Boat)
+			.WithMany(x => x.TaskSchedules)
+			.HasForeignKey(x => new { x.PlanId, x.BoatNumber });
+
+
+
+        modelBuilder.Entity<Qualification>().HasData(
 			new Qualification { Id = 1, Name = "Electrical Systems Basics", Description = "Fundamental knowledge of electrical systems in wind turbines." },
 			new Qualification { Id = 2, Name = "High Voltage Safety", Description = "Safe handling and operation in high-voltage environments." },
 			new Qualification { Id = 3, Name = "Hydraulic Systems Maintenance", Description = "Inspection and repair of hydraulic turbine systems." },
