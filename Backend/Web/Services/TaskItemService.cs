@@ -67,7 +67,7 @@ namespace Backend.Web.Services
 			if (update.DurationHours is float hours) taskItem.DurationHours = hours;
 			if (update.IsCompleted != null) taskItem.IsCompleted = (bool)update.IsCompleted;
 			if (update.ExecutionIntervalStart != null) taskItem.ExecutionIntervalStart = (DateOnly)update.ExecutionIntervalStart;
-			if (update.ExecutionIntervalEnd != null) taskItem.ExecutionIntervalStart = (DateOnly)update.ExecutionIntervalEnd;
+			if (update.ExecutionIntervalEnd != null) taskItem.ExecutionIntervalEnd = (DateOnly)update.ExecutionIntervalEnd;
 			
 			if (update.LocationId != null)
 			{
@@ -76,7 +76,7 @@ namespace Backend.Web.Services
 				update.LocationId = turbine.Id;
 			}
 
-			if (update.RequiredTools != null)
+			if (update.RequiredTools!.Count != 0)
 			{
 				taskItem.RequiredTools.Clear();
 				foreach (var reqTool in update.RequiredTools)
@@ -89,7 +89,7 @@ namespace Backend.Web.Services
 				}
 			}
 
-			if (update.RequiredQualifications != null)
+			if (update.RequiredQualifications!.Count != 0)
 			{
 				taskItem.RequiredQualifications.Clear();
 				foreach (var reqQual in update.RequiredQualifications)
