@@ -7,6 +7,7 @@ import { Tool } from '../Models/tool';
 import { Employee, EmployeeSummary, EmployeeCreateUpdate } from '../Models/employee';
 import { Task, TaskSummary } from '../Models/task';
 import { Boat, PlanRequest, PlanResponse } from '../Models/boat';
+import { CreateTurbine, Turbine } from '../Models/turbine';
 
 @Injectable({
   providedIn: 'root',
@@ -97,6 +98,27 @@ export class HttpService {
 
   deleteTask(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/tasks/${id}`);
+  }
+
+  // --- Turbines ---
+  getAllTurbines(): Observable<Turbine[]> {
+    return this.http.get<Turbine[]>(`${this.apiUrl}/turbines`);
+  }
+
+  getTurbineById(id: number): Observable<Turbine> {
+    return this.http.get<Turbine>(`${this.apiUrl}/turbines/${id}`);
+  }
+
+  createTurbine(payload: CreateTurbine): Observable<Turbine> {
+    return this.http.post<Turbine>(`${this.apiUrl}/turbines`, payload);
+  }
+
+  updateTurbine(id: number, payload: CreateTurbine): Observable<Turbine> {
+    return this.http.patch<Turbine>(`${this.apiUrl}/turbines/${id}`, payload);
+  }
+
+  deleteTurbine(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/turbines/${id}`);
   }
 
   // --- Scheduler ---

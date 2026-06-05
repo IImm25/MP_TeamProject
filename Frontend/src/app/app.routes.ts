@@ -5,6 +5,7 @@ import { Qualifications } from './Ressources/Qualification/qualifications/qualif
 import { Scheduler } from './Schedule/scheduler/scheduler';
 import { ScheduleView } from './Schedule/schedule-view/schedule-view';
 import { Tools } from './Ressources/Tool/tools/tools';
+import { Turbines } from './Ressources/Turbine/turbines/turbines';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'scheduler', pathMatch: 'full' },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'employees', component: Employees },
   { path: 'qualifications', component: Qualifications },
   { path: 'tools', component: Tools },
+  { path: 'turbines', component: Turbines},
   { path: 'scheduler', component: Scheduler },
   { path: 'schedule-view', component: ScheduleView },
 ];

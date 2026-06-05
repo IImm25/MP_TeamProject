@@ -6,7 +6,6 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { environment } from '../../../../environments/environment';
 import { EmployeeCreateUpdate, Employee } from '../../../Models/employee';
 import { Qualification } from '../../../Models/qualification';
 import { HttpService } from '../../../Services/http-service';

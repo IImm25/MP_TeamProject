@@ -5,7 +5,6 @@ import { TableModule } from 'primeng/table';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogEmployee } from '../dialog-employee/dialog-employee';
-import { environment } from '../../../../environments/environment';
 import { Qualification } from '../../../Models/qualification';
 import { Employee as EmployeeModel, EmployeeSummary } from '../../../Models/employee';
 import { HttpService } from '../../../Services/http-service';
