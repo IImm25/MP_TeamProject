@@ -44,7 +44,7 @@ namespace Backend.Web.Controllers
             return Ok(await service.UpdateTurbine(id,updateInfo));
         }
 
-        [HttpDelete("")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<TurbineResponseDto>> DeleteTurbine(int id)
         {
             return Ok(await service.DeleteTurbine(id));
