@@ -8,7 +8,7 @@ namespace Backend.Data.Mappers
     {
         public TurbineMapper()
         {
-            CreateMap<Turbine,TurbineResponseDTO>();
+            CreateMap<Turbine,TurbineResponseDto>();
         }
     }
 }

@@ -7,9 +7,8 @@
         public float Latitude { get; set; }
         public float Longitude { get; set; }
 
-        public Turbine(int id, string name, float latitude, float longitude)
+        public Turbine(string name, float latitude, float longitude)
         {
-            Id = id;
             Name = name;
             Latitude = latitude;
             Longitude = longitude;

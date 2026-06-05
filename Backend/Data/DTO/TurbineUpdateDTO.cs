@@ -1,6 +1,6 @@
 ﻿namespace Backend.Data.DTO
 {
-    public record TurbineUpdateDTO (string? Name, float? Latitude, float? Longitude)
+    public record TurbineUpdateDto (string? Name, float? Latitude, float? Longitude)
     {
 
     }
