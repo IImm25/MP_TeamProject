@@ -40,9 +40,9 @@
 		id: int
 		name: string
 		durationHours: double/ float
-		finished: bool
-		earliestStart: string (ISO-8601)
-		latestFinish: string (ISO-8601)
+		isCompleted: bool
+		executionIntervalStart: string (ISO-8601)
+		executionIntervalEnd: string (ISO-8601)
 		requiredQualifications: TaskQualification[] (siehe aktuelles Backend)
 		requiredTools: TaskTool[] (siehe aktuelles Backend)
 		requiredTurbine: int (id of the turbine)
@@ -52,14 +52,14 @@
 		id: int,
 		name: string,
 		durationHours: double/ float
-		finished: bool
+		isCompleted: bool
 		
 	Schema CreateTask:
 		name: string
 		durationHours: double/ float
-		finished: bool
-		earliestStart: string (ISO-8601)
-		latestFinish: string (ISO-8601)
+		isCompleted: bool
+		executionIntervalStart: string (ISO-8601)
+		executionIntervalEnd: string (ISO-8601)
 		requiredQualifications: TaskQualification[]
 		requiredTools: TaskTool[]
 		location: int

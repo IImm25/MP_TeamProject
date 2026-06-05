@@ -19,6 +19,7 @@
                     .ThenInclude(tq => tq.Qualification)
                 .Include(t => t.RequiredTools)
                     .ThenInclude(tt => tt.Tool)
+                .Include(t => t.Location)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
@@ -29,6 +30,7 @@
                     .ThenInclude(tq => tq.Qualification)
                 .Include(t => t.RequiredTools)
                     .ThenInclude(tt => tt.Tool)
+                .Include (t => t.Location)
                 .ToListAsync();
         }
     }

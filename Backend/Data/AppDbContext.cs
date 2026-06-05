@@ -34,12 +34,14 @@ public class AppDbContext : DbContext
 	{
 		base.OnModelCreating(modelBuilder);
 
+		modelBuilder.Entity<TaskItem>()
+			.HasOne(l => l.Location)
+			.WithMany()
+			.HasForeignKey(l => l.LocationId);
+
+
 		modelBuilder.Entity<PersonQualification>()
 			.HasKey(x => new { x.PersonId, x.QualificationId });
-
-
-	
-		
 
 		modelBuilder.Entity<TaskQualification>()
 			.HasKey(x => new { x.TaskItemId, x.QualificationId });
@@ -47,6 +49,7 @@ public class AppDbContext : DbContext
 		modelBuilder.Entity<TaskTool>()
 			.HasKey(x => new { x.TaskItemId, x.ToolId });
 
+		// PlanBoat
 
 		modelBuilder.Entity<PlanBoat>()
 			.HasKey(x => new { x.PlanId, x.BoatNumber });
