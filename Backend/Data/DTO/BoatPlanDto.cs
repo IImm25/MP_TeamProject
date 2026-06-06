@@ -1,7 +1,8 @@
 ﻿namespace Backend.Data.DTO;
 
 public record BoatPlanDto(
-    List<TaskItemSummaryDto> TaskItems,
+    List<TaskScheduleDto> TaskSchedules,
+    List<BoatScheduleDto> BoatSchedules,
     List<PersonSummaryDto> Persons,
     List<TaskToolDto> Tools
     );

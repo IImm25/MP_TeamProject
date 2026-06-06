@@ -2,17 +2,13 @@
 	Schema DetailTurbine:
 		id: int
 		name: string
-		latitude: float/ double
-		longitude: float/ double
-	
-	Schema SummaryTurbine:
-		id: int
-		name: string
-		
+		latitude: float
+		longitude: float
+
 	Schema CreateTurbine:
 		name: string
-		latitude: float/ double
-		longitude: float/ double
+		latitude: float
+		longitude: float
 	
 	get: /turbines/{id}
 		response 200:
@@ -21,7 +17,7 @@
 	
 	get: /turbines
 		response 200:
-			SummaryTurbine[]
+			DetailTurbine[]
 	
 	post: /turbines
 		body:
@@ -44,9 +40,9 @@
 		id: int
 		name: string
 		durationHours: double/ float
-		finished: bool
-		earliestStart: string (ISO-8601)
-		latestFinish: string (ISO-8601)
+		isCompleted: bool
+		executionIntervalStart: string (ISO-8601)
+		executionIntervalEnd: string (ISO-8601)
 		requiredQualifications: TaskQualification[] (siehe aktuelles Backend)
 		requiredTools: TaskTool[] (siehe aktuelles Backend)
 		requiredTurbine: int (id of the turbine)
@@ -56,14 +52,14 @@
 		id: int,
 		name: string,
 		durationHours: double/ float
-		finished: bool
+		isCompleted: bool
 		
 	Schema CreateTask:
 		name: string
 		durationHours: double/ float
-		finished: bool
-		earliestStart: string (ISO-8601)
-		latestFinish: string (ISO-8601)
+		isCompleted: bool
+		executionIntervalStart: string (ISO-8601)
+		executionIntervalEnd: string (ISO-8601)
 		requiredQualifications: TaskQualification[]
 		requiredTools: TaskTool[]
 		location: int
@@ -94,6 +90,29 @@
 		response 200: no Content 
 		
 - GMPL Plan:
+	Schema BoatTool:
+		tool : TaskTool
+		requiredAmount : int
+
+	Schema BoatSchedule:
+		departure : TimeOnly
+		arrival : TimeOnly
+
+	Schema TaskSchedule:
+		task : TaskSummary
+		startTime : TimeOnly
+
+	Schema BoatPlan:
+		persons: SummaryPerson[]
+		tools : BoatTool[]
+		taskSchedules : TaskSchedule[]
+		boatSchedules : BoatSchedules[]
+
+	Schema Plan:
+		date : DateOnly (ISO-8601)
+		createdAt : DateTime
+		boats : BoatPlan[]
+
 	post: /plan
 		body:
 			maxTime: float/ double

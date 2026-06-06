@@ -5,5 +5,8 @@
         public int Id { get; set; }
         public string Name { get; set; } = "";
         public float DurationHours { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateOnly ExecutionIntervalStart { get; set; }
+        public DateOnly ExecutionIntervalEnd { get; set; }
     }
 }

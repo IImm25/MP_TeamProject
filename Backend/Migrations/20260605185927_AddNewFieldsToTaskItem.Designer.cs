@@ -3,6 +3,7 @@ using System;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260605185927_AddNewFieldsToTaskItem")]
+    partial class AddNewFieldsToTaskItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,10 +54,10 @@ namespace Backend.Migrations
                     b.Property<int>("TripNumber")
                         .HasColumnType("integer");
 
-                    b.Property<TimeOnly>("Arrival")
+                    b.Property<TimeOnly>("arrival")
                         .HasColumnType("time without time zone");
 
-                    b.Property<TimeOnly>("Departure")
+                    b.Property<TimeOnly>("departure")
                         .HasColumnType("time without time zone");
 
                     b.HasKey("PlanId", "BoatNumber", "TripNumber");
@@ -127,10 +130,10 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTimeOffset>("CreatedAt")
+                    b.Property<DateTimeOffset>("createdAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("Date")
+                    b.Property<DateOnly>("date")
                         .HasColumnType("date");
 
                     b.HasKey("Id");

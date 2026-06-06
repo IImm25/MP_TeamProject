@@ -3,6 +3,7 @@ using System;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260605115302_AddPlans")]
+    partial class AddPlans
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,10 +54,10 @@ namespace Backend.Migrations
                     b.Property<int>("TripNumber")
                         .HasColumnType("integer");
 
-                    b.Property<TimeOnly>("Arrival")
+                    b.Property<TimeOnly>("arrival")
                         .HasColumnType("time without time zone");
 
-                    b.Property<TimeOnly>("Departure")
+                    b.Property<TimeOnly>("departure")
                         .HasColumnType("time without time zone");
 
                     b.HasKey("PlanId", "BoatNumber", "TripNumber");
@@ -83,42 +86,6 @@ namespace Backend.Migrations
                     b.ToTable("BoolTools");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.Person", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Firstname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Lastname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Persons");
-                });
-
-            modelBuilder.Entity("Backend.Data.Entitites.PersonQualification", b =>
-                {
-                    b.Property<int>("PersonId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("QualificationId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("PersonId", "QualificationId");
-
-                    b.HasIndex("QualificationId");
-
-                    b.ToTable("PersonQualifications");
-                });
-
             modelBuilder.Entity("Backend.Data.Entitites.Plan", b =>
                 {
                     b.Property<int>("Id")
@@ -127,10 +94,10 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTimeOffset>("CreatedAt")
+                    b.Property<DateTimeOffset>("createdAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("Date")
+                    b.Property<DateOnly>("date")
                         .HasColumnType("date");
 
                     b.HasKey("Id");
@@ -151,7 +118,90 @@ namespace Backend.Migrations
                     b.ToTable("Boats");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.Qualification", b =>
+            modelBuilder.Entity("Backend.Data.Entitites.TaskSchedule", b =>
+                {
+                    b.Property<int>("PlanId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BoatNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<int>("TaskItemId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PlanId", "BoatNumber", "TaskId");
+
+                    b.HasIndex("TaskItemId");
+
+                    b.ToTable("TaskSchedules");
+                });
+
+            modelBuilder.Entity("Backend.Data.Entitites.Turbine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<float>("Latitude")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Longitude")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Turbines");
+                });
+
+            modelBuilder.Entity("Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Persons");
+                });
+
+            modelBuilder.Entity("PersonQualification", b =>
+                {
+                    b.Property<int>("PersonId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QualificationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PersonId", "QualificationId");
+
+                    b.HasIndex("QualificationId");
+
+                    b.ToTable("PersonQualifications");
+                });
+
+            modelBuilder.Entity("Qualification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -294,7 +344,7 @@ namespace Backend.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.TaskItem", b =>
+            modelBuilder.Entity("TaskItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -311,24 +361,16 @@ namespace Backend.Migrations
                     b.Property<DateOnly>("ExecutionIntervalStart")
                         .HasColumnType("date");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LocationId");
-
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.TaskQualification", b =>
+            modelBuilder.Entity("TaskQualification", b =>
                 {
                     b.Property<int>("TaskItemId")
                         .HasColumnType("integer");
@@ -346,31 +388,7 @@ namespace Backend.Migrations
                     b.ToTable("TaskQualifications");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.TaskSchedule", b =>
-                {
-                    b.Property<int>("PlanId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("BoatNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("integer");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time without time zone");
-
-                    b.Property<int>("TaskItemId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("PlanId", "BoatNumber", "TaskId");
-
-                    b.HasIndex("TaskItemId");
-
-                    b.ToTable("TaskSchedules");
-                });
-
-            modelBuilder.Entity("Backend.Data.Entitites.TaskTool", b =>
+            modelBuilder.Entity("TaskTool", b =>
                 {
                     b.Property<int>("TaskItemId")
                         .HasColumnType("integer");
@@ -388,7 +406,7 @@ namespace Backend.Migrations
                     b.ToTable("TaskTools");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.Tool", b =>
+            modelBuilder.Entity("Tool", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -408,32 +426,9 @@ namespace Backend.Migrations
                     b.ToTable("Tools");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.Turbine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<float>("Latitude")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Longitude")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Turbines");
-                });
-
             modelBuilder.Entity("Backend.Data.Entitites.BoatPerson", b =>
                 {
-                    b.HasOne("Backend.Data.Entitites.Person", "Person")
+                    b.HasOne("Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -463,7 +458,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entitites.BoatTool", b =>
                 {
-                    b.HasOne("Backend.Data.Entitites.Tool", "Tool")
+                    b.HasOne("Tool", "Tool")
                         .WithMany()
                         .HasForeignKey("ToolId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -480,25 +475,6 @@ namespace Backend.Migrations
                     b.Navigation("Tool");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.PersonQualification", b =>
-                {
-                    b.HasOne("Backend.Data.Entitites.Person", "Person")
-                        .WithMany("Qualifications")
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Data.Entitites.Qualification", "Qualification")
-                        .WithMany()
-                        .HasForeignKey("QualificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
-
-                    b.Navigation("Qualification");
-                });
-
             modelBuilder.Entity("Backend.Data.Entitites.PlanBoat", b =>
                 {
                     b.HasOne("Backend.Data.Entitites.Plan", "Plan")
@@ -510,39 +486,9 @@ namespace Backend.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.TaskItem", b =>
-                {
-                    b.HasOne("Backend.Data.Entitites.Turbine", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-                });
-
-            modelBuilder.Entity("Backend.Data.Entitites.TaskQualification", b =>
-                {
-                    b.HasOne("Backend.Data.Entitites.Qualification", "Qualification")
-                        .WithMany()
-                        .HasForeignKey("QualificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Data.Entitites.TaskItem", "TaskItem")
-                        .WithMany("RequiredQualifications")
-                        .HasForeignKey("TaskItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Qualification");
-
-                    b.Navigation("TaskItem");
-                });
-
             modelBuilder.Entity("Backend.Data.Entitites.TaskSchedule", b =>
                 {
-                    b.HasOne("Backend.Data.Entitites.TaskItem", "TaskItem")
+                    b.HasOne("TaskItem", "TaskItem")
                         .WithMany()
                         .HasForeignKey("TaskItemId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -559,15 +505,53 @@ namespace Backend.Migrations
                     b.Navigation("TaskItem");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.TaskTool", b =>
+            modelBuilder.Entity("PersonQualification", b =>
                 {
-                    b.HasOne("Backend.Data.Entitites.TaskItem", "TaskItem")
+                    b.HasOne("Person", "Person")
+                        .WithMany("Qualifications")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Qualification", "Qualification")
+                        .WithMany()
+                        .HasForeignKey("QualificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+
+                    b.Navigation("Qualification");
+                });
+
+            modelBuilder.Entity("TaskQualification", b =>
+                {
+                    b.HasOne("Qualification", "Qualification")
+                        .WithMany()
+                        .HasForeignKey("QualificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskItem", "TaskItem")
+                        .WithMany("RequiredQualifications")
+                        .HasForeignKey("TaskItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Qualification");
+
+                    b.Navigation("TaskItem");
+                });
+
+            modelBuilder.Entity("TaskTool", b =>
+                {
+                    b.HasOne("TaskItem", "TaskItem")
                         .WithMany("RequiredTools")
                         .HasForeignKey("TaskItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Data.Entitites.Tool", "Tool")
+                    b.HasOne("Tool", "Tool")
                         .WithMany()
                         .HasForeignKey("ToolId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -576,11 +560,6 @@ namespace Backend.Migrations
                     b.Navigation("TaskItem");
 
                     b.Navigation("Tool");
-                });
-
-            modelBuilder.Entity("Backend.Data.Entitites.Person", b =>
-                {
-                    b.Navigation("Qualifications");
                 });
 
             modelBuilder.Entity("Backend.Data.Entitites.Plan", b =>
@@ -599,7 +578,12 @@ namespace Backend.Migrations
                     b.Navigation("Tools");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.TaskItem", b =>
+            modelBuilder.Entity("Person", b =>
+                {
+                    b.Navigation("Qualifications");
+                });
+
+            modelBuilder.Entity("TaskItem", b =>
                 {
                     b.Navigation("RequiredQualifications");
 
