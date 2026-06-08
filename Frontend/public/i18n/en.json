@@ -23,12 +23,18 @@
     "NAME": "Name",
     "DURATION": "Duration",
     "QUALIFICATION": "Qualification",
+    "START_DATE": "Start Date",
+    "END_DATE": "End Date",
+    "LOCATION": "Location (Turbine)",
     "DIALOG": {
       "NEW": "New Task",
       "EDIT": "Edit Task",
       "DETAIL": "View Task",
       "CORE": "General",
       "NAME_PLACEHOLDER": "Enter a task name!",
+      "START_DATE_PLACEHOLDER": "MM/DD/YYYY",
+      "END_DATE_PLACEHOLDER": "MM/DD/YYYY",
+      "LOCATION_PLACEHOLDER": "Select a wind turbine!",
       "QUALIFICATIONS": "Qualifications",
       "QUALIFICATION": {
         "NEW": "New Qualification",
@@ -51,7 +57,10 @@
     },
     "VALIDATION": {
       "NAME_REQUIRED": "Name is required",
-      "DURATION_REQUIRED": "Duration is required",
+      "DURATION_REQUIRED": "A minimum duration of 1 minute or 1 hour is required",
+      "START_DATE_REQUIRED": "Start date is required",
+      "END_DATE_REQUIRED": "End date is required",
+      "LOCATION_REQUIRED": "A location must be assigned",
       "QUALIFICATION_REQUIRED": "At least one qualification is required",
       "TOOL_REQUIRED": "At least one tool is required"
     }

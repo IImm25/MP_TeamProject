@@ -154,6 +154,17 @@ label {
   border-radius:  0 0 0 var(--border-radius);
 }
 
+.row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.row .field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .field {
   display: flex;
   flex-direction: column;

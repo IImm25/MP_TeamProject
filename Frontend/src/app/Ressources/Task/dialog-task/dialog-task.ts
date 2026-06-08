@@ -9,7 +9,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { Task, TaskQualification, TaskTool } from '../../../Models/task';
+import { Task, TaskCreate, TaskQualification, TaskTool, TaskUpdate } from '../../../Models/task';
 import { DialogModule } from 'primeng/dialog';
 import { StepperModule } from 'primeng/stepper';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -22,10 +22,12 @@ import { Qualification } from '../../../Models/qualification';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { DialogTaskTool } from '../dialog-task-tool/dialog-task-tool';
-import { environment } from '../../../../environments/environment';
 import { DialogTaskQualification } from '../dialog-task-qualification/dialog-task-qualification';
 import { Tool } from '../../../Models/tool';
 import { HttpService } from '../../../Services/http-service';
+import { SelectModule } from 'primeng/select';
+import { DatePickerModule } from 'primeng/datepicker';
+import { Turbine } from '../../../Models/turbine';
 
 @Component({
   selector: 'app-dialog-task',
@@ -42,6 +44,8 @@ import { HttpService } from '../../../Services/http-service';
     TableModule,
     DialogTaskTool,
     DialogTaskQualification,
+    SelectModule,
+    DatePickerModule,
   ],
   templateUrl: './dialog-task.html',
   styleUrl: './dialog-task.css',
@@ -53,20 +57,45 @@ export class DialogTask implements OnInit {
   @Output() taskSaved = new EventEmitter<void>();
 
   @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' = 'New';
+
   @Input() set selectedTask(val: Task | null) {
     this.currentTask = val;
 
     if (val) {
-      console.log(val);
       const dHours = Math.floor(val.durationHours);
       const dMinutes = Math.round((val.durationHours - dHours) * 60);
+
+      const matchingTurbine = this.allTurbines().find(t => t.id === val.location?.id) || val.location;
+
+      let startDate: Date | null = null;
+      let endDate: Date | null = null;
+
+      // FIX: C#-Standard-Minimalwerte (0001-01-01) abfangen!
+      if (val.executionIntervalStart && !val.executionIntervalStart.startsWith('0001')) {
+        // Wir splitten NUR das reine Datum vor dem "T" ab, falls das Backend doch eine Uhrzeit mitschickt
+        const pureDate = val.executionIntervalStart.split('T')[0];
+        const [year, month, day] = pureDate.split('-').map(Number);
+        // Konstruktor mit numerischen Werten erzeugt ein absolut lokales Datum ohne UTC-Verschiebung
+        startDate = new Date(year, month - 1, day);
+      }
+
+      if (val.executionIntervalEnd && !val.executionIntervalEnd.startsWith('0001')) {
+        const pureDate = val.executionIntervalEnd.split('T')[0];
+        const [year, month, day] = pureDate.split('-').map(Number);
+        endDate = new Date(year, month - 1, day);
+      }
+
       this.taskForm.patchValue({
         name: val.name,
         durationHours: dHours,
         durationMinutes: dMinutes,
-        qualifications: val.requiredQualifications,
-        tools: val.requiredTools,
+        location: matchingTurbine,
+        executionIntervalStart: startDate as any,
+        executionIntervalEnd: endDate as any,
+        qualifications: val.requiredQualifications || [],
+        tools: val.requiredTools || [],
       });
+
       if (this.type === 'Detail') {
         this.taskForm.disable();
       } else {
@@ -77,6 +106,9 @@ export class DialogTask implements OnInit {
         name: '',
         durationHours: 0,
         durationMinutes: 0,
+        location: null,
+        executionIntervalStart: null,
+        executionIntervalEnd: null,
         qualifications: [],
         tools: [],
       });
@@ -87,7 +119,6 @@ export class DialogTask implements OnInit {
   }
 
   visible = model<boolean>(false);
-
   currentTask: Task | null = null;
 
   allQualifications: WritableSignal<Qualification[]> = signal([]);
@@ -99,22 +130,36 @@ export class DialogTask implements OnInit {
   ToolType: WritableSignal<'Edit' | 'New'> = signal('New');
   selectedTool: WritableSignal<TaskTool | null> = signal(null);
 
+  allTurbines: WritableSignal<Turbine[]> = signal([]);
+  allTools: WritableSignal<Tool[]> = signal([]);
+
   taskForm = this.formBuilder.group({
     name: ['', Validators.required],
     durationHours: [0],
     durationMinutes: [0, [Validators.max(59)]],
+    location: [null as Turbine | null, Validators.required],
+    executionIntervalStart: [''],
+    executionIntervalEnd: [''],
     qualifications: [[] as TaskQualification[], Validators.required],
     tools: [[] as TaskTool[], Validators.required],
   });
 
-  allTools: WritableSignal<Tool[]> = signal([]);
-
   ngOnInit(): void {
+    console.log("Init", this.currentTask);
     this.http.getQualifications().subscribe((qualifications) => {
       this.allQualifications.set(qualifications);
     });
     this.http.getTools().subscribe((tools) => {
       this.allTools.set(tools);
+    });
+    this.http.getAllTurbines().subscribe((turbines) => {
+      this.allTurbines.set(turbines);
+      if (this.currentTask) {
+        const matchingTurbine = turbines.find(t => t.id === this.currentTask!.location?.id);
+        if (matchingTurbine) {
+          this.taskForm.patchValue({ location: matchingTurbine });
+        }
+      }
     });
   }
 
@@ -125,10 +170,12 @@ export class DialogTask implements OnInit {
         const nameControl = this.taskForm.controls.name;
         const hControl = this.taskForm.controls.durationHours;
         const mControl = this.taskForm.controls.durationMinutes;
+        const locControl = this.taskForm.controls.location;
 
         if (nameControl?.invalid) nameControl.markAsTouched();
         if (hControl?.invalid) hControl.markAsTouched();
         if (mControl?.invalid) mControl.markAsTouched();
+        if (locControl?.invalid) locControl.markAsTouched();
 
         const h = hControl?.value || 0;
         const m = mControl?.value || 0;
@@ -139,20 +186,11 @@ export class DialogTask implements OnInit {
           mControl?.setErrors({ minDuration: true });
           hControl.markAsTouched();
           mControl.markAsTouched();
-          hControl.updateValueAndValidity();
-          mControl.updateValueAndValidity();
-        } else {
-          if (hControl?.hasError('minDuration')) {
-            const { minDuration, ...rest } = hControl.errors!;
-            hControl.setErrors(Object.keys(rest).length ? rest : null);
-          }
-          if (mControl?.hasError('minDuration')) {
-            const { minDuration, ...rest } = mControl.errors!;
-            mControl.setErrors(Object.keys(rest).length ? rest : null);
-          }
         }
+
         return (
           nameControl?.valid === true &&
+          locControl?.valid === true &&
           hControl?.valid === true &&
           mControl?.valid === true &&
           isDurationValid
@@ -184,14 +222,24 @@ export class DialogTask implements OnInit {
     const val = this.taskForm.value;
     const totalDuration = (val.durationHours || 0) + (val.durationMinutes || 0) / 60;
 
-    const payload: Partial<Task> = {
-      name: val.name || '',
-      durationHours: totalDuration,
-      requiredQualifications: val.qualifications || [],
-      requiredTools: val.tools || [],
-    };
+    const targetLocationId = val.location ? (val.location as unknown as Turbine).id : 0;
+
+    const formattedStartDate = this.formatDateToApi(val.executionIntervalStart || new Date());
+    const formattedEndDate = this.formatDateToApi(val.executionIntervalEnd || new Date());
 
     if (this.type === 'Edit' && this.currentTask) {
+      const payload: TaskUpdate = {
+        name: val.name || '',
+        durationHours: totalDuration,
+        locationId: targetLocationId,
+        executionIntervalStart: formattedStartDate,
+        executionIntervalEnd: formattedEndDate,
+        requiredQualifications: val.qualifications || [],
+        requiredTools: val.tools || [],
+      };
+
+      console.log("Edit", payload);
+
       this.http.updateTask(this.currentTask.id, payload).subscribe({
         next: () => {
           this.taskSaved.emit();
@@ -199,6 +247,18 @@ export class DialogTask implements OnInit {
         },
       });
     } else if (this.type === 'New') {
+      const payload: TaskCreate = {
+        name: val.name || '',
+        durationHours: totalDuration,
+        locationId: targetLocationId,
+        executionIntervalStart: formattedStartDate,
+        executionIntervalEnd: formattedEndDate,
+        requiredQualifications: val.qualifications || [],
+        requiredTools: val.tools || [],
+      };
+
+      console.log("New", payload);
+
       this.http.createTask(payload).subscribe({
         next: () => {
           this.taskSaved.emit();
@@ -256,6 +316,7 @@ export class DialogTask implements OnInit {
     const updatedQualifications = currentQualifications.filter((_, i) => i !== index);
     this.taskForm.patchValue({ qualifications: updatedQualifications });
   }
+
   addQualification() {
     this.qualificationDialogVisible.set(true);
     this.QualificationType.set('New');
@@ -294,5 +355,25 @@ export class DialogTask implements OnInit {
   getQualificationName(id: number): string {
     const q = this.allQualifications().find((item) => item.id === id);
     return q ? q.name : 'Unbekannt';
+  }
+
+  private formatDateToApi(dateVal: any): string {
+    if (!dateVal) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Falls es bereits ein Date-Objekt ist (z.B. vom p-datepicker)
+    const date = dateVal instanceof Date ? dateVal : new Date(dateVal);
+
+    // Lokale Komponenten extrahieren, um Zeitzonen-Verschiebungen zu verhindern
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 }
