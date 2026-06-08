@@ -60,6 +60,7 @@
       "DURATION_REQUIRED": "A minimum duration of 1 minute or 1 hour is required",
       "START_DATE_REQUIRED": "Start date is required",
       "END_DATE_REQUIRED": "End date is required",
+      "DATE_NOT_VALID": "Start date must be before end date",
       "LOCATION_REQUIRED": "A location must be assigned",
       "QUALIFICATION_REQUIRED": "At least one qualification is required",
       "TOOL_REQUIRED": "At least one tool is required"

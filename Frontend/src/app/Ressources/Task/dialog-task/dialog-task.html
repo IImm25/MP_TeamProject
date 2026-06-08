@@ -119,6 +119,12 @@
                     }
                   </div>
                 </div>
+                @if (!dateValid()) {
+                      <div class="error-message">
+                        <i class="pi pi-exclamation-circle"></i>
+                        <span>{{ 'TASKS.VALIDATION.DATE_NOT_VALID' | translate }}</span>
+                      </div>
+                    }
               </div>
 
               <div class="field">

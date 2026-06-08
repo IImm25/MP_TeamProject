@@ -65,17 +65,15 @@ export class DialogTask implements OnInit {
       const dHours = Math.floor(val.durationHours);
       const dMinutes = Math.round((val.durationHours - dHours) * 60);
 
-      const matchingTurbine = this.allTurbines().find(t => t.id === val.location?.id) || val.location;
+      const matchingTurbine =
+        this.allTurbines().find((t) => t.id === val.location?.id) || val.location;
 
       let startDate: Date | null = null;
       let endDate: Date | null = null;
 
-      // FIX: C#-Standard-Minimalwerte (0001-01-01) abfangen!
       if (val.executionIntervalStart && !val.executionIntervalStart.startsWith('0001')) {
-        // Wir splitten NUR das reine Datum vor dem "T" ab, falls das Backend doch eine Uhrzeit mitschickt
         const pureDate = val.executionIntervalStart.split('T')[0];
         const [year, month, day] = pureDate.split('-').map(Number);
-        // Konstruktor mit numerischen Werten erzeugt ein absolut lokales Datum ohne UTC-Verschiebung
         startDate = new Date(year, month - 1, day);
       }
 
@@ -90,8 +88,8 @@ export class DialogTask implements OnInit {
         durationHours: dHours,
         durationMinutes: dMinutes,
         location: matchingTurbine,
-        executionIntervalStart: startDate as any,
-        executionIntervalEnd: endDate as any,
+        executionIntervalStart: startDate,
+        executionIntervalEnd: endDate,
         qualifications: val.requiredQualifications || [],
         tools: val.requiredTools || [],
       });
@@ -133,19 +131,21 @@ export class DialogTask implements OnInit {
   allTurbines: WritableSignal<Turbine[]> = signal([]);
   allTools: WritableSignal<Tool[]> = signal([]);
 
+  dateValid: WritableSignal<boolean> = signal(true);
+
   taskForm = this.formBuilder.group({
     name: ['', Validators.required],
     durationHours: [0],
     durationMinutes: [0, [Validators.max(59)]],
     location: [null as Turbine | null, Validators.required],
-    executionIntervalStart: [''],
-    executionIntervalEnd: [''],
+    executionIntervalStart: [null as Date | null, Validators.required],
+    executionIntervalEnd: [null as Date | null, Validators.required],
     qualifications: [[] as TaskQualification[], Validators.required],
     tools: [[] as TaskTool[], Validators.required],
   });
 
   ngOnInit(): void {
-    console.log("Init", this.currentTask);
+    console.log('Init', this.currentTask);
     this.http.getQualifications().subscribe((qualifications) => {
       this.allQualifications.set(qualifications);
     });
@@ -155,7 +155,7 @@ export class DialogTask implements OnInit {
     this.http.getAllTurbines().subscribe((turbines) => {
       this.allTurbines.set(turbines);
       if (this.currentTask) {
-        const matchingTurbine = turbines.find(t => t.id === this.currentTask!.location?.id);
+        const matchingTurbine = turbines.find((t) => t.id === this.currentTask!.location?.id);
         if (matchingTurbine) {
           this.taskForm.patchValue({ location: matchingTurbine });
         }
@@ -171,6 +171,19 @@ export class DialogTask implements OnInit {
         const hControl = this.taskForm.controls.durationHours;
         const mControl = this.taskForm.controls.durationMinutes;
         const locControl = this.taskForm.controls.location;
+
+        let startDate: Date = new Date();
+        let endDate: Date = new Date();
+
+        if (this.taskForm.controls.executionIntervalStart) {
+          startDate = this.taskForm.controls.executionIntervalStart.getRawValue()!;
+        }
+
+        if (this.taskForm.controls.executionIntervalEnd) {
+          endDate = this.taskForm.controls.executionIntervalEnd.getRawValue()!;
+        }
+
+        this.dateValid.set(startDate <= endDate);
 
         if (nameControl?.invalid) nameControl.markAsTouched();
         if (hControl?.invalid) hControl.markAsTouched();
@@ -193,7 +206,8 @@ export class DialogTask implements OnInit {
           locControl?.valid === true &&
           hControl?.valid === true &&
           mControl?.valid === true &&
-          isDurationValid
+          isDurationValid &&
+          this.dateValid()
         );
       case 2:
         if (this.taskForm.controls.qualifications.invalid)
@@ -238,7 +252,7 @@ export class DialogTask implements OnInit {
         requiredTools: val.tools || [],
       };
 
-      console.log("Edit", payload);
+      console.log('Edit', payload);
 
       this.http.updateTask(this.currentTask.id, payload).subscribe({
         next: () => {
@@ -257,7 +271,7 @@ export class DialogTask implements OnInit {
         requiredTools: val.tools || [],
       };
 
-      console.log("New", payload);
+      console.log('New', payload);
 
       this.http.createTask(payload).subscribe({
         next: () => {
