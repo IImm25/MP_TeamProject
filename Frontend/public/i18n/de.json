@@ -23,12 +23,18 @@
     "NAME": "Bezeichnung",
     "DURATION": "Dauer",
     "QUALIFICATION": "Qualifikation",
+    "START_DATE": "Startdatum",
+    "END_DATE": "Enddatum",
+    "LOCATION": "Standort (Windrad)",
     "DIALOG": {
       "NEW": "Neue Aufgabe",
       "EDIT": "Aufgabe bearbeiten",
       "DETAIL": "Aufgabe anzeigen",
       "CORE": "Allgemein",
       "NAME_PLACEHOLDER": "Gib eine Aufgabenbezeichnung ein!",
+      "START_DATE_PLACEHOLDER": "TT.MM.JJJJ",
+      "END_DATE_PLACEHOLDER": "TT.MM.JJJJ",
+      "LOCATION_PLACEHOLDER": "Wähle ein Windrad aus!",
       "QUALIFICATIONS": "Qualifikationen",
       "QUALIFICATION": {
         "NEW": "Neue Qualifikation",
@@ -51,7 +57,11 @@
     },
     "VALIDATION": {
       "NAME_REQUIRED": "Name ist erforderlich",
-      "DURATION_REQUIRED": "Dauer ist erforderlich",
+      "DURATION_REQUIRED": "Mindestdauer von 1 Minute oder 1 Stunde ist erforderlich",
+      "START_DATE_REQUIRED": "Startdatum ist erforderlich",
+      "END_DATE_REQUIRED": "Enddatum ist erforderlich",
+      "DATE_NOT_VALID": "Startdatum muss vor dem Enddatum liegen",
+      "LOCATION_REQUIRED": "Ein Standort muss zugewiesen werden",
       "QUALIFICATION_REQUIRED": "Mindestens eine Qualifikation wird benötigt",
       "TOOL_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
     }

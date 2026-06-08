@@ -5,13 +5,4 @@
   gap: 1.25rem;
 }
 
-.name-row {
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-}
 
-.name-row .field {
-  flex: 1;
-  margin-bottom: 0;
-}

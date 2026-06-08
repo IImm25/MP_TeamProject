@@ -1,5 +1,27 @@
 <p-menubar [model]="items" [autoDisplay]="false" >
   <ng-template pTemplate="start">
-    <img routerLink="/scheduler" src="logo.png" alt="Logo" height="30" class="navbar-logo" />
+    <img routerLink="/scheduler" src="logo.png" alt="Company logo - navigate to scheduler" height="30" class="navbar-logo" />
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <div class="navbar-end-container">
+      <div class="language-toggle">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="currentLang() === 'de'"
+          (click)="changeLang('de')">
+          DE
+        </button>
+        <span class="lang-divider">|</span>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="currentLang() === 'en'"
+          (click)="changeLang('en')">
+          EN
+        </button>
+      </div>
+    </div>
   </ng-template>
 </p-menubar>

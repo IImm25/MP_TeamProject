@@ -12,6 +12,10 @@ let tasks: Task[] = [
     id: 1,
     name: 'Getriebewartung',
     durationHours: 4.5,
+    isCompleted: true,
+    executionIntervalStart: '2022-01-01',
+    executionIntervalEnd: '2022-01-02',
+    location: { id: 1, name: 'Windrad 1', latitude: 52.520008, longitude: 13.404954 },
     requiredQualifications: [{ qualificationId: 1, requiredAmount: 1 }],
     requiredTools: [{ toolId: 1, requiredAmount: 1 }],
   },
@@ -19,6 +23,10 @@ let tasks: Task[] = [
     id: 2,
     name: 'Rotorblatt Reparatur',
     durationHours: 8,
+    isCompleted: false,
+    executionIntervalStart: '2022-01-03',
+    executionIntervalEnd: '2022-01-04',
+    location: { id: 2, name: 'Windrad 2', latitude: 52.520008, longitude: 13.404954 },
     requiredQualifications: [{ qualificationId: 2, requiredAmount: 2 }],
     requiredTools: [{ toolId: 2, requiredAmount: 1 }],
   },
@@ -152,6 +160,9 @@ export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
         id: t.id,
         name: t.name,
         durationHours: t.durationHours,
+        isCompleted: t.isCompleted,
+        executionIntervalStart: t.executionIntervalStart,
+        executionIntervalEnd: t.executionIntervalEnd,
       }));
       return of(new HttpResponse({ status: 200, body: summaries }));
     }

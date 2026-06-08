@@ -2,12 +2,7 @@
   height: 100%;
 }
 
-.duration-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.duration-row p-inputNumber {
+.row p-inputNumber {
   flex: 1;
 }
 
@@ -22,4 +17,9 @@
 
 :host ::ng-deep .step-content {
   padding-bottom: 6rem !important;
+}
+
+body ::ng-deep .p-datepicker.open-upward {
+  transform: translateY(calc(-100% - 2.5rem)) !important;
+  transform-origin: bottom center !important;
 }
