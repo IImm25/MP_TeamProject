@@ -170,8 +170,8 @@ s.t. ChainCompleteFirst{b in BOATS, ta in TASKS}:
     = taskOnBoat[b, ta];
 
 # exactly one last task per used boat
-s.t. OneLastTask{b in BOATS}:
-    sum{ta in TASKS} isLast[b, ta] = boatUsage[b];
+/*s.t. OneLastTask{b in BOATS}:
+    sum{ta in TASKS} isLast[b, ta] = boatUsage[b];*/
 
 # exactly one first task per used boat
 s.t. OneFirstTask{b in BOATS}:
@@ -179,25 +179,19 @@ s.t. OneFirstTask{b in BOATS}:
 
 # --- isFirst/isLast helpers (for time constraints) ---
 
-# isFirst = 1 only if task is on boat AND has no predecessor
-s.t. DefIsFirst{b in BOATS, ta in TASKS}:
-    isFirst[b, ta] <= taskOnBoat[b, ta];
+# isFirst = 1 only if task is on boat AND has no predecessor (upper bound and lower bound)
+s.t. DefIsFirstUB{b in BOATS, ta in TASKS}:
+    isFirst[b, ta] <= taskOnBoat[b, ta] - sum{ta2 in TASKS: ta2 <> ta} after[b, ta2, ta];
 
-s.t. DefIsFirst2{b in BOATS, ta in TASKS}:
-    isFirst[b, ta] <= 1 - sum{ta2 in TASKS: ta2 <> ta} after[b, ta2, ta];
-
-s.t. DefIsFirst3{b in BOATS, ta in TASKS}:
+s.t. DefIsFirstLB{b in BOATS, ta in TASKS}:
     isFirst[b, ta] >= taskOnBoat[b, ta] 
                     - sum{ta2 in TASKS: ta2 <> ta} after[b, ta2, ta];
 
 # isLast = 1 only if task is on boat AND has no successor
-s.t. DefIsLast{b in BOATS, ta in TASKS}:
-    isLast[b, ta] <= taskOnBoat[b, ta];
+s.t. DefIsLastUB{b in BOATS, ta in TASKS}:
+    isLast[b, ta] <= taskOnBoat[b, ta] - sum{ta2 in TASKS: ta2 <> ta} after[b, ta, ta2];
 
-s.t. DefIsLast2{b in BOATS, ta in TASKS}:
-    isLast[b, ta] <= 1 - sum{ta2 in TASKS: ta2 <> ta} after[b, ta, ta2];
-
-s.t. DefIsLast3{b in BOATS, ta in TASKS}:
+s.t. DefIsLastLB{b in BOATS, ta in TASKS}:
     isLast[b, ta] >= taskOnBoat[b, ta] 
                    - sum{ta2 in TASKS: ta2 <> ta} after[b, ta, ta2];
 
@@ -237,6 +231,10 @@ s.t. CalcTravelToHarbor{b in BOATS, ta in TASKS}:
 
 
 # --- havarie replanning constraints ---
+
+# fixed first tasks must be marked as such (so no predecessor is allowed)
+s.t. KeepFixedFirst{ta in TASKS: fixedBoat[ta] > 0 and fixedOrder[ta] = 1}:
+    isFirst[fixedBoat[ta], ta] = 1;
 
 # fixed tasks stay on their assigned boat
 s.t. KeepFixedTasks{ta in TASKS: fixedBoat[ta] > 0}:
@@ -281,7 +279,7 @@ maximize Combined:
     + sum{b in BOATS, ta in TASKS} (duration[ta] * taskOnBoat[b, ta]) * 10
 
     # minimize total start times (encourages earlier scheduling of tasks, can help with makespan if priorities are equal)
-    - sum{b in BOATS, ta in TASKS} startTime[b, ta];  # minimize start times
+    - sum{b in BOATS, ta in TASKS} (taskPrio[ta] * startTime[b, ta]);  # minimize start times
 
 
 
