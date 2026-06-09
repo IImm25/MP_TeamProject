@@ -1,4 +1,6 @@
-﻿using Backend.Data.Repositories;
+﻿using Backend.Data.Entitites;
+using Backend.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Backend.Web.Repositories.Tests
@@ -9,22 +11,29 @@ namespace Backend.Web.Repositories.Tests
         private ITaskItemRepository GetRepo()
                     => Scope.ServiceProvider.GetRequiredService<ITaskItemRepository>();
 
+        private DateOnly intervalStart = new DateOnly();
+        private DateOnly intervalEnd = new DateOnly();
+
         [TestMethod()]
         public async Task GivenTaskWithRelationsInDb_WhenGetFullByIdAsyncCalled_ThenAllNavigationPropertiesAreLoaded()
         {
             string expectedQualName = "qualName";
             string expectedToolName = "toolName";
+
             var repo = GetRepo();
 
             var qual = new Qualification(expectedQualName, "");
             var tool = new Tool(expectedToolName, 1);
+            var turbine = new Turbine() { Name = "turbine" };
             Db.Qualifications.Add(qual);
             Db.Tools.Add(tool);
+            Db.Turbines.Add(turbine);
             await Db.SaveChangesAsync();
 
-            var task = new TaskItem("taskName", 6);
+            var task = new TaskItem("taskName", 6, intervalStart, intervalEnd);
             task.RequiredQualifications.Add(new TaskQualification { QualificationId = qual.Id, RequiredAmount = 1 });
             task.RequiredTools.Add(new TaskTool { ToolId = tool.Id, RequiredAmount = 1 });
+            task.LocationId = turbine.Id;
 
             await repo.AddAsync(task);
 
@@ -51,7 +60,12 @@ namespace Backend.Web.Repositories.Tests
         public async Task GivenTaskWithoutRelations_WhenGetFullByIdAsyncCalled_ThenReturnsTaskWithEmptyCollections()
         {
             var repo = GetRepo();
-            var task = new TaskItem("noQualNoToolTask", 2);
+            var turbine = new Turbine() { Name = "turbine" };
+            Db.Turbines.Add(turbine);
+            await Db.SaveChangesAsync();
+
+            var task = new TaskItem("noQualNoToolTask", 2, intervalStart, intervalEnd);
+            task.LocationId = turbine.Id;
             await repo.AddAsync(task);
 
             var result = await repo.GetFullByIdAsync(task.Id);
@@ -67,13 +81,17 @@ namespace Backend.Web.Repositories.Tests
             var repo = GetRepo();
             var qual = new Qualification("Safety", "Desc");
             Db.Qualifications.Add(qual);
+            var turbine = new Turbine() { Name = "turbine" };
+            Db.Turbines.Add(turbine);
             await Db.SaveChangesAsync();
 
-            var task1 = new TaskItem("Task 1", 1);
+            var task1 = new TaskItem("Task 1", 1, intervalStart, intervalEnd);
             task1.RequiredQualifications.Add(new TaskQualification { QualificationId = qual.Id });
+            task1.LocationId = turbine.Id;
 
-            var task2 = new TaskItem("Task 2", 2);
+            var task2 = new TaskItem("Task 2", 2, intervalStart, intervalEnd);
             task2.RequiredQualifications.Add(new TaskQualification { QualificationId = qual.Id });
+            task2.LocationId = turbine.Id;
 
             await repo.AddAsync(task1);
             await repo.AddAsync(task2);

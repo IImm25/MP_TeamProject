@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Backend.Data.Entitites;
 
 namespace Backend.Data.Repositories.Tests
 {
