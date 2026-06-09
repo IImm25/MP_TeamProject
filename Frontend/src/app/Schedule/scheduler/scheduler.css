@@ -1,19 +1,22 @@
-.header-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
+.scheduler-form-container {
+  margin-top: 1.5rem;
 }
 
-.header-row {
+.button-wrapper {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  width: 100%;
 }
 
-:host ::ng-deep .step-footer {
-  background-color: var(--bg-color) !important;
+.button-wrapper p-button {
+  width: auto !important;
+}
+
+:host ::ng-deep .custom-scheduler-panel .p-panel-header {
+  display: none !important;
+}
+
+:host ::ng-deep .custom-scheduler-panel .p-panel-footer {
+  display: none !important;
 }

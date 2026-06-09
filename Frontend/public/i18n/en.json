@@ -153,22 +153,16 @@
   },
   "SCHEDULER": {
     "TITLE": "Scheduler",
-    "STEPS": {
-      "CORE": "General",
-      "TASKS": "Tasks",
-      "EMPLOYEES": "Employees",
-      "TOOLS": "Tools"
-    },
-    "CORE": {
-      "MAX_WORK_TIME": "Maximum Working Time (h)",
-      "BOAT_AMOUNT": "Number of Boats"
-    },
+    "HEADER": "Schedulesettings",
+    "MAX_WORK_TIME": "Maximum Working Time (h)",
+    "BOAT_AMOUNT": "Number of Boats",
+    "DATE": "Date",
+    "SPEED": "Speed (km/h)",
     "VALIDATION": {
       "MAX_WORK_TIME_REQUIRED": "Maximum working time is required",
       "BOAT_AMOUNT_REQUIRED": "Number of boats is required",
-      "TASKS_REQUIRED": "At least one task is required",
-      "EMPLOYEES_REQUIRED": "At least one employee is required",
-      "TOOLS_REQUIRED": "At least one tool is required"
+      "DATE_REQUIRED": "Date is required",
+      "SPEED_REQUIRED": "Speed is required"
     },
     "GENERATE_PLAN": "Generate Plan"
   },

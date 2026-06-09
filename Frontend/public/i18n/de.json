@@ -154,22 +154,16 @@
   },
   "SCHEDULER": {
     "TITLE": "Einsatzplanung",
-    "STEPS": {
-      "CORE": "Allgemein",
-      "TASKS": "Aufgaben",
-      "EMPLOYEES": "Mitarbeiter",
-      "TOOLS": "Werkzeuge"
-    },
-    "CORE": {
-      "MAX_WORK_TIME": "Maximale Arbeitszeit (h)",
-      "BOAT_AMOUNT": "Anzahl der Boote"
-    },
+    "HEADER": "Planungseinstellungen",
+    "MAX_WORK_TIME": "Maximale Arbeitszeit (h)",
+    "BOAT_AMOUNT": "Anzahl der Boote",
+    "DATE": "Datum",
+    "SPEED": "Geschwindigkeit (km/h)",
     "VALIDATION": {
       "MAX_WORK_TIME_REQUIRED": "Maximale Arbeitszeit ist erforderlich",
       "BOAT_AMOUNT_REQUIRED": "Anzahl der Boote ist erforderlich",
-      "TASKS_REQUIRED": "Mindestens eine Aufgabe wird benötigt",
-      "EMPLOYEES_REQUIRED": "Mindestens ein Mitarbeiter wird benötigt",
-      "TOOLS_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
+      "DATE_REQUIRED": "Datum ist erforderlich",
+      "SPEED_REQUIRED": "Geschwindigkeit ist erforderlich"
     },
     "GENERATE_PLAN": "Plan generieren"
   },

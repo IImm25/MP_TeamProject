@@ -48,10 +48,9 @@ export class ScheduleView {
 
   planResponse = signal<PlanResponse>(
     this.planService.loadBoatsFromStorage() ?? {
-      totalTime: 0,
-      boats: [],
-      toolDiff: [],
-      qualificationDiff: [],
+      date: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      boats: []
     },
   );
   boats: WritableSignal<Boat[]> = signal([]);
@@ -88,9 +87,9 @@ export class ScheduleView {
       this.allEmployees.set(employees);
       this.allQualifications.set(qualifications);
 
-      const unusedBoat = this.getUnusedRessources();
+      /*const unusedBoat = this.getUnusedRessources();
 
-      this.boats.set([unusedBoat, ...this.planResponse().boats]);
+      this.boats.set([unusedBoat, ...this.planResponse().boats]);*/
     });
   }
 
@@ -132,26 +131,27 @@ export class ScheduleView {
   }
 
   isBoatEmpty(boat: Boat): boolean {
-    return boat.taskItems.length === 0 && boat.persons.length === 0 && boat.tools.length === 0;
+    return boat.taskSchedules.length === 0 && boat.persons.length === 0 && boat.tools.length === 0;
   }
 
-  getUnusedRessources(): Boat {
+  /*getUnusedRessources(): Boat {
     const boats = this.planResponse().boats || [];
     const request = this.planService.loadRequestFromStorage();
 
-    // Absolute Absicherung: Wenn toolDiff fehlt oder null ist, erzwinge ein leeres Array
-    const toolDiff = this.planResponse().toolDiff || [];
-
-    if (!request) return { taskItems: [], persons: [], tools: [] };
+    if (!request) return { taskSchedules: [], persons: [], tools: [], boatSchedules: [] };
 
     const used = {
-      tasks: new Set(boats.flatMap((b) => (b.taskItems ?? []).map((t) => t.id))),
+      tasks: new Set(
+        boats.flatMap((b) =>
+          b.taskSchedules.flatMap((ts) => (ts.task?.id != null ? [ts.task.id] : [])),
+        ),
+      ),
       people: new Set(boats.flatMap((b) => (b.persons ?? []).map((p) => p.id))),
       tools: new Set(boats.flatMap((b) => (b.tools ?? []).map((t) => t.toolId))),
     };
 
     return {
-      taskItems: this.allTasks().filter(
+      taskSchedules: this.allTasks().filter(
         (t) => request.taskItemIds.includes(t.id) && !used.tasks.has(t.id),
       ) as TaskSummary[],
       persons: this.allEmployees().filter(
@@ -168,5 +168,5 @@ export class ScheduleView {
         })
         .filter((t) => t.requiredAmount > 0) as TaskTool[],
     };
-  }
+  }*/
 }

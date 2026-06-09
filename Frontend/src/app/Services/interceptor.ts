@@ -191,43 +191,9 @@ export const httpMockInterceptor: HttpInterceptorFn = (req, next) => {
     const body = req.body as PlanRequest;
     const mockSchedule: PlanResponse =
       {
-        totalTime: 0,
-        boats: [
-         /* {
-            taskItems: tasks.filter((t) => (body as any).taskItemIds.includes(t.id)) as TaskSummary[],
-            persons: people.filter((p) => (body as any).personIds.includes(p.id)) as EmployeeSummary[],
-            tools: tools
-        .filter((t) => body.toolIds.includes(t.id))
-        .map(t => ({
-          toolId: t.id,
-          requiredAmount: 1
-        }))
-          }*/
-        ],
-        qualificationDiff: [
-          {
-            id: 1,
-            required: 2,
-            available: 1
-          },
-          {
-            id: 2,
-            required: 1,
-            available: 5
-          }
-        ],
-        toolDiff: [
-          {
-            id: 1,
-            required: 2,
-            available: 1
-          },
-          {
-            id: 2,
-            required: 1,
-            available: 5
-          }
-        ]
+        date: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        boats: []
       };
     return of(new HttpResponse({ status: 400, body: mockSchedule })).pipe(delay(500));
   }
