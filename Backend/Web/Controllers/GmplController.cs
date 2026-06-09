@@ -11,11 +11,12 @@ namespace Backend.Web.Controllers;
 [Route("api/plan")]
 public class GMPLController : ControllerBase
 {
-    //private readonly GmplService gmplService;
-    //public GMPLController(GmplService gmplService)
-    //{
-    //    this.gmplService = gmplService;
-    //}
+    private readonly GmplService gmplService;
+
+    public GMPLController(GmplService gmplservice)
+    {
+        this.gmplService = gmplservice;
+    }
 
     [HttpGet("${date}")]
     public async Task<ActionResult<PlanResponseDto>> GetPlan(DateOnly date)
@@ -24,17 +25,17 @@ public class GMPLController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<ActionResult<PlanResponseDto>> Plan()
+    public async Task<ActionResult<PlanResponseDto>> Plan([FromBody] DateTime date, [FromBody] float BoatSpeed = 36f)
     {
-        // TODO : Prevalidate
         try
         {
             //PlanResponseDto response = await gmplService.Solve(request);
             return Ok(new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []));
         }
-        catch (Exception ex) { 
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
-            return StatusCode(500,ex.Message);
+            return StatusCode(500, ex.Message);
         }
     }
 
@@ -43,6 +44,6 @@ public class GMPLController : ControllerBase
     {
         return Ok();
     }
-    
+
 
 }

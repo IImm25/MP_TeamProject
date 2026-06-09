@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using AutoMapper;
 using Backend.Data.DTO;
+using Backend.Data.Repositories;
 using Backend.GMPL;
 
 public class GmplService
@@ -48,7 +49,7 @@ public class GmplService
         return (name, indices);
     }
 
-    public GmplService(PersonService personService, TaskItemService taskItemService, QualificationService qualificationService, ToolService toolService, IMapper mapper)
+    public GmplService(PersonService personService, TaskItemService taskItemService, QualificationService qualificationService, ToolService toolService, IMapper mapper, DateTime dateTime, float BoatSpeed)
     {
         this.personService = personService;
         this.taskItemService = taskItemService;
@@ -75,6 +76,8 @@ public class GmplService
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
         return new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []);
+        
+        
         List<int> qualIds = await GetUsedQualificationIds(request.TaskItemIds, request.PersonIds);
         string datFileText = await CreateDataFileAsync(request, qualIds);
         string datFile = Path.GetTempFileName();
@@ -228,14 +231,20 @@ public class GmplService
         sb.AppendLine("data;");
 
         sb.AppendLine($"set TASKS := {string.Join(" ", taskIds.Select(id => $"ta_{id}"))};");
-        sb.AppendLine($"set QUALIS := {string.Join(" ", qualIds.Select(id => $"q_{id}"))};");
         sb.AppendLine($"set PEOPLE := {string.Join(" ", personIds.Select(id => $"p_{id}"))};");
+        sb.AppendLine($"set QUALIS := {string.Join(" ", qualIds.Select(id => $"q_{id}"))};");       
         sb.AppendLine($"set TOOLS := {string.Join(" ", toolIds.Select(id => $"to_{id}"))};");
+        sb.AppendLine($"set Places := {string.Join(" ", toolIds.Select(id => $"w_{id}"))};");
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.AppendLine($"param maxWorkingHours := {info.MaxTime};");
+        sb.AppendLine($"param amountBoats := {info.BoatNumber};");        
+        sb.AppendLine($"param drivingSpeed := {info.BoatSpeed.ToString(CultureInfo.InvariantCulture)};");
+        sb.AppendLine("end;");
 
         sb.AppendLine();
 
         // Duration
-
         sb.AppendLine("param duration :=");
         for (int i = 0; i < taskIds.Count; i++)
         {
@@ -245,56 +254,76 @@ public class GmplService
         sb.AppendLine(";\n");
 
         // Person <-> Qualification
-
         sb.AppendLine($"param hasQuali : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} := ");
-
         for (int i = 0; i < personIds.Count; i++)
         {
             var qualMask = await qualificationService.GetPersonQualificationMask(personIds[i], qualIds);
             var maskStr = qualMask.Select(b => b ? "1" : "0");
             sb.AppendLine($"\tp_{personIds[i]} {string.Join(" ", maskStr)}");
         }
-        sb.AppendLine(";");
+        sb.AppendLine(";\n");
 
         // Task <-> Qualification
-
         sb.AppendLine($"param requiredQualis : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} := ");
-
         for (int i = 0; i < taskIds.Count; i++)
         {
             var qualReq = await qualificationService.GetTaskQualificationRequirements(taskIds[i],qualIds);
             sb.AppendLine($"\tta_{taskIds[i]} {string.Join(" ", qualReq)}");
         }
-        sb.Append(";");
+        sb.Append(";\n");
 
         // Task <-> Tools
-
-        sb.AppendLine();
-
         sb.AppendLine($"param requiredTools: {string.Join(" ", toolIds.Select(id => $"to_{id}"))} := ");
-
         for (int i = 0; i < taskIds.Count; i++)
         {
             var qualTools = await toolService.GetTaskToolRequirements(taskIds[i],toolIds);
             sb.AppendLine($"\tta_{taskIds[i]} {string.Join(" ", qualTools)}");
         }
-        sb.AppendLine(";");
+        sb.AppendLine(";\n");
 
         // Tools
-
         sb.AppendLine("param stockTools := ");
         for (int i = 0; i < toolIds.Count; i++)
         {
             var tool = await toolService.GetTool(toolIds[i]);
             sb.AppendLine($"\tto_{toolIds[i]} {tool!.AvailableStock}");
         }
-        sb.AppendLine(";");
+        sb.AppendLine(";\n");
 
-        sb.AppendLine($"param maxWorkingHours := {info.MaxTime};");
-        sb.AppendLine($"param amountBoats := {info.BoatNumber};");
-        sb.AppendLine("end;");
+        //Priority
+        sb.AppendLine("param taskPrio := ");
+        sb.AppendLine(";\n");
+
+        //TaskLocations
+        sb.AppendLine("param taskLocation := ");
+        sb.AppendLine(";\n");
+
+        //Distance Matrix
+        sb.AppendLine("param distances := ");
+        sb.AppendLine(";\n");
+
+        //fixed Boat
+        sb.AppendLine("param fixedBoat := ");
+        sb.AppendLine(";\n");
+
+        // fixed Taskorder on boat
+        sb.AppendLine("param fixedOrder := ");
+        sb.AppendLine(";\n");
+
+        //People in use
+        sb.AppendLine("param fixedPerson := ");
+        sb.AppendLine(";\n");
+
+        //Tools in use
+        sb.AppendLine("param fixedToolAmount := ");
+        sb.AppendLine(";\n");
 
         return sb.ToString();
+    }
+
+    private float[,] CalculateTurbineDistances()
+    {
+        throw new NotImplementedException();
     }
 
     private async Task<List<int>> GetUsedQualificationIds(List<int> taskIds,List<int> personIds)
