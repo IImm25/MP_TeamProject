@@ -1,8 +1,10 @@
-# Description: Personnel limitation – a task (A1) requires 3 people with 'Tech' qualification.
-# Expected result: WorkHours = 0.
-# Reasoning: Only 2 people with 'Tech' are available. Since the QualiCheck constraint (sum ≥ requirement)
-# cannot be satisfied for A1, it cannot be scheduled.
-# Maximize WorkHours: 0.
+# Description: Personnel limitation – task A1 requires 3 people with 'Tech' qualification.
+# Expected result: INFEASIBLE.
+# Reasoning: Only 2 people with 'Tech' are available. The QualiCheck constraint (sum >= requirement)
+# cannot be satisfied for A1. The AtLeastOneTaskGlobal constraint forces at least one task to be
+# planned, but A1 is the only task and it cannot meet its qualification requirements.
+# This makes the problem infeasible – the solver finds no valid solution.
+# Maximize WorkHours: INFEASIBLE.
 data;
 set TASKS := A1;
 set QUALIS := Tech;
