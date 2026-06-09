@@ -1,26 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Backend.Data.Entitites;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Backend.Data.Entitites;
 
 namespace Backend.Data.Repositories.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class RepositoryTests : BaseIntegrationTest
     {
-        private IRepository<Qualification> GetRepo()
-            => Scope.ServiceProvider.GetRequiredService<IRepository<Qualification>>();
+        private IRepository<Qualification> _repo = null!;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _repo = Scope.ServiceProvider.GetRequiredService<IRepository<Qualification>>();
+        }
 
         [TestMethod]
         public async Task GivenNewEntity_WhenAddAsyncCalled_ThenEntityIsPersisted()
         {
-            var repo = GetRepo();
             var qual = new Qualification("qualName", "qualDesc");
 
-            var result = await repo.AddAsync(qual);
+            var result = await _repo.AddAsync(qual);
 
             Assert.AreNotEqual(0, result.Id);
-            var exists = await Db.Qualifications.AnyAsync(q => q.Id == result.Id);
-            Assert.IsTrue(exists);
+            Assert.IsTrue(await Db.Qualifications.AnyAsync(q => q.Id == result.Id));
         }
 
         [TestMethod]
@@ -29,9 +32,8 @@ namespace Backend.Data.Repositories.Tests
             var qual = new Qualification("qualName", "qualDesc");
             Db.Qualifications.Add(qual);
             await Db.SaveChangesAsync();
-            var repo = GetRepo();
 
-            var result = await repo.GetByIdAsync(qual.Id);
+            var result = await _repo.GetByIdAsync(qual.Id);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(qual.Name, result.Name);
@@ -43,10 +45,9 @@ namespace Backend.Data.Repositories.Tests
             var qual = new Qualification("qualName", "qualDesc");
             Db.Qualifications.Add(qual);
             await Db.SaveChangesAsync();
-            var repo = GetRepo();
 
             qual.Name = "qualName2";
-            await repo.UpdateAsync(qual);
+            await _repo.UpdateAsync(qual);
 
             var dbQual = await Db.Qualifications.AsNoTracking().FirstOrDefaultAsync(q => q.Id == qual.Id);
             Assert.AreEqual("qualName2", dbQual?.Name);
@@ -58,21 +59,17 @@ namespace Backend.Data.Repositories.Tests
             var qual = new Qualification("qualName", "qualDesc");
             Db.Qualifications.Add(qual);
             await Db.SaveChangesAsync();
-            var repo = GetRepo();
 
-            var result = await repo.DeleteAsync(qual.Id);
+            var result = await _repo.DeleteAsync(qual.Id);
 
             Assert.IsTrue(result, "DeleteAsync should return true when item exists.");
-            var exists = await Db.Qualifications.AnyAsync(q => q.Id == qual.Id);
-            Assert.IsFalse(exists, "Entity should be removed from database.");
+            Assert.IsFalse(await Db.Qualifications.AnyAsync(q => q.Id == qual.Id), "Entity should be removed from database.");
         }
 
         [TestMethod]
         public async Task GivenNonExistentId_WhenDeleteAsyncCalled_ThenReturnsFalse()
         {
-            var repo = GetRepo();
-
-            var result = await repo.DeleteAsync(9999);
+            var result = await _repo.DeleteAsync(9999);
 
             Assert.IsFalse(result, "DeleteAsync should return false for invalid IDs.");
         }
@@ -85,9 +82,8 @@ namespace Backend.Data.Repositories.Tests
                 new Qualification("qualName2", "qualDesc2")
             );
             await Db.SaveChangesAsync();
-            var repo = GetRepo();
 
-            var results = await repo.GetAllAsync();
+            var results = await _repo.GetAllAsync();
 
             Assert.AreEqual(2, results.Count);
         }

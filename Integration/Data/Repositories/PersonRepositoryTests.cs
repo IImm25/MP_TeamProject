@@ -1,29 +1,31 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Backend.Data.Entitites;
+﻿using Backend.Data.Entitites;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Backend.Data.Repositories.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class PersonRepositoryTests : BaseIntegrationTest
     {
-        private IPersonRepository GetRepo()
-            => Scope.ServiceProvider.GetRequiredService<IPersonRepository>();
+        private IPersonRepository _repo = null!;
 
-        [TestMethod()]
+        [TestInitialize]
+        public void Setup()
+        {
+            _repo = Scope.ServiceProvider.GetRequiredService<IPersonRepository>();
+        }
+
+        [TestMethod]
         public async Task GivenPersonWithQualifications_WhenGetFullByIdAsyncCalled_ThenQualificationsAreLoaded()
         {
-            var repo = GetRepo();
-
             var qual = new Qualification("qualName", "qualDesc");
             Db.Qualifications.Add(qual);
             await Db.SaveChangesAsync();
 
             var person = new Person("Max", "M");
             person.Qualifications.Add(new PersonQualification { QualificationId = qual.Id });
+            await _repo.AddAsync(person);
 
-            await repo.AddAsync(person);
-
-            var result = await repo.GetFullByIdAsync(person.Id);
+            var result = await _repo.GetFullByIdAsync(person.Id);
 
             Assert.IsNotNull(result);
             Assert.AreEqual("Max", result.Firstname);
@@ -34,31 +36,29 @@ namespace Backend.Data.Repositories.Tests
             Assert.AreEqual("qualName", nestedQual.Name);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public async Task GivenPersonWithoutQualifications_WhenGetFullByIdAsyncCalled_ThenReturnsPersonWithEmptyList()
         {
-            var repo = GetRepo();
             var person = new Person("Max", "M");
-            await repo.AddAsync(person);
+            await _repo.AddAsync(person);
 
-            var result = await repo.GetFullByIdAsync(person.Id);
+            var result = await _repo.GetFullByIdAsync(person.Id);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Qualifications.Count, "Expected empty list for person with no qualifications.");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public async Task GivenInvalidPersonId_WhenGetFullByIdAsyncCalled_ThenReturnsNull()
         {
-            var result = await GetRepo().GetFullByIdAsync(12345);
+            var result = await _repo.GetFullByIdAsync(12345);
 
             Assert.IsNull(result);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public async Task WhenGetAllFullAsyncCalled_ThenReturnsAllPeopleWithTheirSkillsets()
         {
-            var repo = GetRepo();
             var qual = new Qualification("qualName1", "qualDesc1");
             Db.Qualifications.Add(qual);
             await Db.SaveChangesAsync();
@@ -69,21 +69,14 @@ namespace Backend.Data.Repositories.Tests
             var p2 = new Person("Max2", "M");
             p2.Qualifications.Add(new PersonQualification { QualificationId = qual.Id });
 
-            await repo.AddAsync(p1);
-            await repo.AddAsync(p2);
+            await _repo.AddAsync(p1);
+            await _repo.AddAsync(p2);
 
-            var results = await repo.GetAllFullAsync();
+            var results = await _repo.GetAllFullAsync();
 
             Assert.AreEqual(2, results.Count);
             Assert.IsTrue(results.All(p => p.Qualifications.Any()), "All people should have their qualification lists populated.");
             Assert.IsTrue(results.All(p => p.Qualifications.First().Qualification != null), "Nested Qualifications were not loaded in the list view.");
-        }
-
-        [ClassCleanup]
-        public static async Task ClassTeardown()
-        {
-            if (Factory != null)
-                await Factory.DisposeAsync();
         }
     }
 }
