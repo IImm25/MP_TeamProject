@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using AutoMapper;
 using Backend.Data.DTO;
+using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 using Backend.GMPL;
 
@@ -76,8 +77,8 @@ public class GmplService
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
         return new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []);
-        
-        
+
+
         List<int> qualIds = await GetUsedQualificationIds(request.TaskItemIds, request.PersonIds);
         string datFileText = await CreateDataFileAsync(request, qualIds);
         string datFile = Path.GetTempFileName();
@@ -111,7 +112,7 @@ public class GmplService
         int mipError = GLPKDllWrapper.glp_intopt(prob, ref iocp);
         if (simplexErr != 0 || mipError != 0)
         {
-            var (toolDiff, qualDiff) = await Validate(request.TaskItemIds,request.PersonIds,request.ToolIds,qualIds);
+            var (toolDiff, qualDiff) = await Validate(request.TaskItemIds, request.PersonIds, request.ToolIds, qualIds);
             //return new PlanResponseDto(0.0, [], toolDiff, qualDiff);
         }
         GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
@@ -176,7 +177,7 @@ public class GmplService
         }
 
         List<BoatPlanDto> boats = new List<BoatPlanDto>();
-      
+
         for (int i = 0; i < request.BoatNumber; i++)
         {
             if (!boatUsage[i]) continue;
@@ -225,20 +226,20 @@ public class GmplService
         var taskIds = info.TaskItemIds;
         var personIds = info.PersonIds;
         var toolIds = info.ToolIds;
-     
+
         var sb = new StringBuilder();
 
         sb.AppendLine("data;");
 
         sb.AppendLine($"set TASKS := {string.Join(" ", taskIds.Select(id => $"ta_{id}"))};");
         sb.AppendLine($"set PEOPLE := {string.Join(" ", personIds.Select(id => $"p_{id}"))};");
-        sb.AppendLine($"set QUALIS := {string.Join(" ", qualIds.Select(id => $"q_{id}"))};");       
+        sb.AppendLine($"set QUALIS := {string.Join(" ", qualIds.Select(id => $"q_{id}"))};");
         sb.AppendLine($"set TOOLS := {string.Join(" ", toolIds.Select(id => $"to_{id}"))};");
         sb.AppendLine($"set Places := {string.Join(" ", toolIds.Select(id => $"w_{id}"))};");
         sb.AppendLine();
         sb.AppendLine();
         sb.AppendLine($"param maxWorkingHours := {info.MaxTime};");
-        sb.AppendLine($"param amountBoats := {info.BoatNumber};");        
+        sb.AppendLine($"param amountBoats := {info.BoatNumber};");
         sb.AppendLine($"param drivingSpeed := {info.BoatSpeed.ToString(CultureInfo.InvariantCulture)};");
         sb.AppendLine("end;");
 
@@ -267,7 +268,7 @@ public class GmplService
         sb.AppendLine($"param requiredQualis : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} := ");
         for (int i = 0; i < taskIds.Count; i++)
         {
-            var qualReq = await qualificationService.GetTaskQualificationRequirements(taskIds[i],qualIds);
+            var qualReq = await qualificationService.GetTaskQualificationRequirements(taskIds[i], qualIds);
             sb.AppendLine($"\tta_{taskIds[i]} {string.Join(" ", qualReq)}");
         }
         sb.Append(";\n");
@@ -276,7 +277,7 @@ public class GmplService
         sb.AppendLine($"param requiredTools: {string.Join(" ", toolIds.Select(id => $"to_{id}"))} := ");
         for (int i = 0; i < taskIds.Count; i++)
         {
-            var qualTools = await toolService.GetTaskToolRequirements(taskIds[i],toolIds);
+            var qualTools = await toolService.GetTaskToolRequirements(taskIds[i], toolIds);
             sb.AppendLine($"\tta_{taskIds[i]} {string.Join(" ", qualTools)}");
         }
         sb.AppendLine(";\n");
@@ -321,19 +322,73 @@ public class GmplService
         return sb.ToString();
     }
 
-    private float[,] CalculateTurbineDistances()
+    //mock Harbor
+    private record Harbor(
+        float Latitude,
+        float Longitude
+        );
+
+    private float[,] CalculateTurbineDistances(List<Turbine> turbines, Harbor harbor)
     {
-        throw new NotImplementedException();
+        turbines.Insert(0, new Turbine("Harbor", harbor.Latitude, harbor.Longitude));
+        float[,] distances = new float[turbines.Count, turbines.Count];
+
+        for (int i = 0; i < turbines.Count; i++)
+        {
+            for (int j = i + 1; j < turbines.Count; j++)
+            {
+                float dist = HaversineKm(
+                    turbines[i].Latitude, turbines[i].Longitude,
+                    turbines[j].Latitude, turbines[j].Longitude);
+
+                distances[i, j] = dist;
+                distances[j, i] = dist; // Matrix ist symmetrisch
+            }
+        }
+
+        return distances;
     }
 
-    private async Task<List<int>> GetUsedQualificationIds(List<int> taskIds,List<int> personIds)
+    private float HaversineKm(float lat1, float lon1, float lat2, float lon2)
+    {
+        const float R = 6371f; // Erdradius in km
+
+        float dLat = ToRad(lat2 - lat1);
+        float dLon = ToRad(lon2 - lon1);
+
+        float a = MathF.Sin(dLat / 2) * MathF.Sin(dLat / 2)
+                + MathF.Cos(ToRad(lat1)) * MathF.Cos(ToRad(lat2))
+                * MathF.Sin(dLon / 2) * MathF.Sin(dLon / 2);
+
+        float c = 2 * MathF.Atan2(MathF.Sqrt(a), MathF.Sqrt(1 - a));
+
+        return R * c;
+    }
+
+    private float ToRad(float degrees) => degrees * (MathF.PI / 180f);
+
+    private float CaclulatePriority(DateTime currentTime, TaskItem task)
+    {
+        float priority = 0.0f;
+        if (currentTime >= task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue))
+        {
+            var start = task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue);
+            var end = task.ExecutionIntervalEnd.ToDateTime(TimeOnly.MinValue);
+
+            priority = (float)((currentTime - start) / (end - start));
+        }
+
+        return priority;
+    }
+
+    private async Task<List<int>> GetUsedQualificationIds(List<int> taskIds, List<int> personIds)
     {
         var allQualIds = await qualificationService.GetAllIds();
         var used = new HashSet<int>();
 
         foreach (var taskId in taskIds)
         {
-            var req = await qualificationService.GetTaskQualificationRequirements(taskId,allQualIds);
+            var req = await qualificationService.GetTaskQualificationRequirements(taskId, allQualIds);
 
             for (int i = 0; i < allQualIds.Count; i++)
             {
@@ -343,7 +398,7 @@ public class GmplService
 
         foreach (var personId in personIds)
         {
-            var mask = await qualificationService.GetPersonQualificationMask(personId,allQualIds);
+            var mask = await qualificationService.GetPersonQualificationMask(personId, allQualIds);
 
             for (int i = 0; i < allQualIds.Count; i++)
             {
