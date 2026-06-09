@@ -41,7 +41,7 @@ export class Scheduler {
   schedulerForm = this.fb.group({
     maxTime: new FormControl<number>(8, [Validators.required, Validators.min(1)]),
     boatAmount: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
-    date: new FormControl<Date | null>(null, [Validators.required]),
+    date: new FormControl<Date>(new Date(), [Validators.required]),
     speed: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
   });
 
@@ -62,14 +62,6 @@ export class Scheduler {
 
     this.http.postPlan(request).subscribe({
       next: (plan: PlanResponse) => {
-        if (plan.boats.length === 0) {
-          this.messageService.add({
-            severity: 'error',
-            summary: this.translate.instant('MESSAGES.ERROR'),
-            detail: this.translate.instant('MESSAGES.ERROR_GENERATING_PLAN'),
-          });
-          return;
-        }
         this.planService.setPlan(plan, request);
         this.router.navigate(['/schedule-view']);
       },
