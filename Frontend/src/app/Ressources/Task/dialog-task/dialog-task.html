@@ -137,6 +137,8 @@
                   class="w-full"
                   [class.detail]="type === 'Detail'"
                   [placeholder]="'TASKS.DIALOG.LOCATION_PLACEHOLDER' | translate"
+                  appendTo="body"
+                  panelStyleClass="open-upward"
                 />
                 @if (taskForm.controls.location.invalid && taskForm.controls.location.touched) {
                   <div class="error-message">

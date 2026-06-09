@@ -23,3 +23,8 @@ body ::ng-deep .p-datepicker.open-upward {
   transform: translateY(calc(-100% - 2.5rem)) !important;
   transform-origin: bottom center !important;
 }
+
+body ::ng-deep .p-select.open-upward {
+  transform: translateY(calc(-100% - 2.5rem)) !important;
+  transform-origin: bottom center !important;
+}
