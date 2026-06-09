@@ -14,6 +14,7 @@
     "TASKS": "Aufgaben",
     "EMPLOYEES": "Mitarbeiter",
     "QUALIFICATIONS": "Qualifikationen",
+    "TURBINES": "Windräder",
     "TOOLS": "Werkzeuge"
   },
   "TASKS": {
@@ -22,12 +23,18 @@
     "NAME": "Bezeichnung",
     "DURATION": "Dauer",
     "QUALIFICATION": "Qualifikation",
+    "START_DATE": "Startdatum",
+    "END_DATE": "Enddatum",
+    "LOCATION": "Standort (Windrad)",
     "DIALOG": {
       "NEW": "Neue Aufgabe",
       "EDIT": "Aufgabe bearbeiten",
       "DETAIL": "Aufgabe anzeigen",
       "CORE": "Allgemein",
       "NAME_PLACEHOLDER": "Gib eine Aufgabenbezeichnung ein!",
+      "START_DATE_PLACEHOLDER": "TT.MM.JJJJ",
+      "END_DATE_PLACEHOLDER": "TT.MM.JJJJ",
+      "LOCATION_PLACEHOLDER": "Wähle ein Windrad aus!",
       "QUALIFICATIONS": "Qualifikationen",
       "QUALIFICATION": {
         "NEW": "Neue Qualifikation",
@@ -50,7 +57,11 @@
     },
     "VALIDATION": {
       "NAME_REQUIRED": "Name ist erforderlich",
-      "DURATION_REQUIRED": "Dauer ist erforderlich",
+      "DURATION_REQUIRED": "Mindestdauer von 1 Minute oder 1 Stunde ist erforderlich",
+      "START_DATE_REQUIRED": "Startdatum ist erforderlich",
+      "END_DATE_REQUIRED": "Enddatum ist erforderlich",
+      "DATE_NOT_VALID": "Startdatum muss vor dem Enddatum liegen",
+      "LOCATION_REQUIRED": "Ein Standort muss zugewiesen werden",
       "QUALIFICATION_REQUIRED": "Mindestens eine Qualifikation wird benötigt",
       "TOOL_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
     }
@@ -65,6 +76,7 @@
     "DIALOG": {
       "NEW": "Neuer Mitarbeiter",
       "EDIT": "Mitarbeiter bearbeiten",
+      "DETAIL": "Mitarbeiter anzeigen",
       "DELETE_TITLE": "Mitarbeiter löschen",
       "DELETE_MESSAGE": "Möchten Sie den Mitarbeiter {{firstname}} {{lastname}} wirklich löschen?",
       "FIRSTNAME_PLACEHOLDER": "Gib einen Vornamen ein!",
@@ -89,6 +101,7 @@
     "DIALOG":{
       "NEW": "Neue Qualifikation",
       "EDIT": "Qualifikation bearbeiten",
+      "DETAIL": "Qualifikation anzeigen",
       "DELETE_TITLE": "Qualifikation löschen",
       "DELETE_MESSAGE": "Möchten Sie die Qualifikation \"{{name}}\" wirklich löschen?",
       "NAME_PLACEHOLDER": "Gib eine Bezeichnung ein!",
@@ -99,6 +112,7 @@
     "TITLE": "Werkzeuge",
 	  "NAME": "Bezeichnung",
 	  "AVAILABLE_STOCK": "Verfügbare Menge",
+    "REQUIRED_AMOUNT": "erforderliche Anzahl",
     "ADD_NEW": "Neues Werkzeug",
 	  "VALIDATION": {
 		  "NAME_REQUIRED": "Bezeichnung ist erforderlich",
@@ -107,10 +121,67 @@
     "DIALOG":{
       "NEW": "Neues Werkzeug",
       "EDIT": "Werkzeug bearbeiten",
+      "DETAIL": "Werkzeug anzeigen",
       "DELETE_TITLE": "Werkzeug löschen",
       "DELETE_MESSAGE": "Möchten Sie das Werkzeug {{name}} wirklich löschen?",
       "NAME_PLACEHOLDER": "Gib eine Bezeichnung ein!",
       "AVAILABLE_STOCK_PLACEHOLDER": "Gib eine verfügbare Menge ein!"
     }
+  },
+  "TURBINES": {
+    "TURBINES": "Windräder",
+    "NAME": "Name",
+    "LATITUDE": "Breitengrad",
+    "LONGITUDE": "Längengrad",
+    "NEW_TURBINE": "Neues Windrad",
+    "COORDINATES": "Koordinaten",
+    "DIALOG": {
+      "NEW": "Neues Windrad",
+      "EDIT": "Windrad bearbeiten",
+      "DETAIL": "Windrad anzeigen",
+      "DELETE_TITLE": "Windrad löschen",
+      "DELETE_MESSAGE": "Möchten Sie das Windrad {{name}} wirklich löschen?",
+      "NAME_PLACEHOLDER": "Gib einen Namen ein!",
+      "LATITUDE_PLACEHOLDER": "Gib einen Breitengrad ein!",
+      "LONGITUDE_PLACEHOLDER": "Gib einen Längengrad ein!"
+
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name ist erforderlich",
+      "LATITUDE_REQUIRED": "Wert erforderlich (Bereich: -90.0 bis 90.0).",
+      "LONGITUDE_REQUIRED": "Wert erforderlich (Bereich: -180.0 bis 180.0)."
+    }
+  },
+  "SCHEDULER": {
+    "TITLE": "Einsatzplanung",
+    "STEPS": {
+      "CORE": "Allgemein",
+      "TASKS": "Aufgaben",
+      "EMPLOYEES": "Mitarbeiter",
+      "TOOLS": "Werkzeuge"
+    },
+    "CORE": {
+      "MAX_WORK_TIME": "Maximale Arbeitszeit (h)",
+      "BOAT_AMOUNT": "Anzahl der Boote"
+    },
+    "VALIDATION": {
+      "MAX_WORK_TIME_REQUIRED": "Maximale Arbeitszeit ist erforderlich",
+      "BOAT_AMOUNT_REQUIRED": "Anzahl der Boote ist erforderlich",
+      "TASKS_REQUIRED": "Mindestens eine Aufgabe wird benötigt",
+      "EMPLOYEES_REQUIRED": "Mindestens ein Mitarbeiter wird benötigt",
+      "TOOLS_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
+    },
+    "GENERATE_PLAN": "Plan generieren"
+  },
+  "SCHEDULE": {
+    "TITLE": "Planung",
+    "BOAT": "Boot",
+    "UNUSED": "Nicht genutzte Ressourcen"
+  },
+  "MESSAGES": {
+    "MISSING_QUALIFICATION": "Fehlende Qualifikation",
+    "MISSING_TOOL": "Fehlendes Werkzeug",
+    "ERROR": "Fehler",
+    "ERROR_GENERATING_PLAN": "Fehler beim Generieren des Plans"
   }
 }

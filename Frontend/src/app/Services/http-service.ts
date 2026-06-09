@@ -5,8 +5,9 @@ import { environment } from '../../environments/environment';
 import { Qualification } from '../Models/qualification';
 import { Tool } from '../Models/tool';
 import { Employee, EmployeeSummary, EmployeeCreateUpdate } from '../Models/employee';
-import { Task, TaskSummary } from '../Models/task';
-import { Boat, PlanRequest } from '../Models/boat';
+import { Task, TaskCreate, TaskSummary, TaskUpdate } from '../Models/task';
+import { Boat, PlanRequest, PlanResponse } from '../Models/boat';
+import { CreateTurbine, Turbine } from '../Models/turbine';
 
 @Injectable({
   providedIn: 'root',
@@ -87,11 +88,11 @@ export class HttpService {
     return this.http.get<Task>(`${this.apiUrl}/tasks/${id}`);
   }
 
-  createTask(data: Partial<Task>): Observable<Task> {
+  createTask(data: TaskCreate): Observable<Task> {
     return this.http.post<Task>(`${this.apiUrl}/tasks`, data);
   }
 
-  updateTask(id: number, data: Partial<Task>): Observable<Task> {
+  updateTask(id: number, data: TaskUpdate): Observable<Task> {
     return this.http.patch<Task>(`${this.apiUrl}/tasks/${id}`, data);
   }
 
@@ -99,8 +100,29 @@ export class HttpService {
     return this.http.delete<void>(`${this.apiUrl}/tasks/${id}`);
   }
 
+  // --- Turbines ---
+  getAllTurbines(): Observable<Turbine[]> {
+    return this.http.get<Turbine[]>(`${this.apiUrl}/turbines`);
+  }
+
+  getTurbineById(id: number): Observable<Turbine> {
+    return this.http.get<Turbine>(`${this.apiUrl}/turbines/${id}`);
+  }
+
+  createTurbine(payload: CreateTurbine): Observable<Turbine> {
+    return this.http.post<Turbine>(`${this.apiUrl}/turbines`, payload);
+  }
+
+  updateTurbine(id: number, payload: CreateTurbine): Observable<Turbine> {
+    return this.http.patch<Turbine>(`${this.apiUrl}/turbines/${id}`, payload);
+  }
+
+  deleteTurbine(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/turbines/${id}`);
+  }
+
   // --- Scheduler ---
-  postPlan(planData: PlanRequest): Observable<Boat[]> {
-    return this.http.post<Boat[]>(`${this.apiUrl}/plan`, planData);
+  postPlan(planData: PlanRequest): Observable<PlanResponse> {
+    return this.http.post<PlanResponse>(`${this.apiUrl}/plan`, planData);
   }
 }

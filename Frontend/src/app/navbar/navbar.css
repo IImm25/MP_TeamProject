@@ -17,3 +17,46 @@
   margin-right: 1.5rem;
   display: block;
 }
+
+img {
+  cursor: pointer;
+}
+
+.navbar-end-container {
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+}
+
+.language-toggle {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn {
+  background: none;
+  border: none;
+  color: #a1a1aa; /* Inaktives Grau */
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+  color: #ffffff;
+}
+
+.lang-btn.active {
+  color: #ffffff !important;
+}
+
+.lang-divider {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.85rem;
+}

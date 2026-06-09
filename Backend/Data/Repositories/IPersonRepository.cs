@@ -1,4 +1,6 @@
-﻿namespace Backend.Data.Repositories
+﻿using Backend.Data.Entitites;
+
+namespace Backend.Data.Repositories
 {
     public interface IPersonRepository : IRepository<Person>
     {

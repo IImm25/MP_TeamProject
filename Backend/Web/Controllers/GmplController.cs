@@ -3,45 +3,46 @@ using Backend.GMPL;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 namespace Backend.Web.Controllers;
 
 [ApiController]
 [Route("api/plan")]
-public class GmplController : ControllerBase
+public class GMPLController : ControllerBase
 {
-    GmplService _gmplService;
-    public GmplController(GmplService gmplService)
+    //private readonly GmplService gmplService;
+    //public GMPLController(GmplService gmplService)
+    //{
+    //    this.gmplService = gmplService;
+    //}
+
+    [HttpGet("${date}")]
+    public async Task<ActionResult<PlanResponseDto>> GetPlan(DateOnly date)
     {
-        _gmplService = gmplService;
+        return Ok(new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []));
     }
 
     [HttpPost("")]
-    public async Task<ActionResult<List<PlanResponseDto>>> Plan([FromBody] PlanRequestDto request)
+    public async Task<ActionResult<PlanResponseDto>> Plan()
     {
-
-        if (request == null) return BadRequest("Wrong Inpout");
-
-        List<PlanResponseDto> response = await _gmplService.CaculateGmplModel(request);
-
-        if (response != null)
+        // TODO : Prevalidate
+        try
         {
-            return Ok(response);
+            //PlanResponseDto response = await gmplService.Solve(request);
+            return Ok(new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []));
         }
-        else return BadRequest();
+        catch (Exception ex) { 
+            Console.WriteLine(ex.Message);
+            return StatusCode(500,ex.Message);
+        }
     }
 
-
-    [HttpGet("/test")]
-    public async Task<ActionResult<GmplResults>> Test()
+    [HttpDelete("${date}")]
+    public async Task<ActionResult<PlanResponseDto>> DeletePlan(DateOnly date)
     {
-
-        var res = await _gmplService.TestGLPK();
-
-        string path = await DataFileGenerator.SaveDataFile("sometext");
-        return Ok(res);
-
+        return Ok();
     }
-
+    
 
 }

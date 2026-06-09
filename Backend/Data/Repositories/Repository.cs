@@ -43,5 +43,10 @@ namespace Backend.Data.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public int Rows()
+        {
+            return _dbSet.Count();
+        }
     }
 }

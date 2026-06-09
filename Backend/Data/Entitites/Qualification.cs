@@ -1,15 +1,18 @@
 ﻿// Author: Erik Schellenberger and Alexander Gewinnus
 
-public class Qualification
+namespace Backend.Data.Entitites
 {
-    public Qualification() { }
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Description { get; set; } = "";
-
-    public Qualification(string name, string description)
+    public class Qualification
     {
-        Name = name;
-        Description = description;
-    }
+        public Qualification() { }
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+
+        public Qualification(string name, string description)
+        {
+            Name = name;
+            Description = description;
+        }
+    } 
 }

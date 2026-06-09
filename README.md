@@ -1,15 +1,22 @@
 # Tolles Projekt
 
-## Aufgabe 8
+## Projektaufgabe Teil 1
 Bei der Wartung von offshore Windparks müssen Arbeiten an den einzelnen Anlagen durchgeführt
 werden. Jede Aufgabe macht den Einsatz von bestimmten Werkzeugen und Personal mit bestimmten
 Qualifikationen jeweils in bestimmter Anzahl erforderlich. Außerdem ist jeder Aufgabe eine Dauer
 zugeordnet. Die Gesamtheit der Aufgaben eines Einsatzteams darf die tägliche Arbeitszeit nicht
 überschreiten, Fahrzeiten werden zunächst1 vernachlässigt.
-Personal und Werkzeuge werden mit Booten zu den Anlagen gebracht. Es stehen zunächst1
+Personal und Werkzeuge werden mit Booten zu den Anlagen gebracht. Es stehen zunächst
 ausreichend Boote zur Verfügung. Bei Arbeitsbeginn wird Personal und Werkzeug so den Booten
 zugeordnet, dass insgesamt die Arbeitszeit maximal ausgenutzt wird. Es ist dabei in der Regel so, dass
 nicht alle Aufgaben abgearbeitet werden können.
+
+## Projektaufgabe Teil 2
+- Startzeitpunkt für jede Aufgabe festlegen
+- Aufgaben müssen in einem bestimmten Zeitfenster [erster Tag, letzter Tag] durchgeführt werden
+- Fahrzeiten ergeben sich aus Entfernungen und der Geschwindigkeit des Bootes
+- Es gibt manchmal kurzfristig neue Aufgaben wegen Havarien etc, die dann nachträglich zeitnah in vorhandenen Plan eingeplant werden müssen (Kompetenzen und Werkzeuge beachten)
+- Durch schlechtes Wetter können sich Fahrzeiten verlängern oder die Durchführung wird unmöglich, in dem Fall sollen Pläne während ihres Verlaufs angepasst werden
 
 ## Verteilung der Aufgabe:
 - Projektleitung -> Erik
@@ -34,6 +41,9 @@ https://github.com/IImm25/MP_TeamProject/issues/2#issuecomment-4262008465).
 ## Termine im Projekt:
 - 23.04.2026: Sprint-Review (Vorstellung Zwischenstand 5 Minuten pro Person)
 - 30.04.2026: Abgabe des Projektes
+- 04.06.2026: Sprint-Review
+- 11.06.2026: Sprint-Review (optional)
+- 02.07.2026: Abgabe des Projektes
 
 ## Backend Start:
 

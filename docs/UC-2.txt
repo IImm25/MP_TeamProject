@@ -1,0 +1,43 @@
+### UC-02: Manage Tool Inventory
+
+* Name and Identification Number: UC-02 Manage Tool Inventory
+* Description: Creation, modification, and deletion of tools in the registry, ensuring every tool type is strictly mapped to a specific available stock quantity in the warehouse.
+* Participating Actors:
+* Primary Actor: Resource Manager
+* Secondary Actor: none
+
+
+* Status: to be approved
+* Used Use Cases (includes): none
+* Trigger: Procurement of new equipment, tool damage/loss, or inventory corrections.
+* Preconditions: The Resource Manager is authenticated.
+* Invariants: A tool must always have a quantity assigned to it. The stock level cannot drop below zero (q >= 0).
+* Postcondition/Result: The tool registry is updated, providing hard upper bounds for concurrent task scheduling.
+
+
+* Normal Flow:
+1. The Resource Manager opens the Tool Inventory dashboard.
+2. The system lists all existing tool types along with their warehouse quantities.
+3. The Resource Manager selects "Add New Tool Type".
+4. The Resource Manager enters the unique name of the tool and specifies the initial quantity currently available in the warehouse.
+5. The system validates that the name is unique (?) and the quantity is a non-negative integer.
+6. The system registers the tool and saves the stock level.
+
+
+* Alternative Flows:
+* 3a. Edit tool details or quantity:
+1. The Resource Manager selects a tool from the list and modifies its name or changes the stock quantity.
+2. The system updates the record.
+
+
+* 3b. Delete a tool type:
+1. The Resource Manager triggers the deletion of a tool type.
+2. The system removes the tool from the database if it is not required by active, non-modifiable schedules(?).
+
+
+* Notes: A tool cannot exist in the system without a defined stock quantity.
+
+
+use case history:
+Versionierung, Name des Autors, Datum, Beschreibung
+1.0, Leonie Skala, 29.05.2026, Initial creation

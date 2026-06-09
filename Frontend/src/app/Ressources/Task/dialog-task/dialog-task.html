@@ -23,7 +23,7 @@
         <p-step-panel [value]="1">
           <ng-template #content let-activateCallback="activateCallback">
             <div class="step-content">
-               <h3>{{ 'TASKS.DIALOG.CORE' | translate }}</h3>
+              <h3>{{ 'TASKS.DIALOG.CORE' | translate }}</h3>
               <div class="field">
                 <label for="name">{{ 'TASKS.NAME' | translate }}*</label>
                 <input
@@ -43,7 +43,7 @@
               </div>
               <div class="field">
                 <label for="duration">{{ 'TASKS.DURATION' | translate }} (h)*</label>
-                <div class="duration-row">
+                <div class="row">
                   <p-inputNumber
                     id="durationHours"
                     formControlName="durationHours"
@@ -74,6 +74,77 @@
                   </div>
                 }
               </div>
+
+              <div class="field">
+                <div class="row">
+                  <div class="field">
+                    <label for="startDate">{{ 'TASKS.START_DATE' | translate }}*</label>
+                    <p-datepicker
+                      id="startDate"
+                      formControlName="executionIntervalStart"
+                      [inputStyleClass]="type === 'Detail' ? 'detail' : ''"
+                      [placeholder]="'TASKS.DIALOG.START_DATE_PLACEHOLDER' | translate"
+                      appendTo="body"
+                      panelStyleClass="open-upward"
+                    />
+                    @if (
+                      taskForm.controls.executionIntervalStart.invalid &&
+                      taskForm.controls.executionIntervalStart.touched
+                    ) {
+                      <div class="error-message">
+                        <i class="pi pi-exclamation-circle"></i>
+                        <span>{{ 'TASKS.VALIDATION.START_DATE_REQUIRED' | translate }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="field">
+                    <label for="endDate">{{ 'TASKS.END_DATE' | translate }}*</label>
+                    <p-datepicker
+                      id="endDate"
+                      formControlName="executionIntervalEnd"
+                      [inputStyleClass]="type === 'Detail' ? 'detail' : ''"
+                      [placeholder]="'TASKS.DIALOG.END_DATE_PLACEHOLDER' | translate"
+                      appendTo="body"
+                      panelStyleClass="open-upward"
+                    />
+                    @if (
+                      taskForm.controls.executionIntervalEnd.invalid &&
+                      taskForm.controls.executionIntervalEnd.touched
+                    ) {
+                      <div class="error-message">
+                        <i class="pi pi-exclamation-circle"></i>
+                        <span>{{ 'TASKS.VALIDATION.END_DATE_REQUIRED' | translate }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+                @if (!dateValid()) {
+                      <div class="error-message">
+                        <i class="pi pi-exclamation-circle"></i>
+                        <span>{{ 'TASKS.VALIDATION.DATE_NOT_VALID' | translate }}</span>
+                      </div>
+                    }
+              </div>
+
+              <div class="field">
+                <label for="location">{{ 'TASKS.LOCATION' | translate }}*</label>
+                <p-select
+                  id="location"
+                  formControlName="location"
+                  [options]="allTurbines()"
+                  optionLabel="name"
+                  class="w-full"
+                  [class.detail]="type === 'Detail'"
+                  [placeholder]="'TASKS.DIALOG.LOCATION_PLACEHOLDER' | translate"
+                />
+                @if (taskForm.controls.location.invalid && taskForm.controls.location.touched) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ 'TASKS.VALIDATION.LOCATION_REQUIRED' | translate }}</span>
+                  </div>
+                }
+              </div>
             </div>
             <div class="step-footer">
               <p-button
@@ -94,6 +165,7 @@
 
         <p-step-panel [value]="2">
           <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
               <div>
                 <h3>{{ 'TASKS.DIALOG.QUALIFICATIONS' | translate }}</h3>
                 @if (type !== 'Detail') {
@@ -157,22 +229,23 @@
                   </ng-template>
                 </p-table>
               </div>
+            </div>
 
-              <div class="step-footer">
-                <p-button
-                  [label]="'COMMON.BACK' | translate"
-                  [text]="true"
-                  severity="secondary"
-                  (onClick)="activateCallback(1)"
-                />
-                <p-button
-                  [label]="'COMMON.NEXT' | translate"
-                  icon="pi pi-arrow-right"
-                  iconPos="right"
-                  (onClick)="validateAndGoToNext(2, 3, activateCallback)"
-                />
-              </div>
-            </ng-template>
+            <div class="step-footer">
+              <p-button
+                [label]="'COMMON.BACK' | translate"
+                [text]="true"
+                severity="secondary"
+                (onClick)="activateCallback(1)"
+              />
+              <p-button
+                [label]="'COMMON.NEXT' | translate"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="validateAndGoToNext(2, 3, activateCallback)"
+              />
+            </div>
+          </ng-template>
         </p-step-panel>
 
         <p-step-panel [value]="3">

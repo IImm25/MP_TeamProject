@@ -2,6 +2,7 @@
 using AutoMapper;
 using Backend.Data.DTO;
 using Backend.Data.DTO.Create;
+using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 
 namespace Backend.Web.Services
@@ -9,11 +10,13 @@ namespace Backend.Web.Services
     public class ToolService
     {
         private readonly IRepository<Tool> tools;
+        private readonly ITaskItemRepository taskItems;
         private readonly IMapper mapper;
 
-        public ToolService(IRepository<Tool> tools, IMapper mapper)
+        public ToolService(IRepository<Tool> tools, ITaskItemRepository taskItems, IMapper mapper)
         {
             this.tools = tools;
+            this.taskItems = taskItems;
             this.mapper = mapper;
         }
 
@@ -49,6 +52,19 @@ namespace Backend.Web.Services
         public async Task<bool> DeleteTool(int id)
         {
             return await tools.DeleteAsync(id);
+        }
+
+        public async Task<List<int>> GetTaskToolRequirements(int taskId, List<int> toolIds)
+        {
+            var task = await taskItems.GetFullByIdAsync(taskId);
+            if (task == null) return toolIds.Select(_ => 0).ToList();
+
+            var requiredTools = task.RequiredTools
+                .ToDictionary(x => x.ToolId, x => x.RequiredAmount);
+
+            return toolIds
+                .Select(id => requiredTools.GetValueOrDefault(id))
+                .ToList();
         }
     }
 }

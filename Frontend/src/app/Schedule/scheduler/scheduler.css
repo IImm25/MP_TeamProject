@@ -1,0 +1,19 @@
+.header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+:host ::ng-deep .step-footer {
+  background-color: var(--bg-color) !important;
+}

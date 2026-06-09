@@ -1,1 +1,25 @@
-sometext
+data;
+
+set TASKS := ta_2;
+set QUALIS := q_1;
+set PEOPLE := p_1;
+set TOOLS := to_1;
+
+param duration :=
+      ta_2      2;
+
+param hasQuali : q_1   :=
+         p_1          1     ;
+
+param requiredQualis: q_1   :=
+            ta_2     1     ;
+
+param requiredTools: to_1  :=
+            ta_2     3     ;
+
+param stockTools :=
+      to_1       20;
+
+param maxWorkingHours := 8;
+param amountBoats := 2;
+end;

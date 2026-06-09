@@ -1,4 +1,5 @@
 ﻿using Backend.Data;
+using Backend.Data.Entitites;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
 using Backend.Web.Services;
@@ -32,12 +33,15 @@ builder.Services.AddScoped<IRepository<PersonQualification>, Repository<PersonQu
 builder.Services.AddScoped<IRepository<TaskQualification>, Repository<TaskQualification>>();
 builder.Services.AddScoped<IRepository<TaskTool>, Repository<TaskTool>>();
 
+builder.Services.AddScoped<IRepository<Turbine>, Repository<Turbine>>();
+
 // registering services for Dependency Injection
 builder.Services.AddScoped<PersonService>();
 builder.Services.AddScoped<QualificationService>();
 builder.Services.AddScoped<TaskItemService>();
 builder.Services.AddScoped<ToolService>();
 builder.Services.AddScoped<GmplService>();
+builder.Services.AddScoped<TurbineService>();
 
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonSummaryMapper>();
@@ -49,6 +53,7 @@ builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<QualificationResponseMapper>();
     cfg.AddProfile<PersonDetailMapper>();
     cfg.AddProfile<PersonQualificationMapper>();
+    cfg.AddProfile<TurbineMapper>();
 });
 
 

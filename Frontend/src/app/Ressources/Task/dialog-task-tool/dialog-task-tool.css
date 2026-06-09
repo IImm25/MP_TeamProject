@@ -1,20 +1,16 @@
 :host ::ng-deep .p-dialog {
   color: var(--text-color);
-  height: 50vh;
+  height: auto;
+  min-height: 50vh;
 }
 
 h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
+  margin: 0
 }
 
 label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--text-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-left: 0.25rem;
@@ -27,42 +23,10 @@ label {
   margin-top: 1rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 .footer-actions {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  padding: 1rem;
 }
 
-
-:host ::ng-deep p-select,
-:host ::ng-deep .p-select,
-:host ::ng-deep p-inputnumber,
-:host ::ng-deep .p-inputnumber {
-  width: 100%;
-  display: flex;
-}
-
-:host ::ng-deep .p-inputnumber-input {
-  width: 100%;
-}
-
-:host ::ng-deep .p-select.p-disabled {
-  background-color: var(--bg-color) !important;
-  color: var(--text-color) !important;
-  border: none !important;
-  opacity: 1 !important;
-}
-
-:host ::ng-deep .p-dialog-footer {
-  border-top: 1px solid var(--secondary-color);
-  padding-top: 1.5rem;
-  margin-top: 1rem;
-  opacity: 0.8;
-}
 

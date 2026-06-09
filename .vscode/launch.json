@@ -1,0 +1,14 @@
+{
+    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "editor-browser",
+            "request": "launch",
+            "name": "Open dialog-tool.html",
+            "url": "file:///c%3A/Users/linda/Linda/Studium/Master/Semester%202/Mathematische%20Programmierung/%C3%9Cbungen/MP_TeamProject/Frontend/src/app/Ressources/Tool/dialog-tool/dialog-tool.html"
+        }
+    ]
+}

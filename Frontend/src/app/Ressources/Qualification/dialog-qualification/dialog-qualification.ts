@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DialogModule } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
+import { required } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-dialog-qualification',
@@ -18,31 +19,39 @@ export class DialogQualification {
   private fb = inject(FormBuilder);
   private httpService = inject(HttpService);
 
-  @Input() type: 'Edit' | 'New' = 'New';
+  @Input({required: true}) type: 'Edit' | 'New' | 'Detail' = 'New';
+  @Input() set selectedQualification(qual: Qualification | null) {
+    this.currentQualification = qual;
+    if (qual) {
+      this.qualificationForm.patchValue({
+        name: qual.name,
+        description: qual.description || '',
+      });
+      if (this.type === 'Detail') {
+        this.qualificationForm.disable();
+      } else {
+        this.qualificationForm.enable();
+      }
+    } else {
+      this.qualificationForm.reset({
+        name: '',
+        description: '',
+      });
+      if (this.type !== 'Detail') {
+        this.qualificationForm.enable();
+      }
+    }
+  };
   visible = model<boolean>(false);
 
   @Output() onSave = new EventEmitter<void>();
 
-  selectedId: number | null = null;
+  currentQualification: Qualification | null = null;
 
   qualificationForm = this.fb.group({
     name: ['', Validators.required],
     description: ['', Validators.required]
   });
-
-
-  patchForm(qualification: Qualification | null) {
-    if (qualification) {
-      this.selectedId = qualification.id;
-      this.qualificationForm.patchValue({
-        name: qualification.name,
-        description: qualification.description
-      });
-    } else {
-      this.selectedId = null;
-      this.qualificationForm.reset();
-    }
-  }
 
   close() {
     this.visible.set(false);
@@ -55,8 +64,8 @@ export class DialogQualification {
        name: this.qualificationForm.value.name || '',
        description: this.qualificationForm.value.description || '',
     };
-    const request = this.type === 'Edit' && this.selectedId
-      ? this.httpService.updateQualification(this.selectedId, payload)
+    const request = this.type === 'Edit' && this.currentQualification
+      ? this.httpService.updateQualification(this.currentQualification.id, payload)
       : this.httpService.createQualification(payload);
 
     request.subscribe(() => {

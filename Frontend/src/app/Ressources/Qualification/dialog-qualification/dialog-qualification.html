@@ -2,7 +2,8 @@
   [visible]="visible()"
   (visibleChange)="close()"
   [header]="
-    type === 'New' ? ('QUALIFICATIONS.DIALOG.NEW' | translate) : ('QUALIFICATIONS.DIALOG.EDIT' | translate)
+    type === 'New' ? ('QUALIFICATIONS.DIALOG.NEW' | translate) :
+    type === 'Detail' ? ('QUALIFICATIONS.DIALOG.DETAIL' | translate) : ('QUALIFICATIONS.DIALOG.EDIT' | translate)
   "
   [modal]="true"
   [draggable]="false"
@@ -38,7 +39,7 @@
       [label]="'COMMON.CANCEL' | translate"
       [text]="true"
       severity="secondary"
-      (onClick)="close()"
+      (onClick)="this.visible.set(false)"
     />
     <p-button
       [label]="'COMMON.SAVE' | translate"

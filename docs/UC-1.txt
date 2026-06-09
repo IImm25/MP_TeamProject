@@ -1,0 +1,42 @@
+### UC-01: Manage Personnel
+
+* Name and Identification Number: UC-01 Manage Personnel
+* Description: Creation, modification, and deletion of employee profiles, including the assignment of one or multiple qualifications to each person.
+* Participating Actors:
+* Primary Actor: Resource Manager
+* Secondary Actor: none
+
+
+* Status: to be approved
+* Used Use Cases (includes): none
+* Trigger: Hiring new staff, employee departures, or changes/updates in an employee's professional certifications.
+* Preconditions: The Resource Manager is authenticated and authorized within the system.
+* Invariants: An employee profile must always maintain a unique identifier. Relationships to historical schedules must not become corrupt upon deletion.
+* Postcondition/Result: The personnel registry is updated. Modified or new employee profiles (including their qualification) are available for scheduling.
+* Normal Flow:
+1. The Resource Manager navigates to the Personnel Management section.
+2. The system displays a list of all current employees and their assigned qualifications.
+3. The Resource Manager chooses to create a new employee profile.
+4. The Resource Manager enters the employee's personal details and selects one or multiple qualifications from a predefined list.
+5. The system validates the entries for completeness and uniqueness.
+6. The system saves the new/modified employee profile.
+
+
+* Alternative Flows:
+* 3a. Edit existing employee:
+1. The Resource Manager selects an existing employee from the list.
+2. The Resource Manager modifies details or adds/removes qualifications.
+3. The system saves the changes (Return to step 6).
+
+
+* 3b. Delete an employee:
+1. The Resource Manager selects an employee and triggers the deletion.
+2. The system checks if the employee is currently locked in an active deployment(?). If not, the profile is deleted.
+
+
+* Notes: An employee can hold multiple distinct qualifications simultaneously.
+
+
+use case history:
+Versionierung, Name des Autors, Datum, Beschreibung
+1.0, Leonie Skala, 29.05.2026, Initial creation
