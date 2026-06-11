@@ -1,14 +1,13 @@
 ﻿// Author: Erik Schellenberger
 
-namespace Backend.Data.Entitites
-{
-    public class TaskQualification
-    {
-        public int TaskItemId { get; set; }
-        public TaskItem TaskItem { get; set; } = null!;
+namespace Backend.Data.Entitites;
 
-        public int QualificationId { get; set; }
-        public Qualification Qualification { get; set; } = null!;
-        public int RequiredAmount { get; set; }
-    } 
-}
+public class TaskQualification
+{
+    public int TaskItemId { get; set; }
+    public TaskItem TaskItem { get; set; } = null!;
+
+    public int QualificationId { get; set; }
+    public Qualification Qualification { get; set; } = null!;
+    public int RequiredAmount { get; set; }
+} 

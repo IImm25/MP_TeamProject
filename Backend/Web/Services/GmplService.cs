@@ -1,14 +1,15 @@
-﻿namespace Backend.Web.Services;
-
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using AutoMapper;
+﻿using AutoMapper;
 using Backend.Data.DTO;
 using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 using Backend.GMPL;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Backend.Web.Services;
+
+
 
 public class GmplService
 {
@@ -23,7 +24,10 @@ public class GmplService
     private readonly TaskItemService taskItemService;
     private readonly QualificationService qualificationService;
     private readonly ToolService toolService;
+    private readonly TurbineService turbineService;
     private readonly IMapper mapper;
+
+    private readonly Repository<Plan> _planRepository;
 
     private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
@@ -50,7 +54,7 @@ public class GmplService
         return (name, indices);
     }
 
-    public GmplService(PersonService personService, TaskItemService taskItemService, QualificationService qualificationService, ToolService toolService, IMapper mapper, DateTime dateTime, float BoatSpeed)
+    public GmplService(PersonService personService, TaskItemService taskItemService, QualificationService qualificationService, ToolService toolService, TurbineService turbineService, IMapper mapper)
     {
         this.personService = personService;
         this.taskItemService = taskItemService;
@@ -74,312 +78,421 @@ public class GmplService
         //Glpk.glp_free_env();
     }
 
+
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
-        return new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []);
+        
+        List<int> taskIds = (await taskItemService.GetAll()).Select(t => t.Id).ToList();
+        List<int> personIds = (await personService.GetAll()).Select(p => p.Id).ToList();
+        List<int> toolIds = (await toolService.GetAll()).Select(t => t.Id).ToList();
+        List<TurbineResponseDto> turbines = await turbineService.GetAll();
+        List<int> qualIds = await GetUsedQualificationIds(taskIds, personIds);
+
+        List<TaskItemDetailDto> taskItemDetails = new List<TaskItemDetailDto>();
+        foreach (var taskId in taskIds)
+        {
+            var task = await taskItemService.GetTaskItem(taskId);
+            if (task != null) taskItemDetails.Add(task);
+        }
 
 
-        List<int> qualIds = await GetUsedQualificationIds(request.TaskItemIds, request.PersonIds);
-        string datFileText = await CreateDataFileAsync(request, qualIds);
+        List<PlanBoat> existingPlans = new List<PlanBoat>();
+        List<BoatPerson> existingAssignments = new List<BoatPerson>();
+        List<BoatTool> existingTools = new List<BoatTool>();
+
+        List<Plan> plans = await _planRepository.GetAllAsync();
+        var latestPlan = plans.Last();
+        if (latestPlan != null && latestPlan.Boats != null)
+        {
+            existingPlans = latestPlan.Boats.ToList();
+            existingAssignments = latestPlan.Boats.SelectMany(b => b.Persons).ToList();
+            existingTools = latestPlan.Boats.SelectMany(b => b.Tools).ToList();
+        }
+
+        // Danach die Data-Datei mit diesen (gefüllten) Listen erstellen
+        string datFileText = await CreateDataFileAsync(
+            request,
+            qualIds,
+            taskIds,
+            personIds,
+            toolIds,
+            turbines,
+            existingPlans,      // jetzt ggf. gefüllt
+            existingAssignments,
+            existingTools,
+            taskItemDetails
+        );
+        
+
         string datFile = Path.GetTempFileName();
         File.WriteAllText(datFile, datFileText);
 
-        if (GLPKDllWrapper.glp_mpl_read_data(tran, datFile) != 0)
+        try
         {
-            throw new Exception($"Error while reading GMPL data File: '{Path.GetFullPath(datFile)}'");
-        }
-        File.Delete(datFile);   // cleanup temp dat file on sucess
+            if (GLPKDllWrapper.glp_mpl_read_data(tran, datFile) != 0)
+                throw new Exception($"Fehler beim Lesen der GMPL-Data-Datei: '{datFile}'");
+            File.Delete(datFile);
 
-        if (GLPKDllWrapper.glp_mpl_generate(tran, nint.Zero) != 0)
-        {
-            throw new Exception($"Error generating GMPL Modell.");
-        }
+            
+            if (GLPKDllWrapper.glp_mpl_generate(tran, nint.Zero) != 0)
+                throw new Exception("Fehler beim Generieren des GMPL-Modells.");
 
-        GLPKDllWrapper.glp_mpl_build_prob(tran, prob);
-
-        // Simplex
-        var smcp = new GLPKDllWrapper.glp_smcp();
-        GLPKDllWrapper.glp_init_smcp(ref smcp);
-        smcp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
-
-        int simplexErr = GLPKDllWrapper.glp_simplex(prob, ref smcp);
-
-        // MIP
-        var iocp = new GLPKDllWrapper.glp_iocp();
-        GLPKDllWrapper.glp_init_iocp(ref iocp);
-        iocp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
-
-        int mipError = GLPKDllWrapper.glp_intopt(prob, ref iocp);
-        if (simplexErr != 0 || mipError != 0)
-        {
-            var (toolDiff, qualDiff) = await Validate(request.TaskItemIds, request.PersonIds, request.ToolIds, qualIds);
-            //return new PlanResponseDto(0.0, [], toolDiff, qualDiff);
-        }
-        GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
+            
+            GLPKDllWrapper.glp_mpl_build_prob(tran, prob);
 
 
-        var taskOnBoat = new HashSet<int>[request.BoatNumber];
-        var personOnBoat = new HashSet<int>[request.BoatNumber];
-        var toolOnBoat = new Dictionary<int, int>[request.BoatNumber];
-        var boatUsage = new bool[request.BoatNumber];
+            var smcp = new GLPKDllWrapper.glp_smcp();
+            GLPKDllWrapper.glp_init_smcp(ref smcp);
+            smcp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
+            int simplexErr = GLPKDllWrapper.glp_simplex(prob, ref smcp);
 
-        for (int i = 0; i < request.BoatNumber; i++)
-        {
-            taskOnBoat[i] = new HashSet<int>();
-            personOnBoat[i] = new HashSet<int>();
-            toolOnBoat[i] = new Dictionary<int, int>();
-        }
+            
+            var iocp = new GLPKDllWrapper.glp_iocp();
+            GLPKDllWrapper.glp_init_iocp(ref iocp);
+            iocp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
+            int mipError = GLPKDllWrapper.glp_intopt(prob, ref iocp);
 
-        int numCols = GLPKDllWrapper.glp_get_num_cols(prob);
-
-        for (int j = 1; j <= numCols; j++)
-        {
-            string colName = GLPKDllWrapper.GetColName(prob, j);
-            int val = (int)Math.Round(GLPKDllWrapper.glp_mip_col_val(prob, j));
-
-            var (varName, indices) = parseColumnName(colName);
-
-            switch (varName)
+            if (simplexErr != 0 || mipError != 0)
             {
-                case "taskOnBoat":
-                    {
-                        int boatId = indices[0];
-                        int taskId = indices[1];
-                        if (val != 0)
-                            taskOnBoat[boatId].Add(taskId);
-                        break;
-                    }
-                case "personOnBoat":
-                    {
-                        int boatId = indices[0];
-                        int personId = indices[1];
-                        if (val != 0)
-                            personOnBoat[boatId].Add(personId);
-                        break;
-                    }
-                case "toolOnBoat":
-                    {
-                        int boatId = indices[0];
-                        int toolId = indices[1];
-                        if (val > 0)
-                            toolOnBoat[boatId][toolId] = val;
-                        break;
-                    }
-                case "boatUsage":
-                    {
-                        int boatId = indices[0];
-                        boatUsage[boatId] = val != 0;
-                        break;
-                    }
-                default:
-                    throw new Exception($"Unknown column name id GMPL Solver results: {varName}[{indices}]");
-            }
-        }
-
-        List<BoatPlanDto> boats = new List<BoatPlanDto>();
-
-        for (int i = 0; i < request.BoatNumber; i++)
-        {
-            if (!boatUsage[i]) continue;
-
-            List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
-            foreach (var id in personOnBoat[i])
-            {
-                persons.Add(
-                    mapper.Map<PersonSummaryDto>(
-                        await personService.GetPerson(id + 1) // very ugly fix
-                    )
-                );
+                var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
+                return new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, new List<BoatPlanDto>());
             }
 
-            List<TaskToolDto> tools = toolOnBoat[i]
-                .Select(x => new TaskToolDto
+            
+            GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
+
+           
+            var taskOnBoat = new HashSet<int>[request.BoatNumber];
+            var personOnBoat = new HashSet<int>[request.BoatNumber];
+            var toolOnBoat = new Dictionary<int, int>[request.BoatNumber];
+            var boatUsage = new bool[request.BoatNumber];
+
+            for (int i = 0; i < request.BoatNumber; i++)
+            {
+                taskOnBoat[i] = new HashSet<int>();
+                personOnBoat[i] = new HashSet<int>();
+                toolOnBoat[i] = new Dictionary<int, int>();
+            }
+
+            var startTimes = new Dictionary<(int boat, int task), TimeOnly>();
+
+            int numCols = GLPKDllWrapper.glp_get_num_cols(prob);
+            for (int j = 1; j <= numCols; j++)
+            {
+                string colName = GLPKDllWrapper.GetColName(prob, j);
+                int val = (int)Math.Round(GLPKDllWrapper.glp_mip_col_val(prob, j));
+                var (varName, indices) = parseColumnName(colName);
+
+                switch (varName)
                 {
-                    ToolId = x.Key + 1,
-                    RequiredAmount = x.Value
-                }).ToList();
-
-
-            List<TaskItemSummaryDto> tasks = new List<TaskItemSummaryDto>();
-            foreach (var id in taskOnBoat[i])
-            {
-                tasks.Add(
-                    mapper.Map<TaskItemSummaryDto>(
-                        await taskItemService.GetTaskItem(id + 1) // very ugly fix
-                    )
-                );
+                    case "taskOnBoat":
+                        if (indices.Count >= 2 && val != 0)
+                            taskOnBoat[indices[0]].Add(indices[1]);
+                        break;
+                    case "personOnBoat":
+                        if (indices.Count >= 2 && val != 0)
+                            personOnBoat[indices[0]].Add(indices[1]);
+                        break;
+                    case "toolOnBoat":
+                        if (indices.Count >= 2 && val > 0)
+                            toolOnBoat[indices[0]][indices[1]] = val;
+                        break;
+                    case "boatUsage":
+                        if (indices.Count >= 1)
+                            boatUsage[indices[0]] = val != 0;
+                        break;
+                }
             }
 
-            //boats.Add(new BoatPlanDto(tasks, persons, tools));
+           
+            List<BoatPlanDto> boats = new List<BoatPlanDto>();
+            for (int i = 0; i < request.BoatNumber; i++)
+            {
+                if (!boatUsage[i]) continue;
+
+                List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
+                foreach (int pid in personOnBoat[i])
+                {
+                    var p = await personService.GetPerson(pid);
+                    if (p != null) persons.Add(mapper.Map<PersonSummaryDto>(p));
+                }
+
+                List<TaskToolDto> tools = toolOnBoat[i]
+                    .Select(kv => new TaskToolDto { ToolId = kv.Key, RequiredAmount = kv.Value })
+                    .ToList();
+
+                List<TaskScheduleDto> tasks = new List<TaskScheduleDto>();
+                foreach (int tid in taskOnBoat[i])
+                {
+                    var t = await taskItemService.GetTaskItem(tid);
+                    if (t != null)
+                    {
+                        TimeOnly startTime = startTimes.GetValueOrDefault((i, tid), TimeOnly.MinValue);
+                        tasks.Add(new TaskScheduleDto(startTime, mapper.Map<TaskItemSummaryDto>(t)));
+                    }
+                }
+
+                boats.Add(new BoatPlanDto(tasks, persons, tools));
+            }
+
+            var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
+
+            return new PlanResponseDto(
+                DateOnly.FromDateTime(request.Time),
+                DateTimeOffset.UtcNow,
+                boats
+                );
         }
-
-        double workingHours = GLPKDllWrapper.glp_mip_obj_val(prob);
-
-        var (partialToolDiff, partialQualDiff) = await Validate(request.TaskItemIds, request.PersonIds, request.ToolIds, qualIds);
-
-        //return new PlanResponseDto(workingHours, boats, partialToolDiff, partialQualDiff);
+        catch (Exception ex)
+        {
+            if (File.Exists(datFile)) File.Delete(datFile);
+            throw new Exception($"Fehler in Solve: {ex.Message}", ex);
+        }
     }
-
-
-    private async Task<string> CreateDataFileAsync(PlanRequestDto info, List<int> qualIds)
+    private async Task<string> CreateDataFileAsync(
+        PlanRequestDto info,
+        List<int> qualIds,
+        List<int> taskIds,
+        List<int> personIds,
+        List<int> toolIds,
+        List<TurbineResponseDto> turbines,
+        List<PlanBoat> existingPlans,
+        List<BoatPerson> existingAssignments,
+        List<BoatTool> existingTools,
+        List<TaskItemDetailDto> taskItemDetails)
     {
-        var taskIds = info.TaskItemIds;
-        var personIds = info.PersonIds;
-        var toolIds = info.ToolIds;
-
         var sb = new StringBuilder();
 
         sb.AppendLine("data;");
+        sb.AppendLine();
 
+        // Sets
         sb.AppendLine($"set TASKS := {string.Join(" ", taskIds.Select(id => $"ta_{id}"))};");
         sb.AppendLine($"set PEOPLE := {string.Join(" ", personIds.Select(id => $"p_{id}"))};");
         sb.AppendLine($"set QUALIS := {string.Join(" ", qualIds.Select(id => $"q_{id}"))};");
         sb.AppendLine($"set TOOLS := {string.Join(" ", toolIds.Select(id => $"to_{id}"))};");
-        sb.AppendLine($"set Places := {string.Join(" ", toolIds.Select(id => $"w_{id}"))};");
+
+        string places = "w_1 " + string.Join(" ", turbines.Select(t => $"w_{t.Id}"));
+        sb.AppendLine($"set PLACES := {places};");
         sb.AppendLine();
-        sb.AppendLine();
-        sb.AppendLine($"param maxWorkingHours := {info.MaxTime};");
+
+        // Parameter
+        sb.AppendLine($"param maxWorkingHours := {info.MaxWorkHours.ToString(CultureInfo.InvariantCulture)};");
         sb.AppendLine($"param amountBoats := {info.BoatNumber};");
         sb.AppendLine($"param drivingSpeed := {info.BoatSpeed.ToString(CultureInfo.InvariantCulture)};");
-        sb.AppendLine("end;");
-
         sb.AppendLine();
 
         // Duration
         sb.AppendLine("param duration :=");
-        for (int i = 0; i < taskIds.Count; i++)
+        foreach (var taskId in taskIds)
         {
-            var taskItem = await taskItemService.GetTaskItem(taskIds[i]);
-            sb.AppendLine($"\tta_{taskIds[i]} {taskItem!.DurationHours.ToString(CultureInfo.InvariantCulture)}");
+            var taskItem = taskItemDetails.FirstOrDefault(t => t.Id == taskId);
+            sb.AppendLine($"\tta_{taskId} {taskItem?.DurationHours.ToString(CultureInfo.InvariantCulture) ?? "0"}");
         }
-        sb.AppendLine(";\n");
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        // Person <-> Qualification
-        sb.AppendLine($"param hasQuali : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} := ");
-        for (int i = 0; i < personIds.Count; i++)
+        // Person -> Qualification
+        sb.AppendLine($"param hasQuali : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} :=");
+        foreach (var personId in personIds)
         {
-            var qualMask = await qualificationService.GetPersonQualificationMask(personIds[i], qualIds);
+            var qualMask = await qualificationService.GetPersonQualificationMask(personId, qualIds);
             var maskStr = qualMask.Select(b => b ? "1" : "0");
-            sb.AppendLine($"\tp_{personIds[i]} {string.Join(" ", maskStr)}");
+            sb.AppendLine($"\tp_{personId} {string.Join(" ", maskStr)}");
         }
-        sb.AppendLine(";\n");
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        // Task <-> Qualification
-        sb.AppendLine($"param requiredQualis : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} := ");
-        for (int i = 0; i < taskIds.Count; i++)
+        // Task -> Qualification
+        sb.AppendLine($"param requiredQualis : {string.Join(" ", qualIds.Select(id => $"q_{id}"))} :=");
+        foreach (var taskId in taskIds)
         {
-            var qualReq = await qualificationService.GetTaskQualificationRequirements(taskIds[i], qualIds);
-            sb.AppendLine($"\tta_{taskIds[i]} {string.Join(" ", qualReq)}");
+            var qualReq = await qualificationService.GetTaskQualificationRequirements(taskId, qualIds);
+            sb.AppendLine($"\tta_{taskId} {string.Join(" ", qualReq)}");
         }
-        sb.Append(";\n");
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        // Task <-> Tools
-        sb.AppendLine($"param requiredTools: {string.Join(" ", toolIds.Select(id => $"to_{id}"))} := ");
-        for (int i = 0; i < taskIds.Count; i++)
+        // Task -> Tools
+        sb.AppendLine($"param requiredTools : {string.Join(" ", toolIds.Select(id => $"to_{id}"))} :=");
+        foreach (var taskId in taskIds)
         {
-            var qualTools = await toolService.GetTaskToolRequirements(taskIds[i], toolIds);
-            sb.AppendLine($"\tta_{taskIds[i]} {string.Join(" ", qualTools)}");
+            var toolReqs = await toolService.GetTaskToolRequirements(taskId, toolIds);
+            sb.AppendLine($"\tta_{taskId} {string.Join(" ", toolReqs)}");
         }
-        sb.AppendLine(";\n");
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        // Tools
-        sb.AppendLine("param stockTools := ");
-        for (int i = 0; i < toolIds.Count; i++)
+        // Stock Tools
+        sb.AppendLine("param stockTools :=");
+        foreach (var toolId in toolIds)
         {
-            var tool = await toolService.GetTool(toolIds[i]);
-            sb.AppendLine($"\tto_{toolIds[i]} {tool!.AvailableStock}");
+            var tool = await toolService.GetTool(toolId);
+            sb.AppendLine($"\tto_{toolId} {tool?.AvailableStock ?? 0}");
         }
-        sb.AppendLine(";\n");
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        //Priority
-        sb.AppendLine("param taskPrio := ");
-        sb.AppendLine(";\n");
+        // Priority
+        sb.AppendLine("param taskPrio :=");
+        foreach (var taskId in taskIds)
+        {
+            var taskItem = taskItemDetails.FirstOrDefault(t => t.Id == taskId);
+            float priority = CalculatePriority(info.Time, taskItem);
+            sb.AppendLine($"\tta_{taskId} {priority.ToString(CultureInfo.InvariantCulture)}");
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        //TaskLocations
-        sb.AppendLine("param taskLocation := ");
-        sb.AppendLine(";\n");
+        // Task Locations
+        sb.AppendLine("param taskLocation :=");
+        foreach (var task in taskItemDetails)
+        {
+            sb.AppendLine($"\tta_{task.Id} w_{task.Location.Id}");
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        //Distance Matrix
-        sb.AppendLine("param distances := ");
-        sb.AppendLine(";\n");
+        // Distance Matrix
+        var turbineEntities = turbines.Select(t => new Turbine(t.Name, t.Latitude, t.Longitude) { Id = t.Id }).ToList();
+        float[,] distances = CalculateTurbineDistances(turbineEntities, new Harbor(0, 0));
 
-        //fixed Boat
-        sb.AppendLine("param fixedBoat := ");
-        sb.AppendLine(";\n");
+        var locationNames = new List<string> { "w_1" };
+        locationNames.AddRange(turbines.Select(t => $"w_{t.Id}"));
 
-        // fixed Taskorder on boat
-        sb.AppendLine("param fixedOrder := ");
-        sb.AppendLine(";\n");
+        sb.AppendLine($"param distance : {string.Join(" ", locationNames)} :=");
+        for (int i = 0; i < locationNames.Count; i++)
+        {
+            sb.Append($"\t{locationNames[i]}");
+            for (int j = 0; j < locationNames.Count; j++)
+            {
+                sb.Append($" {distances[i, j].ToString(CultureInfo.InvariantCulture)}");
+            }
+            sb.AppendLine();
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        //People in use
-        sb.AppendLine("param fixedPerson := ");
-        sb.AppendLine(";\n");
+        // Fixed Boat
+        sb.AppendLine("param fixedBoat :=");
+        foreach (var taskId in taskIds)
+        {
+            var existingPlan = existingPlans.FirstOrDefault(p => p.TaskSchedules.Any(ts => ts.TaskId == taskId));
+            int boatNumber = existingPlan?.BoatNumber ?? 0;
+            sb.AppendLine($"\tta_{taskId} {boatNumber}");
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
 
-        //Tools in use
-        sb.AppendLine("param fixedToolAmount := ");
-        sb.AppendLine(";\n");
+        // Fixed Order
+        sb.AppendLine("param fixedOrder :=");
+        foreach (var taskId in taskIds)
+        {
+            var existingSchedule = existingPlans
+                .SelectMany(p => p.TaskSchedules)
+                .FirstOrDefault(ts => ts.TaskId == taskId);
+
+            if (existingSchedule != null)
+            {
+                // TODO: Order aus existingSchedule holen
+                int order = 1;
+                sb.AppendLine($"\tta_{taskId} {order}");
+            }
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
+
+        // Fixed Person
+        sb.AppendLine("param fixedPerson :=");
+        foreach (var personId in personIds)
+        {
+            var existingAssignment = existingAssignments.FirstOrDefault(a => a.PersonId == personId);
+            int boatNumber = existingAssignment?.BoatNumber ?? 0;
+            sb.AppendLine($"\tp_{personId} {boatNumber}");
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
+
+        // Fixed Tool Amount
+        sb.AppendLine($"param fixedToolAmount : {string.Join(" ", toolIds.Select(id => $"to_{id}"))} :=");
+        for (int boatNum = 1; boatNum <= info.BoatNumber; boatNum++)
+        {
+            sb.Append($"\t{boatNum}");
+            foreach (var toolId in toolIds)
+            {
+                var existingTool = existingTools.FirstOrDefault(bt =>
+                    bt.BoatNumber == boatNum && bt.ToolId == toolId);
+                int amount = existingTool?.RequiredAmount ?? 0;
+                sb.Append($" {amount}");
+            }
+            sb.AppendLine();
+        }
+        sb.AppendLine(";");
+        sb.AppendLine();
+
+        sb.AppendLine("end;");
 
         return sb.ToString();
     }
 
-    //mock Harbor
-    private record Harbor(
-        float Latitude,
-        float Longitude
-        );
+    private float CalculatePriority(DateTime currentTime, TaskItemDetailDto task)
+    {
+        if (currentTime >= task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue))
+        {
+            var start = task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue);
+            var end = task.ExecutionIntervalEnd.ToDateTime(TimeOnly.MinValue);
+
+            if (end == start) return 1.0f;
+
+            float priority = (float)((currentTime - start).TotalHours / (end - start).TotalHours);
+            return Math.Clamp(priority, 0.0f, 1.0f);
+        }
+
+        return 0.0f;
+    }
+
+    private record Harbor(float Latitude, float Longitude);
 
     private float[,] CalculateTurbineDistances(List<Turbine> turbines, Harbor harbor)
     {
-        turbines.Insert(0, new Turbine("Harbor", harbor.Latitude, harbor.Longitude));
-        float[,] distances = new float[turbines.Count, turbines.Count];
+        var allLocations = new List<Turbine> { new Turbine("Harbor", harbor.Latitude, harbor.Longitude) { Id = 0 } };
+        allLocations.AddRange(turbines);
 
-        for (int i = 0; i < turbines.Count; i++)
+        float[,] distances = new float[allLocations.Count, allLocations.Count];
+
+        for (int i = 0; i < allLocations.Count; i++)
         {
-            for (int j = i + 1; j < turbines.Count; j++)
+            for (int j = i + 1; j < allLocations.Count; j++)
             {
-                float dist = HaversineKm(
-                    turbines[i].Latitude, turbines[i].Longitude,
-                    turbines[j].Latitude, turbines[j].Longitude);
+                float dist = Haversine2Km(
+                    allLocations[i].Latitude, allLocations[i].Longitude,
+                    allLocations[j].Latitude, allLocations[j].Longitude);
 
                 distances[i, j] = dist;
-                distances[j, i] = dist; // Matrix ist symmetrisch
+                distances[j, i] = dist;
             }
         }
 
         return distances;
     }
 
-    private float HaversineKm(float lat1, float lon1, float lat2, float lon2)
+    private float Haversine2Km(float latitude1, float longitude1, float latitude2, float longitude2)
     {
-        const float R = 6371f; // Erdradius in km
+        const float earthRadius = 6371f;
 
-        float dLat = ToRad(lat2 - lat1);
-        float dLon = ToRad(lon2 - lon1);
+        float diffLatitude = ToRad(latitude2 - latitude1);
+        float diffLongitude = ToRad(longitude2 - longitude1);
 
-        float a = MathF.Sin(dLat / 2) * MathF.Sin(dLat / 2)
-                + MathF.Cos(ToRad(lat1)) * MathF.Cos(ToRad(lat2))
-                * MathF.Sin(dLon / 2) * MathF.Sin(dLon / 2);
+        float a = MathF.Sin(diffLatitude / 2) * MathF.Sin(diffLatitude / 2)
+                + MathF.Cos(ToRad(latitude1)) * MathF.Cos(ToRad(latitude2))
+                * MathF.Sin(diffLongitude / 2) * MathF.Sin(diffLongitude / 2);
 
         float c = 2 * MathF.Atan2(MathF.Sqrt(a), MathF.Sqrt(1 - a));
 
-        return R * c;
+        return earthRadius * c;
     }
 
     private float ToRad(float degrees) => degrees * (MathF.PI / 180f);
-
-    private float CaclulatePriority(DateTime currentTime, TaskItem task)
-    {
-        float priority = 0.0f;
-        if (currentTime >= task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue))
-        {
-            var start = task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue);
-            var end = task.ExecutionIntervalEnd.ToDateTime(TimeOnly.MinValue);
-
-            priority = (float)((currentTime - start) / (end - start));
-        }
-
-        return priority;
-    }
 
     private async Task<List<int>> GetUsedQualificationIds(List<int> taskIds, List<int> personIds)
     {
@@ -417,15 +530,12 @@ public class GmplService
     {
         toolIds = toolIds.Distinct().ToList();
 
-        // -------------------------
-        // REQUIRED QUALIFICATIONS
-        // -------------------------
+        // Required Qualifications
         var requiredQuals = qualIds.ToDictionary(id => id, _ => 0);
 
         foreach (var taskId in taskIds)
         {
-            var req = await qualificationService
-                .GetTaskQualificationRequirements(taskId, qualIds);
+            var req = await qualificationService.GetTaskQualificationRequirements(taskId, qualIds);
 
             for (int i = 0; i < qualIds.Count; i++)
             {
@@ -433,15 +543,12 @@ public class GmplService
             }
         }
 
-        // -------------------------
-        // AVAILABLE QUALIFICATIONS
-        // -------------------------
+        // Available Qualifications
         var availableQuals = qualIds.ToDictionary(id => id, _ => 0);
 
         foreach (var personId in personIds)
         {
-            var mask = await qualificationService
-                .GetPersonQualificationMask(personId, qualIds);
+            var mask = await qualificationService.GetPersonQualificationMask(personId, qualIds);
 
             for (int i = 0; i < qualIds.Count; i++)
             {
@@ -450,15 +557,12 @@ public class GmplService
             }
         }
 
-        // -------------------------
-        // REQUIRED TOOLS
-        // -------------------------
+        // Required Tools
         var requiredTools = toolIds.ToDictionary(id => id, _ => 0);
 
         foreach (var taskId in taskIds)
         {
-            var req = await toolService
-                .GetTaskToolRequirements(taskId, toolIds);
+            var req = await toolService.GetTaskToolRequirements(taskId, toolIds);
 
             for (int i = 0; i < toolIds.Count; i++)
             {
@@ -466,20 +570,16 @@ public class GmplService
             }
         }
 
-        // -------------------------
-        // AVAILABLE TOOLS
-        // -------------------------
+        // Available Tools
         var availableTools = toolIds.ToDictionary(id => id, _ => 0);
 
         foreach (var toolId in toolIds)
         {
             var tool = await toolService.GetTool(toolId);
-            availableTools[toolId] = tool!.AvailableStock;
+            availableTools[toolId] = tool?.AvailableStock ?? 0;
         }
 
-        // -------------------------
-        // DIFF OUTPUT (FILTERED)
-        // -------------------------
+        // Diff Output
         var toolDiff = toolIds
             .Select(id => new RequirementDiffDto(
                 id,
@@ -498,7 +598,5 @@ public class GmplService
 
         return (toolDiff, qualDiff);
     }
-
-
 
 }

@@ -25,7 +25,7 @@ public class GMPLController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<ActionResult<PlanResponseDto>> Plan([FromBody] DateTime date, [FromBody] float BoatSpeed = 36f)
+    public async Task<ActionResult<PlanResponseDto>> Plan([FromBody] PlanRequestDto request)
     {
         try
         {
