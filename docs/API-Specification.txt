@@ -115,10 +115,10 @@
 
 	post: /plan
 		body:
-			maxTime: float/ double
-			boatNumber: int
+			maxTime: float/ double ??
+			boatNumber: int ??
 			date: string (ISO-8601)
-			speed: double/ float
+			speed: float
 		response 200:
 			totalTime: double/float
 			boats[]: 
