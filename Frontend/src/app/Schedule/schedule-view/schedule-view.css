@@ -1,3 +1,54 @@
+/*
+*/
+
+/* --- HEADER CONTROLS --- */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+.date-selector {
+  min-width: 150px;
+}
+
+/* Zwingt den Datepicker-Input in ein kompaktes, edles Navbar-Format */
+:host ::ng-deep .date-selector .p-datepicker input {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-color) !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  text-align: center;
+  border-radius: 4px !important;
+}
+
+/* --- EMPTY DATABANK STATE --- */
+.no-plan-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  color: #52525b;
+  text-align: center;
+}
+
+.no-plan-state i {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.no-plan-state p {
+  font-size: 1rem;
+  font-style: italic;
+  margin: 0;
+}
+
+/* --- RESTLICHE GANTT- & CARD-STYLES BLEIBEN IDENTISCH --- */
 .schedule-container {
   padding: 2rem;
   background-color: var(--bg-color);
@@ -78,15 +129,112 @@
   transform: translateY(-2px);
 }
 
+/* --- GANTT STYLES --- */
+.view-switcher-container {
+  display: flex;
+  align-items: center;
+}
+.view-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a1a1aa;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.view-btn.left {
+  border-radius: 4px 0 0 4px;
+}
+.view-btn.right {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+.view-btn.active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+.gantt-chart {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.gantt-timeline-header {
+  display: flex;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 0;
+}
+.gantt-label-space {
+  width: 150px;
+  flex-shrink: 0;
+}
+.gantt-hours {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 1rem;
+  color: #a1a1aa;
+  font-size: 0.8rem;
+}
+.gantt-row {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  min-height: 70px;
+  height: auto
+}
+.gantt-label-cell {
+  width: 150px;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.gantt-timeline-cell {
+  position: relative;
+  width: 100%;
+  height: 70px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 10% 100%;
+}
+.gantt-bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: auto;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: var(--text-color);
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.gantt-bar.task {
+  background-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.gantt-bar.travel {
+  background-color: var(--bg-color);
+}
+
 @media (min-width: 768px) {
   .card-wrapper {
     width: 50%;
   }
 }
-
 @media (min-width: 1024px) {
   .card-wrapper {
     width: 33.333333%;
   }
 }
-

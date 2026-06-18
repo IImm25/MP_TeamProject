@@ -36,3 +36,9 @@ export interface RequirementDiff {
   required: number;
   available: number;
 }
+
+export interface TravelTime {
+  boatNumber: number;
+  travelTime: string;
+  travelDuration: number;
+}

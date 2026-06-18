@@ -1,94 +1,282 @@
-<p-toast position="top-right"/>
+<p-toast position="top-right" />
 
 <div class="content-wrapper">
   <header class="section-header">
     <div class="title-group">
       <h1 class="title">{{ 'SCHEDULE.TITLE' | translate }}</h1>
     </div>
+
+    <div class="header-controls">
+      <div class="date-selector">
+        <p-datepicker
+          [(ngModel)]="selectedDate"
+          (onSelect)="onDateChange($event)"
+          [showIcon]="true"
+          iconDisplay="input"
+          dateFormat="dd.mm.yy"
+          appendTo="body"
+        />
+      </div>
+
+      <div class="view-switcher-container">
+        <button
+          type="button"
+          class="view-btn left"
+          [class.active]="currentView() === 'cards'"
+          (click)="currentView.set('cards')"
+        >
+          <i class="pi pi-th-large"></i> {{ 'SCHEDULE.CARDS' | translate }}
+        </button>
+        <button
+          type="button"
+          class="view-btn right"
+          [class.active]="currentView() === 'gantt'"
+          (click)="currentView.set('gantt')"
+        >
+          <i class="pi pi-chart-bar"></i> {{ 'SCHEDULE.GANTT' | translate }}
+        </button>
+      </div>
+    </div>
   </header>
 
   <div class="schedule-container">
-    <div class="grid">
-      @for (boat of boats(); track $index) {
-        <div class="card-wrapper">
-          <p-card
-            [header]="$index === 0 ? ('SCHEDULE.UNUSED' | translate ) : ( 'SCHEDULE.BOAT' | translate ) + ' ' + ($index)"
-            [styleClass]="'custom-card ' + (isBoatEmpty(boat) ? 'empty-boat-card' : '')"
-          >
-            <p-accordion [multiple]="true">
-              <p-accordion-panel value="tasks" [disabled]="isBoatEmpty(boat)">
-                <p-accordion-header>
-                  <i class="pi pi-list mr-2"></i> {{ 'MENU.TASKS' | translate }}
-                </p-accordion-header>
-                <p-accordion-content>
-                  <div class="chips-container">
-                  <!-- @for (task of boat.taskItems; track task.id) {
-                      <p-chip
-                        [label]="task.name "
-                        icon="pi pi-list"
-                        (click)="openTask(task)"
-                        styleClass="clickable-chip"
-                      />
-                  }-->
-                  </div>
-                </p-accordion-content>
-              </p-accordion-panel>
+    @if (boats().length === 0 && unusedResources().taskSchedules.length === 0) {
+      <div class="no-plan-state">
+        <i class="pi pi-calendar-times"></i>
+        <p>{{ 'SCHEDULE.GANTTVIEW.NO_PLAN' | translate }}</p>
+      </div>
+    } @else {
+      @if (currentView() === 'cards') {
+        <div class="grid">
+          @if (
+            unusedResources().taskSchedules.length > 0 ||
+            unusedResources().persons.length > 0 ||
+            unusedResources().tools.length > 0
+          ) {
+            <div class="card-wrapper">
+              <p-card
+                [header]="'SCHEDULE.CARD.UNUSED' | translate"
+                styleClass="custom-card empty-boat-card"
+              >
+                <p-accordion [multiple]="true">
+                  <p-accordion-panel
+                    value="tasks"
+                    [disabled]="unusedResources().taskSchedules.length === 0"
+                  >
+                    <p-accordion-header
+                      ><i class="pi pi-list mr-2"></i>
+                      {{ 'MENU.TASKS' | translate }}</p-accordion-header
+                    >
+                    <p-accordion-content>
+                      <div class="chips-container">
+                        @for (schedule of unusedResources().taskSchedules; track schedule.task.id) {
+                          <p-chip
+                            [label]="schedule.task.name"
+                            icon="pi pi-list"
+                            (click)="openTask(schedule.task)"
+                            styleClass="clickable-chip"
+                          />
+                        }
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                  <p-accordion-panel
+                    value="crew"
+                    [disabled]="unusedResources().persons.length === 0"
+                  >
+                    <p-accordion-header
+                      ><i class="pi pi-users mr-2"></i>
+                      {{ 'MENU.EMPLOYEES' | translate }}</p-accordion-header
+                    >
+                    <p-accordion-content>
+                      <div class="chips-container">
+                        @for (person of unusedResources().persons; track person.id) {
+                          <p-chip
+                            [label]="person.firstname + ' ' + person.lastname"
+                            icon="pi pi-user"
+                            (click)="openEmployee(person)"
+                            styleClass="clickable-chip"
+                          />
+                        }
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                  <p-accordion-panel
+                    value="tools"
+                    [disabled]="unusedResources().tools.length === 0"
+                  >
+                    <p-accordion-header
+                      ><i class="pi pi-wrench mr-2"></i>
+                      {{ 'MENU.TOOLS' | translate }}</p-accordion-header
+                    >
+                    <p-accordion-content>
+                      <div class="chips-container">
+                        @for (t of unusedResources().tools; track t.toolId) {
+                          <p-chip
+                            [label]="getToolName(t.toolId)"
+                            icon="pi pi-wrench"
+                            (click)="openTool(t.toolId, 1)"
+                            styleClass="clickable-chip"
+                          />
+                        }
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                </p-accordion>
+              </p-card>
+            </div>
+          }
 
-              <p-accordion-panel value="crew" [disabled]="isBoatEmpty(boat)">
-                <p-accordion-header>
-                  <i class="pi pi-users mr-2"></i> {{ 'MENU.EMPLOYEES' | translate }}
-                </p-accordion-header>
-                <p-accordion-content>
-                  <div class="chips-container">
-                    @for (person of boat.persons; track person.id) {
-                      <p-chip
-                        [label]="person.firstname + ' ' + person.lastname "
-                        icon="pi pi-user"
-                        (click)="openEmployee(person)"
-                        styleClass="clickable-chip"
-                      />
-                    }
-                  </div>
-                </p-accordion-content>
-              </p-accordion-panel>
-
-              <p-accordion-panel value="tools" [disabled]="isBoatEmpty(boat)">
-                <p-accordion-header>
-                  <i class="pi pi-wrench mr-2"></i> {{ 'MENU.TOOLS' | translate }}
-                </p-accordion-header>
-                <p-accordion-content>
-                  <div class="chips-container">
-                    @for (t of boat.tools; track t.toolId) {
-                      <p-chip
-                        [label]="getToolName(t.toolId) + ' (' + t.requiredAmount + 'x)' "
-                        icon="pi pi-wrench"
-                        (click)="openTool(t.toolId, t.requiredAmount)"
-                        styleClass="clickable-chip"
-                      />
-                    }
-                  </div>
-                </p-accordion-content>
-              </p-accordion-panel>
-            </p-accordion>
-          </p-card>
+          @for (boat of boats(); track $index) {
+            <div class="card-wrapper">
+              <p-card
+                [header]="('SCHEDULE.BOAT' | translate) + ' ' + ($index + 1)"
+                styleClass="custom-card"
+              >
+                <p-accordion [multiple]="true">
+                  <p-accordion-panel value="tasks" [disabled]="boat.taskSchedules.length === 0">
+                    <p-accordion-header
+                      ><i class="pi pi-list mr-2"></i>
+                      {{ 'MENU.TASKS' | translate }}</p-accordion-header
+                    >
+                    <p-accordion-content>
+                      <div class="chips-container">
+                        @for (schedule of boat.taskSchedules; track schedule.task.id) {
+                          <p-chip
+                            [label]="schedule.task.name"
+                            icon="pi pi-list"
+                            (click)="openTask(schedule.task)"
+                            styleClass="clickable-chip"
+                          />
+                        }
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                  <p-accordion-panel value="crew" [disabled]="boat.persons.length === 0">
+                    <p-accordion-header
+                      ><i class="pi pi-users mr-2"></i>
+                      {{ 'MENU.EMPLOYEES' | translate }}</p-accordion-header
+                    >
+                    <p-accordion-content>
+                      <div class="chips-container">
+                        @for (person of boat.persons; track person.id) {
+                          <p-chip
+                            [label]="person.firstname + ' ' + person.lastname"
+                            icon="pi pi-user"
+                            (click)="openEmployee(person)"
+                            styleClass="clickable-chip"
+                          />
+                        }
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                  <p-accordion-panel value="tools" [disabled]="boat.tools.length === 0">
+                    <p-accordion-header
+                      ><i class="pi pi-wrench mr-2"></i>
+                      {{ 'MENU.TOOLS' | translate }}</p-accordion-header
+                    >
+                    <p-accordion-content>
+                      <div class="chips-container">
+                        @for (t of boat.tools; track t.toolId) {
+                          <p-chip
+                            [label]="getToolName(t.toolId) + ' (' + t.requiredAmount + 'x)'"
+                            icon="pi pi-wrench"
+                            (click)="openTool(t.toolId, t.requiredAmount)"
+                            styleClass="clickable-chip"
+                          />
+                        }
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                </p-accordion>
+              </p-card>
+            </div>
+          }
         </div>
       }
-    </div>
+
+      @if (currentView() === 'gantt') {
+        <div class="gantt-chart">
+          <div class="gantt-timeline-header">
+            <div class="gantt-label-space"></div>
+            <div class="gantt-hours">
+              <span>07:00</span><span>08:00</span><span>09:00</span><span>10:00</span>
+              <span>11:00</span><span>12:00</span><span>13:00</span><span>14:00</span>
+              <span>15:00</span><span>16:00</span><span>17:00</span>
+            </div>
+          </div>
+
+          @for (boat of boats(); track $index; let bIndex = $index) {
+            <div class="gantt-row">
+              <div class="gantt-label-cell" (click)="op.toggle($event)">
+                <div class="boat-title">
+                  <i class="pi pi-compass"></i>
+                  <span>{{ 'SCHEDULE.BOAT' | translate }} {{ bIndex + 1 }}</span>
+                </div>
+                <span class="click-info-hint"
+                  >{{ 'SCHEDULE.GANTTVIEW.DETAILS' | translate }} <i class="pi pi-chevron-down"></i
+                ></span>
+              </div>
+
+              <div class="gantt-timeline-cell">
+                @for (travelTime of travelTimes(); track $index) {
+                  @if (travelTime.boatNumber === bIndex + 1 && travelTime.travelDuration > 0) {
+                    <div
+                      class="gantt-bar travel"
+                      [style.left]="calculatePosition(travelTime.travelTime)"
+                      [style.width]="calculateWidth(travelTime.travelDuration)"
+                    >
+                      <span class="bar-title">{{ 'SCHEDULE.GANTTVIEW.TRAVEL' | translate }}</span>
+                      <span class="bar-time">
+                        {{ travelTime.travelTime.substring(0, 5) }} ({{
+                          formatDuration(travelTime.travelDuration)
+                        }})
+                      </span>
+                    </div>
+                  }
+                }
+
+                @for (schedule of boat.taskSchedules; track schedule.task.id) {
+                  <div
+                    class="gantt-bar task"
+                    [style.left]="calculatePosition(schedule.startTime)"
+                    [style.width]="calculateWidth(schedule.task.durationHours)"
+                    (click)="openTask(schedule.task)"
+                  >
+                    <span class="bar-title">{{ schedule.task.name }}</span>
+                    <span class="bar-time"
+                      >{{ schedule.startTime.substring(0, 5) }} ({{
+                        formatDuration(schedule.task.durationHours)
+                      }})</span
+                    >
+                  </div>
+                }
+              </div>
+
+              <p-popover #op>...</p-popover>
+            </div>
+          }
+        </div>
+      }
+    }
   </div>
 
-  @if(taskVisible()) {
+  @if (taskVisible()) {
     <app-dialog-task [type]="'Detail'" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
   }
-
-  @if(employeeVisible()) {
+  @if (employeeVisible()) {
     <app-dialog-employee
       [type]="'Detail'"
       [selectedEmployee]="selectedEmployee()"
       [(visible)]="employeeVisible"
     />
   }
-
-  @if(toolVisible()) {
-    <app-dialog-tool [type]="'Detail'" [selectedTool]="selectedTool()" [requiredAmount]="requiredAmount()" [(visible)]="toolVisible" />
+  @if (toolVisible()) {
+    <app-dialog-tool
+      [type]="'Detail'"
+      [selectedTool]="selectedTool()"
+      [requiredAmount]="requiredAmount()"
+      [(visible)]="toolVisible"
+    />
   }
 </div>

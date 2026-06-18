@@ -170,7 +170,18 @@
   "SCHEDULE": {
     "TITLE": "Planung",
     "BOAT": "Boot",
-    "UNUSED": "Nicht genutzte Ressourcen"
+    "CARDS": "Allgemein",
+    "GANTT": "Gantt",
+    "CARD": {
+      "UNUSED": "Nicht genutzte Ressourcen"
+    },
+    "GANTTVIEW": {
+      "DETAILS": "Details",
+      "NO_PLAN": "Für diesen Tag existiert kein Plan",
+      "NO_EMPLOYEE": "Kein Mitarbeiter",
+      "NO_TOOL": "Kein Werkzeug",
+      "TRAVEL": "Fahrt"
+    }
   },
   "MESSAGES": {
     "MISSING_QUALIFICATION": "Fehlende Qualifikation",

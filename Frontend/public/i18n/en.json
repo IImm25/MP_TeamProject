@@ -169,7 +169,18 @@
   "SCHEDULE": {
     "TITLE": "Schedule",
     "BOAT": "Boat",
-    "UNUSED": "Unused Resources"
+    "CARDS": "General",
+    "GANTT": "Gantt",
+    "CARD": {
+      "UNUSED": "Unused Resources"
+    },
+    "GANTTVIEW": {
+      "DETAILS": "Details",
+      "NO_PLAN": "For this day there is no plan",
+      "NO_EMPLOYEE": "No employee",
+      "NO_TOOL": "No tool",
+      "TRAVEL": "Travel"
+    }
   },
   "MESSAGES": {
     "MISSING_QUALIFICATION": "Missing Qualification",

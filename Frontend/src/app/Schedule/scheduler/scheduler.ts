@@ -42,7 +42,7 @@ export class Scheduler {
     maxTime: new FormControl<number>(8, [Validators.required, Validators.min(1)]),
     boatAmount: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
     date: new FormControl<Date>(new Date(), [Validators.required]),
-    speed: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
+    speed: new FormControl<number>(36, [Validators.required, Validators.min(1)]),
   });
 
 

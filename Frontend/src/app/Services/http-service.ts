@@ -125,4 +125,12 @@ export class HttpService {
   postPlan(planData: PlanRequest): Observable<PlanResponse> {
     return this.http.post<PlanResponse>(`${this.apiUrl}/plan`, planData);
   }
+
+  getPlanByDate(date: string): Observable<PlanResponse> {
+    return this.http.get<PlanResponse>(`${this.apiUrl}/plan/$${date}`);
+  }
+
+  deletePlan(date: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/plan/${date}`);
+  }
 }
