@@ -47,13 +47,12 @@ param stockTools :=
 	to_2	2;                      # scarce - limits planning flexibility
 
 # --- task priorities (higher = more urgent) ---
-# priority of havarie task must exceed sum of all normal task priorities
-# sum of normal priorities: 3 + 9 + 5 = 17 -> havarie >= 18
+# havaries are modeled by giving a task a very high priority and do not explicitly exist as "havarie tasks"
 param taskPrio :=
 	ta_1	3                       # low priority
 	ta_2	9                       # high priority
 	ta_3	5                       # medium priority
-	ta_4	18;                     # havarie: dominates all others combined
+	ta_4	18;                     # very high priority
 
 # --- task locations ---
 param taskLocation :=
