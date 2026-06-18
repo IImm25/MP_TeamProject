@@ -123,7 +123,6 @@ public class GmplService
             taskItemDetails
         );
         
-
         string datFile = Path.GetTempFileName();
         File.WriteAllText(datFile, datFileText);
 
@@ -154,7 +153,7 @@ public class GmplService
 
             if (simplexErr != 0 || mipError != 0)
             {
-                var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
+                //var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
                 return new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, new List<BoatPlanDto>());
             }
 
@@ -272,7 +271,7 @@ public class GmplService
         sb.AppendLine($"set QUALIS := {string.Join(" ", qualIds.Select(id => $"q_{id}"))};");
         sb.AppendLine($"set TOOLS := {string.Join(" ", toolIds.Select(id => $"to_{id}"))};");
 
-        string places = "w_1 " + string.Join(" ", turbines.Select(t => $"w_{t.Id}"));
+        string places = "w_0 " + string.Join(" ", turbines.Select(t => $"w_{t.Id}"));
         sb.AppendLine($"set PLACES := {places};");
         sb.AppendLine();
 
@@ -357,7 +356,7 @@ public class GmplService
         var turbineEntities = turbines.Select(t => new Turbine(t.Name, t.Latitude, t.Longitude) { Id = t.Id }).ToList();
         float[,] distances = CalculateTurbineDistances(turbineEntities, new Harbor(0, 0));
 
-        var locationNames = new List<string> { "w_1" };
+        var locationNames = new List<string> { "w_0" };
         locationNames.AddRange(turbines.Select(t => $"w_{t.Id}"));
 
         sb.AppendLine($"param distance : {string.Join(" ", locationNames)} :=");
@@ -414,6 +413,7 @@ public class GmplService
         sb.AppendLine();
 
         // Fixed Tool Amount
+        // wird in fixed boat noch genauer definiert als zwei listen 
         sb.AppendLine($"param fixedToolAmount : {string.Join(" ", toolIds.Select(id => $"to_{id}"))} :=");
         for (int boatNum = 1; boatNum <= info.BoatNumber; boatNum++)
         {
