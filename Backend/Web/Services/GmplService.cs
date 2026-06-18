@@ -81,7 +81,7 @@ public class GmplService
 
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
-        
+
         List<int> taskIds = (await taskItemService.GetAll()).Select(t => t.Id).ToList();
         List<int> personIds = (await personService.GetAll()).Select(p => p.Id).ToList();
         List<int> toolIds = (await toolService.GetAll()).Select(t => t.Id).ToList();
@@ -122,7 +122,7 @@ public class GmplService
             existingTools,
             taskItemDetails
         );
-        
+
         string datFile = Path.GetTempFileName();
         File.WriteAllText(datFile, datFileText);
 
@@ -132,20 +132,18 @@ public class GmplService
                 throw new Exception($"Fehler beim Lesen der GMPL-Data-Datei: '{datFile}'");
             File.Delete(datFile);
 
-            
+
             if (GLPKDllWrapper.glp_mpl_generate(tran, nint.Zero) != 0)
                 throw new Exception("Fehler beim Generieren des GMPL-Modells.");
 
-            
             GLPKDllWrapper.glp_mpl_build_prob(tran, prob);
-
 
             var smcp = new GLPKDllWrapper.glp_smcp();
             GLPKDllWrapper.glp_init_smcp(ref smcp);
             smcp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
             int simplexErr = GLPKDllWrapper.glp_simplex(prob, ref smcp);
 
-            
+
             var iocp = new GLPKDllWrapper.glp_iocp();
             GLPKDllWrapper.glp_init_iocp(ref iocp);
             iocp.msg_lev = GLPKDllWrapper.GLP_MSG_OFF;
@@ -157,14 +155,15 @@ public class GmplService
                 return new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, new List<BoatPlanDto>());
             }
 
-            
             GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
 
-           
+
             var taskOnBoat = new HashSet<int>[request.BoatNumber];
             var personOnBoat = new HashSet<int>[request.BoatNumber];
             var toolOnBoat = new Dictionary<int, int>[request.BoatNumber];
             var boatUsage = new bool[request.BoatNumber];
+            var startTimes = new Dictionary<(int boat, int task), double>(); // Stunden seit Tagesbeginn
+            var travelToHarborValues = new Dictionary<(int boat, int task), double>(); // Stunden
 
             for (int i = 0; i < request.BoatNumber; i++)
             {
@@ -173,13 +172,13 @@ public class GmplService
                 toolOnBoat[i] = new Dictionary<int, int>();
             }
 
-            var startTimes = new Dictionary<(int boat, int task), TimeOnly>();
-
             int numCols = GLPKDllWrapper.glp_get_num_cols(prob);
+
             for (int j = 1; j <= numCols; j++)
             {
                 string colName = GLPKDllWrapper.GetColName(prob, j);
-                int val = (int)Math.Round(GLPKDllWrapper.glp_mip_col_val(prob, j));
+                double rawVal = GLPKDllWrapper.glp_mip_col_val(prob, j);
+                int val = (int)Math.Round(rawVal);
                 var (varName, indices) = parseColumnName(colName);
 
                 switch (varName)
@@ -200,10 +199,32 @@ public class GmplService
                         if (indices.Count >= 1)
                             boatUsage[indices[0]] = val != 0;
                         break;
+                    case "startTime":
+                        if (indices.Count >= 2 && rawVal > 0)
+                            startTimes[(indices[0], indices[1])] = rawVal;
+                        break;
+                    case "travelToHarbor":
+                        if (indices.Count >= 2 && rawVal > 0)
+                            travelToHarborValues[(indices[0], indices[1])] = rawVal;
+                        break;
+
+                    // Folgende Variablen werden nur für das Gantt-Display im GMPL gebraucht,
+                    // in C# aber nicht weiter verarbeitet => einfach ignorieren
+                    case "after":
+                    case "isFirst":
+                    case "isLast":
+                    case "travelBetween":
+                    case "lastTaskStart":
+                        break;
+
+                    default:
+                        // Leer- oder unbekannte Spalten ohne Index ignorieren (z.B. GMPL-interne Hilfsvariablen)
+                        if (indices.Count > 0)
+                            throw new Exception($"Unbekannte Spalte im GMPL-Ergebnis: {varName}[{string.Join(",", indices)}]");
+                        break;
                 }
             }
 
-           
             List<BoatPlanDto> boats = new List<BoatPlanDto>();
             for (int i = 0; i < request.BoatNumber; i++)
             {
@@ -224,23 +245,60 @@ public class GmplService
                 foreach (int tid in taskOnBoat[i])
                 {
                     var t = await taskItemService.GetTaskItem(tid);
-                    if (t != null)
+                    if (t == null) continue;
+
+                    TimeOnly startTime = TimeOnly.MinValue;
+                    if (startTimes.TryGetValue((i, tid), out double hours))
                     {
-                        TimeOnly startTime = startTimes.GetValueOrDefault((i, tid), TimeOnly.MinValue);
-                        tasks.Add(new TaskScheduleDto(startTime, mapper.Map<TaskItemSummaryDto>(t)));
+                        int totalMinutes = (int)Math.Round(hours * 60);
+                        startTime = new TimeOnly(totalMinutes / 60, totalMinutes % 60);
                     }
+
+                    tasks.Add(new TaskScheduleDto(startTime, mapper.Map<TaskItemSummaryDto>(t)));
                 }
 
-                boats.Add(new BoatPlanDto(tasks, persons, tools));
+                tasks.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+
+                // Departure: Der erste Task startet nach der Hafenausfahrt.
+                // Da GMPL startTime[first] >= travelTime[harbor, location] gilt,
+                // ist die Abfahrt = startTime des ersten Tasks (der früheste nach dem Sortieren).
+                // Falls keine Tasks vorhanden (sollte nicht vorkommen), Fallback auf MinValue.
+                TimeOnly departure = tasks.Count > 0 ? tasks.First().StartTime : TimeOnly.MinValue;
+
+                // Arrival: letzter Task + dessen Dauer + Rückfahrt zum Hafen (travelToHarbor)
+                TimeOnly arrival = TimeOnly.MinValue;
+                if (tasks.Count > 0)
+                {
+                    var lastTask = tasks.Last();
+                    int lastTaskId = taskOnBoat[i].First(tid =>
+                    {
+                        if (!startTimes.TryGetValue((i, tid), out double h)) return false;
+                        int m = (int)Math.Round(h * 60);
+                        return new TimeOnly(m / 60, m % 60) == lastTask.StartTime;
+                    });
+
+                    double lastDuration = lastTask.Task.DurationHours;
+                    double returnTravel = travelToHarborValues.TryGetValue((i, lastTaskId), out double rv) ? rv : 0.0;
+
+                    double arrivalHours = lastTask.StartTime.Hour
+                                        + lastTask.StartTime.Minute / 60.0
+                                        + lastDuration
+                                        + returnTravel;
+
+                    int arrivalMinutes = (int)Math.Round(arrivalHours * 60);
+                    arrival = new TimeOnly(arrivalMinutes / 60 % 24, arrivalMinutes % 60);
+                }
+
+                List<BoatScheduleDto> boatSchedules = new List<BoatScheduleDto>
+                {
+                    new BoatScheduleDto(departure, arrival)
+                };
+
+                boats.Add(new BoatPlanDto(tasks, boatSchedules, persons, tools));
             }
 
-            var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
-
-            return new PlanResponseDto(
-                DateOnly.FromDateTime(request.Time),
-                DateTimeOffset.UtcNow,
-                boats
-                );
+            //var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
+            return new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, boats);
         }
         catch (Exception ex)
         {
