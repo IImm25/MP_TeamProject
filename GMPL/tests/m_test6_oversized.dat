@@ -1,8 +1,10 @@
 # Description: Task too large – A1 has a duration of 10h with a limit of 8h.
-# Expected result: WorkHours = 0.
-# Reasoning: As in m_test5, A1 cannot be scheduled because it exceeds the per-boat time limit.
-# Since the model is a maximization and DoneAtMostOnce (≤ 1) applies, the optimal solution is to not execute A1.
-# Maximize WorkHours: 0.
+# Expected result: INFEASIBLE.
+# Reasoning: A1 cannot be scheduled because it exceeds the per-boat time limit.
+# The AtLeastOneTaskGlobal constraint forces at least one task to be planned,
+# but A1 is the only task and it violates the TimeLimit constraint.
+# This makes the problem infeasible – the solver finds no valid solution.
+# Maximize WorkHours: INFEASIBLE.
 data;
 set TASKS := A1;
 set QUALIS := Tech;

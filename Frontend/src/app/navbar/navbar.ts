@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
@@ -17,8 +17,12 @@ export class Navbar implements OnInit, OnDestroy {
   private cd = inject(ChangeDetectorRef);
 
   items: MenuItem[] = [];
+  currentLang = signal<string>('de');
 
   ngOnInit() {
+    const initLang = this.translate.currentLang || this.translate.defaultLang || 'de';
+    this.currentLang.set(initLang);
+
     this.subscription = this.translate
       .stream([
         'MENU.ADMINISTRATION',
@@ -26,6 +30,7 @@ export class Navbar implements OnInit, OnDestroy {
         'MENU.EMPLOYEES',
         'MENU.QUALIFICATIONS',
         'MENU.TOOLS',
+        'MENU.TURBINES',
         'MENU.SCHEDULER',
       ])
       .subscribe({
@@ -39,6 +44,7 @@ export class Navbar implements OnInit, OnDestroy {
                 { label: translations['MENU.TOOLS'], icon: 'pi pi-wrench', routerLink: ['/tools'] },
                 { label: translations['MENU.EMPLOYEES'], icon: 'pi pi-users', routerLink: ['/employees'] },
                 { label: translations['MENU.TASKS'], icon: 'pi pi-list', routerLink: ['/tasks'] },
+                { label: translations['MENU.TURBINES'], icon: 'pi pi-map-marker', routerLink: ['/turbines'] },
               ],
             },
             {
@@ -50,6 +56,12 @@ export class Navbar implements OnInit, OnDestroy {
           this.cd.detectChanges();
         },
       });
+  }
+
+  changeLang(lang: string) {
+    this.translate.use(lang).subscribe(() => {
+      this.currentLang.set(lang);
+    });
   }
 
   ngOnDestroy() {

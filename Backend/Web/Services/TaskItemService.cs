@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Backend.Data.DTO;
 using Backend.Data.DTO.Create;
+using Backend.Data.Entitites;
 using Backend.Data.Repositories;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Web.Services
 {
@@ -10,16 +10,23 @@ namespace Backend.Web.Services
     {
         private readonly ITaskItemRepository tasks;
         private readonly IMapper mapper;
+        private readonly IRepository<Turbine> turbines;
 
-        public TaskItemService(ITaskItemRepository tasks, IMapper mapper)
+        public TaskItemService(ITaskItemRepository tasks, IMapper mapper, IRepository<Turbine> turbines)
         {
             this.tasks = tasks;
             this.mapper = mapper;
+            this.turbines = turbines;
         }
 
         public async Task<TaskItemDetailDto> CreateTaskItem(TaskItemCreateDto create)
         {
-            TaskItem taskItem = new TaskItem(create.Name,create.DurationHours);
+            TaskItem taskItem = new TaskItem(create.Name, create.DurationHours, create.ExecutionIntervalStart, create.ExecutionIntervalEnd);
+            taskItem.IsCompleted = false;
+
+            var turbine = await turbines.GetByIdAsync(create.LocationId);
+            if (turbine == null) throw new Exception($"Turbine with id ${create.LocationId}");
+            taskItem.Location = turbine;
 
             foreach (var reqTool in create.RequiredTools)
             {
@@ -57,13 +64,24 @@ namespace Backend.Web.Services
         {
             var taskItem = await tasks.GetFullByIdAsync(id);
 
-            if (taskItem == null) {
+            if (taskItem == null)
+            {
                 return null;
             }
             if (update.Name != null) taskItem.Name = update.Name;
             if (update.DurationHours is float hours) taskItem.DurationHours = hours;
+            if (update.IsCompleted != null) taskItem.IsCompleted = (bool)update.IsCompleted;
+            if (update.ExecutionIntervalStart != null) taskItem.ExecutionIntervalStart = (DateOnly)update.ExecutionIntervalStart;
+            if (update.ExecutionIntervalEnd != null) taskItem.ExecutionIntervalEnd = (DateOnly)update.ExecutionIntervalEnd;
 
-            if (update.RequiredTools != null)
+            if (update.LocationId != null)
+            {
+                var turbine = await turbines.GetByIdAsync((int)update.LocationId);
+                if (turbine == null) throw new Exception($"Turbine with id ${update.LocationId}");
+                taskItem.Location = turbine;
+            }
+
+            if (update.RequiredTools!.Count != 0)
             {
                 taskItem.RequiredTools.Clear();
                 foreach (var reqTool in update.RequiredTools)
@@ -76,7 +94,7 @@ namespace Backend.Web.Services
                 }
             }
 
-            if (update.RequiredQualifications != null)
+            if (update.RequiredQualifications!.Count != 0)
             {
                 taskItem.RequiredQualifications.Clear();
                 foreach (var reqQual in update.RequiredQualifications)

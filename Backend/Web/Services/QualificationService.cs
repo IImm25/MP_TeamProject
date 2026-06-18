@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend.Data.DTO;
 using Backend.Data.DTO.Create;
+using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 using Microsoft.VisualBasic;
 

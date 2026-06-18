@@ -1,9 +1,10 @@
 # Description: Qualification mismatch (wrong person).
-# Scenario: A1 requires qualification Q1. P1 only has qualification Q2 and is assigned to the boat.
+# Scenario: A1 requires qualification Q1. P1 only has qualification Q2.
 # Reasoning: Presence on the boat is not sufficient; the QualiCheck requires matching qualifications.
-# Since no assigned person satisfies Q1, the requirement cannot be met.
-# Expected result: A1 cannot be executed.
-# Maximize WorkHours: 0.
+# Since no person satisfies Q1, A1 cannot be executed. Combined with AtLeastOneTaskGlobal (which
+# forces at least one task), the problem has no valid solution.
+# Expected result: INFEASIBLE – the solver finds no valid solution.
+# Maximize WorkHours: INFEASIBLE.
 data;
 set TASKS := A1;
 set QUALIS := Q1 Q2;

@@ -2,10 +2,10 @@
 # Scenario: A1 requires 2 mechanics. P1 is the only mechanic available.
 # Reasoning: Since personOnBoat[p,b] is binary, P1 can contribute at most 1 to the mechanic count.
 # Therefore the maximum achievable sum for Mech is 1, which is below the required 2.
-# This makes A1 infeasible under the QualiCheck constraint.
-# Expected result: A1 cannot be executed (ACTUAL = 0).
-# Note: If A1 is still scheduled, it indicates a flaw in the qualification counting logic or constraint formulation.
-# Maximize WorkHours: 0.
+# The QualiCheck constraint makes A1 infeasible. Combined with AtLeastOneTaskGlobal (which forces
+# at least one task), the problem has no valid solution.
+# Expected result: INFEASIBLE – the solver finds no valid solution.
+# Maximize WorkHours: INFEASIBLE.
 data;
 set TASKS := A1;
 set QUALIS := Mech;
