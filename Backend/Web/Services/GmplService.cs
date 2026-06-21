@@ -3,7 +3,11 @@ using Backend.Data.DTO;
 using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 using Backend.GMPL;
+using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -15,19 +19,17 @@ public class GmplService
 {
     private IntPtr prob = nint.Zero;
     private IntPtr tran = nint.Zero;
-
     private static string columnRegex = @"^([A-Za-z_]\w*)(?:\[(.*?)\])?$";
     private static string modFile = Path.Combine(AppContext.BaseDirectory, "GMPL", "modell.mod");
 
-    //private readonly DataFileGeneratorService dataFileGeneratorService;
     private readonly PersonService personService;
     private readonly TaskItemService taskItemService;
     private readonly QualificationService qualificationService;
     private readonly ToolService toolService;
     private readonly TurbineService turbineService;
     private readonly IMapper mapper;
+    private readonly IRepository<Plan> _planRepository;
 
-    private readonly Repository<Plan> _planRepository;
 
     private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
@@ -54,22 +56,36 @@ public class GmplService
         return (name, indices);
     }
 
-    public GmplService(PersonService personService, TaskItemService taskItemService, QualificationService qualificationService, ToolService toolService, TurbineService turbineService, IMapper mapper)
+    // Konstruktor mit DI-Parametern
+    public GmplService(
+        PersonService personService,
+        TaskItemService taskItemService,
+        QualificationService qualificationService,
+        ToolService toolService,
+        TurbineService turbineService,
+        IMapper mapper,
+        IRepository<Plan> planRepository)
     {
         this.personService = personService;
         this.taskItemService = taskItemService;
         this.qualificationService = qualificationService;
         this.toolService = toolService;
+        this.turbineService = turbineService;
         this.mapper = mapper;
+
 
         prob = GLPKDllWrapper.glp_create_prob();
         tran = GLPKDllWrapper.glp_mpl_alloc_wksp();
-
         if (GLPKDllWrapper.glp_mpl_read_model(tran, modFile, 0) != 0)
         {
             throw new Exception($"Error while reading GMPL model file: '{Path.GetFullPath(modFile)}'");
         }
+
+        _planRepository = planRepository;
     }
+
+
+
 
     ~GmplService()
     {

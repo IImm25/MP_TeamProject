@@ -34,6 +34,8 @@ builder.Services.AddScoped<IRepository<TaskQualification>, Repository<TaskQualif
 builder.Services.AddScoped<IRepository<TaskTool>, Repository<TaskTool>>();
 
 builder.Services.AddScoped<IRepository<Turbine>, Repository<Turbine>>();
+builder.Services.AddScoped<IRepository<Plan>, Repository<Plan>>();
+
 
 // registering services for Dependency Injection
 builder.Services.AddScoped<PersonService>();
@@ -42,6 +44,8 @@ builder.Services.AddScoped<TaskItemService>();
 builder.Services.AddScoped<ToolService>();
 builder.Services.AddScoped<GmplService>();
 builder.Services.AddScoped<TurbineService>();
+
+
 
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonSummaryMapper>();

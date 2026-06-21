@@ -1,10 +1,6 @@
 ﻿using Backend.Data.DTO;
-using Backend.GMPL;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.Eventing.Reader;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
 namespace Backend.Web.Controllers;
 
 [ApiController]
@@ -13,12 +9,12 @@ public class GMPLController : ControllerBase
 {
     private readonly GmplService gmplService;
 
-    public GMPLController(GmplService gmplservice)
+    public GMPLController(GmplService gmplService)
     {
-        this.gmplService = gmplservice;
+        this.gmplService = gmplService; // ← injiziertes Objekt direkt verwenden
     }
 
-    [HttpGet("${date}")]
+    [HttpGet("{date}")]
     public async Task<ActionResult<PlanResponseDto>> GetPlan(DateOnly date)
     {
         return Ok(new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []));
@@ -29,8 +25,8 @@ public class GMPLController : ControllerBase
     {
         try
         {
-            //PlanResponseDto response = await gmplService.Solve(request);
-            return Ok(new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []));
+            PlanResponseDto response = await gmplService.Solve(request);
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -39,11 +35,9 @@ public class GMPLController : ControllerBase
         }
     }
 
-    [HttpDelete("${date}")]
+    [HttpDelete("{date}")]
     public async Task<ActionResult<PlanResponseDto>> DeletePlan(DateOnly date)
     {
         return Ok();
     }
-
-
 }
