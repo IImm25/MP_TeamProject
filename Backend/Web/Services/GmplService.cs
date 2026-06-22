@@ -117,7 +117,7 @@ public class GmplService
         List<BoatTool> existingTools = new List<BoatTool>();
 
         List<Plan> plans = await _planRepository.GetAllAsync();
-        var latestPlan = plans.Last();
+        var latestPlan = plans.LastOrDefault();
         if (latestPlan != null && latestPlan.Boats != null)
         {
             existingPlans = latestPlan.Boats.ToList();
