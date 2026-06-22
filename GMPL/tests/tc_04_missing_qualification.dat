@@ -1,0 +1,39 @@
+# TC-04: Task requires q_2 but no person in the team holds it
+# Expect: INFEASIBLE (or no task scheduled) - solver cannot satisfy QualiCheck
+# UC-04 Alt Flow 5a: missing crucial qualifications
+data;
+
+set TASKS  := ta_1;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1 q_2;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2;
+
+param amountBoats    := 1;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration := ta_1 2.0;
+
+param taskPrio := ta_1 5;
+
+param taskLocation := ta_1 w_2;
+
+param distance : w_1 w_2 :=
+                 w_1  0  36
+                 w_2 36   0;
+
+param hasQuali : q_1 q_2 :=
+      p_1        1   0
+      p_2        1   0;
+
+param requiredQualis : q_1 q_2 :=
+      ta_1        0   1;
+
+param requiredTools : to_1 :=
+      ta_1         1;
+
+param stockTools := to_1 5;
+
+end;

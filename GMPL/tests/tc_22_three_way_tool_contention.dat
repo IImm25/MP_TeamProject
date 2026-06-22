@@ -1,0 +1,59 @@
+# TC-22: Three boats each want to run a task requiring the same scarce tool, but stock only
+# covers two of them. Verifies GlobalToolStock correctly arbitrates across THREE simultaneous
+# consumers (not just two, as in TC-05), and that the objective picks the two highest-priority
+# tasks rather than an arbitrary subset.
+data;
+
+set TASKS  := ta_1 ta_2 ta_3;
+set PEOPLE := p_1 p_2 p_3;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3 w_4;
+
+param amountBoats    := 3;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 1.0
+      ta_2 1.0
+      ta_3 1.0;
+
+# Distinct priorities so the optimal choice is unambiguous: drop the lowest priority (ta_2).
+param taskPrio :=
+      ta_1 9
+      ta_2 1
+      ta_3 5;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3
+      ta_3 w_4;
+
+param distance : w_1 w_2 w_3 w_4 :=
+                 w_1  0  36  36  36
+                 w_2 36   0  36  36
+                 w_3 36  36   0  36
+                 w_4 36  36  36   0;
+
+param hasQuali : q_1 :=
+      p_1        1
+      p_2        1
+      p_3        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1
+      ta_3        1;
+
+# each task needs 1 unit of the scarce tool, but only 2 units exist in total -> only 2 of 3
+# tasks can ever run simultaneously across boats.
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1
+      ta_3         1;
+
+param stockTools := to_1 2;
+
+end;

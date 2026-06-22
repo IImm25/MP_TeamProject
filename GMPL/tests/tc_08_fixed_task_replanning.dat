@@ -1,0 +1,64 @@
+# TC-08: Havarie replanning - ta_1 is fixed to boat 1 at position 1
+# ta_2 is a new emergency task that must be inserted around the fixed one
+# Expect: OPTIMAL, ta_1 stays on boat 1 as isFirst, ta_2 gets scheduled somewhere
+# UC-05: FIXED tasks cannot be altered, moved, or removed
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 2;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 2.0
+      ta_2 2.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 9;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1  0  36  36
+                 w_2 36   0  36
+                 w_3 36  36   0;
+
+param hasQuali : q_1 :=
+      p_1        1
+      p_2        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1;
+
+param stockTools := to_1 10;
+
+# ta_1 is FIXED: locked to boat 1, position 1 (already running)
+param fixedBoat :=
+      ta_1 1
+      ta_2 0;
+
+param fixedOrder :=
+      ta_1 1
+      ta_2 0;
+
+param fixedPerson := p_1 1 p_2 0;
+
+param fixedToolAmount : to_1 :=
+      1            1
+      2            0;
+
+end;

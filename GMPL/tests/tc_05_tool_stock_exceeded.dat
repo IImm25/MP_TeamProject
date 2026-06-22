@@ -1,0 +1,49 @@
+# TC-05: Two tasks each need 2x to_1, but stock is only 3
+# Both tasks cannot be scheduled simultaneously across boats
+# Expect: OPTIMAL but only one of the two tasks gets scheduled
+# UC-02 invariant: stock level cannot be exceeded (q >= 0 enforced by GlobalToolStock)
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 2;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 2.0
+      ta_2 2.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 5;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1  0  36  36
+                 w_2 36   0  36
+                 w_3 36  36   0;
+
+param hasQuali : q_1 :=
+      p_1        1
+      p_2        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1;
+
+param requiredTools : to_1 :=
+      ta_1         2
+      ta_2         2;
+
+param stockTools := to_1 3;
+
+end;

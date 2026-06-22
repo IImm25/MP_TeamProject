@@ -1,0 +1,73 @@
+# TC-18: Subtour-resistance test. 4 tasks on ONE boat, where the after[] chain constraints
+# (ChainComplete/ChainCompleteFirst/OneSuccessor/OnePredecessor) must enforce a SINGLE chain
+# from harbor through all 4 tasks back to harbor, rather than allowing the solver to form two
+# disconnected 2-cycles (ta_1<->ta_2 and ta_3<->ta_4) which would satisfy OneSuccessor/
+# OnePredecessor locally per node but produce an invalid "subtour" with no real isFirst/isLast
+# anchor to the harbor.
+# Geography is deliberately symmetric/cheap between {ta_1,ta_2} and between {ta_3,ta_4} so a
+# naive (buggy) sequencing relaxation might be tempted to form two separate 2-task loops if
+# the model only checked local in/out-degree without truly tying start times to a single
+# harbor-anchored chain via isFirst/isLast and StartFirst/StartAfter.
+# All 4 tasks have generous time budget if done as ONE proper chain (harbor->...->harbor).
+# Expect: OPTIMAL, all 4 tasks on boat 1, exactly one isFirst=1 and one isLast=1 (single chain),
+# and the chain's startTime values strictly increase along a single path with no disconnected
+# cycle component (verifiable from after[] structure: must form one path, not two 2-cycles).
+data;
+
+set TASKS  := ta_1 ta_2 ta_3 ta_4;
+set PEOPLE := p_1;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3 w_4 w_5;
+
+param amountBoats    := 1;
+param maxWorkingHours := 24;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 0.5
+      ta_2 0.5
+      ta_3 0.5
+      ta_4 0.5;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 5
+      ta_3 5
+      ta_4 5;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3
+      ta_3 w_4
+      ta_4 w_5;
+
+# w_2<->w_3 are close (cheap 2-cycle bait), w_4<->w_5 are close (cheap 2-cycle bait),
+# but harbor w_1 is reachable from all, and cross-cluster hops are moderate, so a single
+# correct chain harbor->w_2->w_3->w_4->w_5->harbor (or similar ordering) is feasible.
+param distance : w_1 w_2 w_3 w_4 w_5 :=
+                 w_1  0  18  18  18  18
+                 w_2 18   0   9  36  36
+                 w_3 18   9   0  36  36
+                 w_4 18  36  36   0   9
+                 w_5 18  36  36   9   0;
+
+param hasQuali : q_1 :=
+      p_1        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1
+      ta_3        1
+      ta_4        1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1
+      ta_3         1
+      ta_4         1;
+
+param stockTools := to_1 5;
+
+end;

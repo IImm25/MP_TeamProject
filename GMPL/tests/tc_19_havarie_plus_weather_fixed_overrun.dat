@@ -1,0 +1,73 @@
+# TC-19: Combined havarie + weather event (UC-05 + UC-06 happening together, as the notes
+# in UC-06 imply: "Running tasks are atomic and are always finished even if the reduced speed
+# causes delayed returns to the harbor"). A fixed/running task ta_1 must remain protected (its
+# isFirst/order intact) even though the GLOBAL drivingSpeed has been reduced, which by itself
+# would already overrun maxWorkingHours for the fixed task's travel-back-to-harbor leg.
+# This tests whether TimeLimit (using the now-slower travelTime) is still allowed to push the
+# fixed boat over budget on paper, instead of incorrectly forcing infeasibility on a task that
+# per UC-06's notes "must be completed... even if the reduced speed causes delayed returns".
+# NOTE: the current model has NO mechanism to exempt a FIXED task's return leg from
+# TimeLimit/maxWorkingHours - this test is designed to reveal whether that omission causes
+# an incorrect INFEASIBLE result for a task that, per the use case, must never be blocked.
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 2;
+param maxWorkingHours := 4;
+param drivingSpeed   := 4;
+param harbor         := 'w_1';
+
+# Weather has degraded driving speed to 4 km/h. Distance w_1<->w_2 = 18km -> travel = 4.5h
+# ALONE already exceeds maxWorkingHours=4 for just the return leg of an already-running task.
+param duration :=
+      ta_1 1.0
+      ta_2 1.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 9;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1   0  18  18
+                 w_2  18   0  18
+                 w_3  18  18   0;
+
+param hasQuali : q_1 :=
+      p_1        1
+      p_2        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1;
+
+param stockTools := to_1 5;
+
+# ta_1 is already running (FIXED) when the weather change hits
+param fixedBoat :=
+      ta_1 1
+      ta_2 0;
+
+param fixedOrder :=
+      ta_1 1
+      ta_2 0;
+
+param fixedPerson := p_1 1 p_2 0;
+
+param fixedToolAmount : to_1 :=
+      1            1
+      2            0;
+
+end;

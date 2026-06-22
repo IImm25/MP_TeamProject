@@ -1,0 +1,55 @@
+# TC-17: Globally impossible - not a single task can be scheduled on any boat.
+# Two tasks, two boats, but NO person anywhere holds the required qualification for
+# EITHER task. AtLeastOneTaskGlobal demands sum of all taskOnBoat >= 1, while QualiCheck
+# makes every single taskOnBoat[b,ta] assignment impossible (forces personOnBoat sum to be
+# >= required, but no one qualifies) -> the model as a whole must report INFEASIBLE rather
+# than silently returning an empty/degenerate "optimal" plan with zero tasks scheduled.
+# This is the strict UC-04 Alt Flow 5a scenario at the GLOBAL level (vs. TC-04/TC-07 which
+# are single-boat, single-task local infeasibilities).
+# Expect: PROBLEM HAS NO PRIMAL FEASIBLE SOLUTION (true infeasibility, not an empty optimum).
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1 q_2;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 2;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 2.0
+      ta_2 2.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 5;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1  0  36  36
+                 w_2 36   0  36
+                 w_3 36  36   0;
+
+# Neither person holds q_1 or q_2 - both required qualifications are entirely absent from the team
+param hasQuali : q_1 q_2 :=
+      p_1        0   0
+      p_2        0   0;
+
+param requiredQualis : q_1 q_2 :=
+      ta_1        1   0
+      ta_2        0   1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1;
+
+param stockTools := to_1 10;
+
+end;
