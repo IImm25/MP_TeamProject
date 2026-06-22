@@ -200,15 +200,15 @@ public class GmplService
                 switch (varName)
                 {
                     case "taskOnBoat":
-                        if (indices.Count >= 2 && val != 0)
+                        if (indices.Count >= 1 && val != 0)
                             taskOnBoat[indices[0]].Add(indices[1]);
                         break;
                     case "personOnBoat":
-                        if (indices.Count >= 2 && val != 0)
+                        if (indices.Count >= 1 && val != 0)
                             personOnBoat[indices[0]].Add(indices[1]);
                         break;
                     case "toolOnBoat":
-                        if (indices.Count >= 2 && val > 0)
+                        if (indices.Count >= 1 && val > 0)
                             toolOnBoat[indices[0]][indices[1]] = val;
                         break;
                     case "boatUsage":
@@ -216,14 +216,13 @@ public class GmplService
                             boatUsage[indices[0]] = val != 0;
                         break;
                     case "startTime":
-                        if (indices.Count >= 2 && rawVal > 0)
-                            startTimes[(indices[0], indices[1])] = rawVal;
+                        if (indices.Count >= 1 && rawVal > 0)
+                            startTimes[(indices[0], indices[1])] = rawVal + 8; // 8 Uhr arbeitsstart
                         break;
                     case "travelToHarbor":
-                        if (indices.Count >= 2 && rawVal > 0)
+                        if (indices.Count >= 1 && rawVal > 0)
                             travelToHarborValues[(indices[0], indices[1])] = rawVal;
                         break;
-
                     // Folgende Variablen werden nur für das Gantt-Display im GMPL gebraucht,
                     // in C# aber nicht weiter verarbeitet => einfach ignorieren
                     case "after":
@@ -249,18 +248,18 @@ public class GmplService
                 List<PersonSummaryDto> persons = new List<PersonSummaryDto>();
                 foreach (int pid in personOnBoat[i])
                 {
-                    var p = await personService.GetPerson(pid);
+                    var p = await personService.GetPerson(pid + 1);
                     if (p != null) persons.Add(mapper.Map<PersonSummaryDto>(p));
                 }
 
                 List<TaskToolDto> tools = toolOnBoat[i]
-                    .Select(kv => new TaskToolDto { ToolId = kv.Key, RequiredAmount = kv.Value })
+                    .Select(kv => new TaskToolDto { ToolId = kv.Key + 1, RequiredAmount = kv.Value })
                     .ToList();
 
                 List<TaskScheduleDto> tasks = new List<TaskScheduleDto>();
                 foreach (int tid in taskOnBoat[i])
                 {
-                    var t = await taskItemService.GetTaskItem(tid);
+                    var t = await taskItemService.GetTaskItem(tid + 1);
                     if (t == null) continue;
 
                     TimeOnly startTime = TimeOnly.MinValue;
