@@ -77,7 +77,7 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
