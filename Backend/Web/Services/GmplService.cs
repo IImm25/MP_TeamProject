@@ -428,7 +428,7 @@ public class GmplService
 
         // Distance Matrix
         var turbineEntities = turbines.Select(t => new Turbine(t.Name, t.Latitude, t.Longitude) { Id = t.Id }).ToList();
-        float[,] distances = CalculateTurbineDistances(turbineEntities, new Harbor(0, 0));
+        float[,] distances = CalculateTurbineDistances(turbineEntities, new Harbor(54.433304330384395f, 13.031369793515506f));
 
         var locationNames = new List<string> { "w_0" };
         locationNames.AddRange(turbines.Select(t => $"w_{t.Id}"));
