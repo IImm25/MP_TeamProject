@@ -95,8 +95,17 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Integration Tests
-        run: dotnet test Integration --no-build --configuration Release --logger trx --results-directory TestResults
-
+        run: |
+          dotnet test Integration \
+            --no-build \
+            --configuration Release \
+            --report-trx
+            
+      - name: Debug TRX Files
+        if: always()
+        run: |
+          find . -name "*.trx"
+            
       - name: Debug Test Results
         if: always()
         run: |
