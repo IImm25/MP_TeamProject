@@ -1,0 +1,6 @@
+#map { height: 600px; }
+
+.map-marker {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}

@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   inject,
+  input,
   Input,
   model,
   OnInit,
@@ -56,6 +57,7 @@ export class DialogTask implements OnInit {
 
   @Output() taskSaved = new EventEmitter<void>();
 
+  @Input({required: false}) selectedTurbine : Turbine | null = null;
   @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' = 'New';
 
   @Input() set selectedTask(val: Task | null) {
@@ -104,7 +106,7 @@ export class DialogTask implements OnInit {
         name: '',
         durationHours: 0,
         durationMinutes: 0,
-        location: null,
+        location: this.selectedTurbine ? this.selectedTurbine : null,
         executionIntervalStart: null,
         executionIntervalEnd: null,
         qualifications: [],

@@ -83,5 +83,9 @@
         [disabled]="turbineForm.invalid"
       />
     }
+    @if (type == 'Detail') {
+      <p-button [label]="'TASK.NEW' | translate" (onClick)="createNewTask()" />
+    }
   </ng-template>
 </p-dialog>
+<app-dialog-task type="New" [(visible)]="taskCreateVisible" [selectedTurbine]="currentTurbine"/>
