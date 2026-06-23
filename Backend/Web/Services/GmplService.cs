@@ -30,7 +30,7 @@ public class GmplService
     private readonly TurbineService turbineService;
     private readonly IMapper mapper;
     private readonly IRepository<Plan> _planRepository;
-
+    private readonly IPlanRepository repository;
 
     private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
@@ -65,7 +65,8 @@ public class GmplService
         ToolService toolService,
         TurbineService turbineService,
         IMapper mapper,
-        IRepository<Plan> planRepository)
+        IRepository<Plan> planRepository,
+        IPlanRepository repository)
     {
         this.personService = personService;
         this.taskItemService = taskItemService;
@@ -73,7 +74,7 @@ public class GmplService
         this.toolService = toolService;
         this.turbineService = turbineService;
         this.mapper = mapper;
-
+        this.repository = repository;
 
         prob = GLPKDllWrapper.glp_create_prob();
         tran = GLPKDllWrapper.glp_mpl_alloc_wksp();
@@ -85,15 +86,61 @@ public class GmplService
         _planRepository = planRepository;
     }
 
-
-
-
     ~GmplService()
     {
         GLPKDllWrapper.glp_mpl_free_wksp(tran);
         GLPKDllWrapper.glp_delete_prob(prob);
         //Glpk.glp_free_env();
     }
+
+    public async Task<PlanResponseDto> GetPlan(DateOnly date)
+    {
+        var plans = await repository.GetAllAsync();
+
+        Plan p = plans.Where(x => x.Date == date).FirstOrDefault();
+
+        if (p == null) return null;
+        else
+        {
+            var response = await MapPlanToResponseDto(p);
+            return response;
+        }
+    }
+
+    private async Task<PlanResponseDto> MapPlanToResponseDto(Plan plan)
+    {
+        List<BoatPlanDto> boatDtos = new List<BoatPlanDto>();
+
+        foreach (PlanBoat planBoat in plan.PlanBoats)
+        {
+            List<PersonSummaryDto> persons = planBoat.Persons
+                .Select(bp => mapper.Map<PersonSummaryDto>(bp.Person))
+                .ToList();
+
+            List<TaskToolDto> tools = planBoat.Tools
+                .Select(bt => new TaskToolDto
+                {
+                    ToolId = bt.ToolId,
+                    RequiredAmount = bt.RequiredAmount
+                }).ToList();
+
+            List<TaskScheduleDto> taskSchedules = planBoat.TaskSchedules
+                .Select(ts => new TaskScheduleDto(
+                    ts.StartTime,
+                    mapper.Map<TaskItemSummaryDto>(ts.TaskItem)
+                )).ToList();
+
+            List<BoatScheduleDto> boatSchedules = planBoat.BoatSchedules
+                .Select(bs => new BoatScheduleDto(bs.Departure, bs.Arrival))
+                .ToList();
+
+            boatDtos.Add(new BoatPlanDto(taskSchedules, boatSchedules, persons, tools));
+        }
+
+        return new PlanResponseDto(plan.Date, plan.CreatedAt, boatDtos);
+    }
+
+
 
 
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
@@ -119,11 +166,11 @@ public class GmplService
 
         List<Plan> plans = await _planRepository.GetAllAsync();
         var latestPlan = plans.LastOrDefault();
-        if (latestPlan != null && latestPlan.Boats != null)
+        if (latestPlan != null && latestPlan.PlanBoats != null)
         {
-            existingPlans = latestPlan.Boats.ToList();
-            existingAssignments = latestPlan.Boats.SelectMany(b => b.Persons).ToList();
-            existingTools = latestPlan.Boats.SelectMany(b => b.Tools).ToList();
+            existingPlans = latestPlan.PlanBoats.ToList();
+            existingAssignments = latestPlan.PlanBoats.SelectMany(b => b.Persons).ToList();
+            existingTools = latestPlan.PlanBoats.SelectMany(b => b.Tools).ToList();
         }
 
         // Danach die Data-Datei mit diesen (gefüllten) Listen erstellen
@@ -351,6 +398,7 @@ public class GmplService
                     {
                         BoatNumber = boatNumber,
                         TaskId = ts.Task.Id,
+                        TaskItem = null!, // Navigation ignorieren, nur IDs setzen
                         StartTime = ts.StartTime
                     }).ToList();
 

@@ -56,7 +56,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<PlanBoat>()
 			.HasOne(x => x.Plan)
-			.WithMany(x => x.Boats)
+			.WithMany(x => x.PlanBoats)
 			.HasForeignKey(x => x.PlanId);
 
         // BoatPerson

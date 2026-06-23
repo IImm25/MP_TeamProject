@@ -17,7 +17,7 @@ public class GMPLController : ControllerBase
     [HttpGet("{date}")]
     public async Task<ActionResult<PlanResponseDto>> GetPlan(DateOnly date)
     {
-        return Ok(new PlanResponseDto(DateOnly.FromDateTime(DateTime.Now), DateTimeOffset.UtcNow, []));
+        return Ok(gmplService.GetPlan(date));
     }
 
     [HttpPost("")]
