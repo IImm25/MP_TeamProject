@@ -97,6 +97,21 @@ jobs:
       - name: Run Integration Tests
         run: dotnet test Integration --no-build --configuration Release --logger trx --results-directory TestResults
 
+      - name: Debug Test Results
+        if: always()
+        run: |
+          echo "=== Aktuelles Verzeichnis ==="
+          pwd
+          
+          echo "=== Suche nach TRX-Dateien ==="
+          find . -type f -name "*.trx"
+          
+          echo "=== Inhalt von TestResults ==="
+          ls -la TestResults || true
+          
+          echo "=== Rekursiver Inhalt von TestResults ==="
+          find TestResults || true
+
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
         if: always()
