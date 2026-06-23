@@ -3,6 +3,7 @@ using Backend.Data.DTO;
 using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 using Backend.GMPL;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Globalization;
@@ -239,7 +240,7 @@ public class GmplService
                         break;
                 }
             }
-
+            
             List<BoatPlanDto> boats = new List<BoatPlanDto>();
             for (int i = 0; i < request.BoatNumber; i++)
             {
@@ -255,7 +256,7 @@ public class GmplService
                 List<TaskToolDto> tools = toolOnBoat[i]
                     .Select(kv => new TaskToolDto { ToolId = kv.Key + 1, RequiredAmount = kv.Value })
                     .ToList();
-
+               
                 List<TaskScheduleDto> tasks = new List<TaskScheduleDto>();
                 foreach (int tid in taskOnBoat[i])
                 {
@@ -313,7 +314,65 @@ public class GmplService
             }
 
             //var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
-            return new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, boats);
+            
+            PlanResponseDto response = new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, boats);
+            List<PlanBoat> planBoats = new List<PlanBoat>();
+            for (int i = 0; i < boats.Count; i++)
+            {
+                int boatNumber = i + 1; // 1-basiert
+                BoatPlanDto boatDto = boats[i];
+
+                List<BoatPerson> boatPersons = boatDto.Persons
+                    .Select(p => new BoatPerson
+                    {
+                        BoatNumber = boatNumber,
+                        PersonId = p.Id
+                    }).ToList();
+
+                List<BoatTool> boatTools = boatDto.Tools
+                    .Select(t => new BoatTool
+                    {
+                        BoatNumber = boatNumber,
+                        ToolId = t.ToolId,
+                        RequiredAmount = t.RequiredAmount
+                    }).ToList();
+
+                List<BoatSchedule> boatSchedules = boatDto.BoatSchedules
+                    .Select((s, idx) => new BoatSchedule
+                    {
+                        BoatNumber = boatNumber,
+                        TripNumber = idx + 1,
+                        Departure = s.Departure,
+                        Arrival = s.Arrival
+                    }).ToList();
+
+                List<TaskSchedule> taskSchedules = boatDto.TaskSchedules
+                    .Select(ts => new TaskSchedule
+                    {
+                        BoatNumber = boatNumber,
+                        TaskId = ts.Task.Id,
+                        StartTime = ts.StartTime
+                    }).ToList();
+
+                planBoats.Add(new PlanBoat
+                {
+                    BoatNumber = boatNumber,
+                    Persons = boatPersons,
+                    Tools = boatTools,
+                    BoatSchedules = boatSchedules,
+                    TaskSchedules = taskSchedules
+                });
+            }
+
+            Plan entity = new Plan(
+                DateOnly.FromDateTime(request.Time),
+                DateTimeOffset.UtcNow,
+                planBoats
+            );
+
+
+            await _planRepository.AddAsync( entity);
+            return response;
         }
         catch (Exception ex)
         {

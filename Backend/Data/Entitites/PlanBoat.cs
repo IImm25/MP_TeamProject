@@ -5,7 +5,7 @@ public class PlanBoat
     public int BoatNumber { get; set; } // composite primary key of (BoatIndex,PlanId)
 
     public int PlanId { get; set; }
-    public Plan Plan { get; set; } = null!;
+    public Plan Plan { get; set; } = null!; 
 
     public ICollection<BoatPerson> Persons { get; set; } = [];
     public ICollection<BoatTool> Tools { get; set; } = [];
