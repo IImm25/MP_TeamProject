@@ -102,7 +102,7 @@ jobs:
         if: always()
         with:
           name: MSTest Results
-          path: TestResults/*.trx
+          path: **/*.trx
           reporter: dotnet-trx
 
       - name: Upload Test Results as Artifact
