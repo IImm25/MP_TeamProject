@@ -101,7 +101,6 @@ jobs:
             --configuration Release \
             -- \
             --report-trx
-            --results-directory TestResults
             
       - name: Debug TRX Files
         if: always()
