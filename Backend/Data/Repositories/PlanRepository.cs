@@ -15,14 +15,14 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
     public async Task<Plan?> GetFullPlanByIdAsync(int id)
     {
         var plan = await context.Plans
-            .Include( x => x.PlanBoats)
+            .Include(x => x.PlanBoats)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         return plan;
     }
 
     public async Task<List<Plan>> GetAllFullAsync()
-    {
+    {         
         return await context.Plans
         .Include(x => x.PlanBoats)
             .ThenInclude(b => b.Persons)
@@ -34,8 +34,9 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
                 .ThenInclude(ts => ts.TaskItem)
         .Include(x => x.PlanBoats)
             .ThenInclude(b => b.BoatSchedules)
+        .AsSplitQuery()
         .ToListAsync();
     }
 
-   
+
 }

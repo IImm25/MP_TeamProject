@@ -30,7 +30,12 @@ public class AppDbContext : DbContext
 	public DbSet<BoatSchedule> BoatSchedules => Set<BoatSchedule>();
 	public DbSet<TaskSchedule> TaskSchedules => Set<TaskSchedule>();
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
 

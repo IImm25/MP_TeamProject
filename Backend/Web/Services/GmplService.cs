@@ -65,8 +65,9 @@ public class GmplService
         ToolService toolService,
         TurbineService turbineService,
         IMapper mapper,
-        IRepository<Plan> planRepository,
-        IPlanRepository repository)
+        IPlanRepository repository,
+        IRepository<Plan> planRepository
+        )
     {
         this.personService = personService;
         this.taskItemService = taskItemService;
@@ -74,6 +75,7 @@ public class GmplService
         this.toolService = toolService;
         this.turbineService = turbineService;
         this.mapper = mapper;
+        this._planRepository = planRepository;
         this.repository = repository;
 
         prob = GLPKDllWrapper.glp_create_prob();
@@ -83,7 +85,7 @@ public class GmplService
             throw new Exception($"Error while reading GMPL model file: '{Path.GetFullPath(modFile)}'");
         }
 
-        _planRepository = planRepository;
+       
     }
 
     ~GmplService()
@@ -95,16 +97,24 @@ public class GmplService
 
     public async Task<PlanResponseDto> GetPlan(DateOnly date)
     {
-        var plans = await repository.GetAllAsync();
-
-        Plan p = plans.Where(x => x.Date == date).FirstOrDefault();
-
-        if (p == null) return null;
-        else
+        try
         {
-            var response = await MapPlanToResponseDto(p);
-            return response;
+            var plans = await repository.GetAllFullAsync();
+
+            Plan p = plans.Where(x => x.Date == date).FirstOrDefault();
+
+            if (p == null) return null;
+            else
+            {
+                var response = await MapPlanToResponseDto(p);
+                return response;
+            }
         }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        
     }
 
     private async Task<PlanResponseDto> MapPlanToResponseDto(Plan plan)
