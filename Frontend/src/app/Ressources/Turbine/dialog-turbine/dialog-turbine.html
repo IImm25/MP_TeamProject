@@ -75,6 +75,7 @@
       severity="secondary"
       (onClick)="visible.set(false)"
     />
+    <p-button [label]="'TASKS.NEW_TASK' | translate" icon="pi pi-plus" (onClick)="createNewTask()" />
     @if (type !== 'Detail') {
       <p-button
         [label]="'COMMON.SAVE' | translate"
@@ -82,9 +83,6 @@
         (onClick)="save()"
         [disabled]="turbineForm.invalid"
       />
-    }
-    @if (type == 'Detail') {
-      <p-button [label]="'TASK.NEW' | translate" (onClick)="createNewTask()" />
     }
   </ng-template>
 </p-dialog>
