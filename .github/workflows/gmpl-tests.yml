@@ -1,18 +1,23 @@
-name: GMPL Model Tests
+name: CI
 
 on:
   push:
     branches-ignore:
-      - main          # Direkte Pushes nach main sind laut README ohnehin verboten
+      - main
     paths:
       - 'GMPL/**'
+      - 'Backend/**'
+      - 'Integration/**'
   pull_request:
     paths:
       - 'GMPL/**'
-  workflow_dispatch:  # Manueller Start über GitHub UI möglich
+      - 'Backend/**'
+      - 'Integration/**'
+  workflow_dispatch:
 
 jobs:
   test-gmpl:
+    name: GMPL Model Tests
     runs-on: self-hosted
 
     steps:
@@ -23,7 +28,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq glpk-utils
-          echo "Installiert: $(glpsol --version 2>&1 | head -n 1)"
+          echo "Installed: $(glpsol --version 2>&1 | head -n 1)"
 
       - name: Run GMPL Tests
         run: |
@@ -32,7 +37,7 @@ jobs:
           bash run_tests.sh | tee ../test-results.txt
           exit ${PIPESTATUS[0]}
 
-      - name: Upload test results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -40,7 +45,7 @@ jobs:
           path: test-results.txt
           retention-days: 30
 
-      - name: Comment results on Pull Request
+      - name: Comment Results on Pull Request
         if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         with:
@@ -51,16 +56,16 @@ jobs:
             try {
               results = fs.readFileSync('test-results.txt', 'utf8');
             } catch (e) {
-              results = 'Testergebnisse konnten nicht gelesen werden.';
+              results = 'Test results could not be read.';
             }
 
             const statsLine = results.split('\n').find(l => l.startsWith('Statistik:')) || '';
             const success = !results.includes('[FAIL]');
-            const icon = success ? '✅' : '❌';
+            const status = success ? 'PASSED' : 'FAILED';
 
-            const body = `## ${icon} GMPL Model Tests\n\n` +
+            const body = `## GMPL Model Tests: ${status}\n\n` +
               `**${statsLine}**\n\n` +
-              `<details>\n<summary>Vollständige Ausgabe</summary>\n\n` +
+              `<details>\n<summary>Full Output</summary>\n\n` +
               `\`\`\`\n${results}\n\`\`\`\n</details>`;
 
             github.rest.issues.createComment({
@@ -69,3 +74,66 @@ jobs:
               repo: context.repo.repo,
               body: body
             });
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run Integration Tests
+        run: |
+          dotnet test Integration \
+            --no-build \
+            --configuration Release \
+            -- \
+            --report-trx
+            
+      - name: Debug TRX Files
+        if: always()
+        run: |
+          find . -name "*.trx"
+            
+      - name: Debug Test Results
+        if: always()
+        run: |
+          echo "=== Aktuelles Verzeichnis ==="
+          pwd
+          
+          echo "=== Suche nach TRX-Dateien ==="
+          find . -type f -name "*.trx"
+          
+          echo "=== Inhalt von TestResults ==="
+          ls -la TestResults || true
+          
+          echo "=== Rekursiver Inhalt von TestResults ==="
+          find TestResults || true
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: MSTest Results
+          path: '**/*.trx'
+          reporter: dotnet-trx
+
+      - name: Upload Test Results as Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 14
