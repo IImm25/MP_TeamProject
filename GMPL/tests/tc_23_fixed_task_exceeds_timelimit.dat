@@ -1,0 +1,61 @@
+# TC-23: Fixed task exceeds maxWorkingHours due to long travel time
+# UC-05 Invariant: "Tasks with the status FIXED cannot be altered, moved, or removed by the system"
+# UC-06 Notes: "Running tasks are atomic and are always finished even if the reduced speed causes delayed returns"
+# 
+# Setup: One task ta_1 is FIXED on boat 1. The travel time from task location to harbor
+# exceeds maxWorkingHours when combined with task duration.
+#
+# Expected (per UC-05/UC-06): OPTIMAL solution where ta_1 is still scheduled on boat 1
+#   - The fixed task MUST be completed regardless of time limit
+#   - TimeLimit constraint should NOT apply to boats with fixed tasks
+#
+# Actual (current model): INFEASIBLE because TimeLimit constraint applies to all boats
+#   including boats with fixed tasks, violating UC-05 invariant
+#
+# Test Result: CONFIRMS BUG - model violates UC-05 requirement
+# Expected: OPTIMAL, WorkHours = (9 * 100) + (1 * 10) = 910
+# Actual: PROBLEM HAS NO PRIMAL FEASIBLE SOLUTION
+# Model output: "PROBLEM HAS NO PRIMAL FEASIBLE SOLUTION"
+data;
+
+set TASKS  := ta_1;
+set PEOPLE := p_1;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2;
+
+param amountBoats    := 1;
+param maxWorkingHours := 4;  # 4 hour limit
+param drivingSpeed   := 4;   # 4 km/h
+param harbor         := 'w_1';
+
+# Task takes 1 hour, but travel to/from harbor takes 4.5 hours each way (18km / 4km/h)
+# Total: 1 + 4.5 + 4.5 = 10 hours > 4 hour limit
+param duration := ta_1 1.0;
+
+param taskPrio := ta_1 9;  # High priority
+
+param taskLocation := ta_1 w_2;
+
+param distance : w_1 w_2 := 
+                 w_1   0  18 
+                 w_2  18   0;
+
+param hasQuali : q_1 := 
+      p_1        1;
+
+param requiredQualis : q_1 := 
+      ta_1        1;
+
+param requiredTools : to_1 := 
+      ta_1         1;
+
+param stockTools := to_1 5;
+
+# ta_1 is FIXED on boat 1 - must be completed per UC-05
+param fixedBoat := ta_1 1;
+param fixedPerson := p_1 1;
+param fixedToolAmount : to_1 := 
+      1            1;
+
+end;

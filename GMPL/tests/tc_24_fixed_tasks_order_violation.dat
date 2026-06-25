@@ -1,0 +1,76 @@
+# TC-24: Fixed tasks lose their sequence order without fixedOrder parameter
+# UC-05 Invariant: "Tasks with the status FIXED cannot be altered, moved, or removed by the system"
+# 
+# Setup: Two tasks ta_1 and ta_2 are FIXED on boat 1.
+# Without fixedOrder parameter, the model CAN reorder them.
+#
+# Expected (per UC-05): ta_1 must remain FIRST, ta_2 must remain SECOND
+#   - After optimization: after[1,ta_1,ta_2] = 1, isFirst[1,ta_1] = 1, isLast[1,ta_2] = 1
+#   - The original sequence order must be preserved for fixed tasks
+#
+# Actual (current model): Model MAY reorder tasks since fixedOrder constraint is missing
+#   - The model only enforces fixedBoat (task stays on boat) but NOT fixedOrder (position in sequence)
+#
+# Test Result: CONFIRMS MISSING FEATURE - fixedOrder parameter needed for UC-05
+# Expected: ta_1 starts first (isFirst[1,ta_1]=1, after[1,ta_1,ta_2]=1)
+# Actual: ta_2 starts at 2, ta_1 starts at 5 (REVERSED ORDER)
+# Model output: INTEGER OPTIMAL SOLUTION FOUND
+# startTime[1,ta_1].val = 5, startTime[1,ta_2].val = 2
+# Fixed tasks CAN be reordered, violating UC-05 invariant
+#
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 1;
+param maxWorkingHours := 10;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration := 
+      ta_1 2.0
+      ta_2 2.0;
+
+param taskPrio := 
+      ta_1 1   # Lower priority - model might want to do this last
+      ta_2 9;  # Higher priority - model might want to do this first
+
+param taskLocation := 
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 := 
+                 w_1  0  36  72
+                 w_2 36   0  36
+                 w_3 72  36   0;
+
+param hasQuali : q_1 := 
+      p_1        1
+      p_2        1;
+
+param requiredQualis : q_1 := 
+      ta_1        1
+      ta_2        1;
+
+param requiredTools : to_1 := 
+      ta_1         1
+      ta_2         1;
+
+param stockTools := to_1 10;
+
+# Both tasks are FIXED on boat 1
+# UC-05 requires that their sequence order is preserved
+param fixedBoat := 
+      ta_1 1
+      ta_2 1;
+
+param fixedPerson := p_1 1 p_2 1;
+
+param fixedToolAmount : to_1 := 
+      1            2;
+
+end;

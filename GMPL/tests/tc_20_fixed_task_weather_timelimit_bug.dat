@@ -50,7 +50,6 @@ param stockTools := to_1 5;
 
 # ta_1 is already running (FIXED) when the weather change hits - must finish regardless
 param fixedBoat  := ta_1 1;
-param fixedOrder := ta_1 1;
 param fixedPerson := p_1 1;
 param fixedToolAmount : to_1 :=
       1            1;

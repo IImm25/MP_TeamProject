@@ -60,11 +60,7 @@ param stockTools := to_1 3;
 # ta_1 already running on boat 1, with its 2 tools physically already on board
 param fixedBoat :=
       ta_1 1
-      ta_2 0;
-
-param fixedOrder :=
-      ta_1 1
-      ta_2 0;
+      ta_2 -1;
 
 # p_2 is already committed to boat 2 (e.g. crewed up for a different running task earlier,
 # or simply assigned ahead of time) - this forces ta_2 onto boat 2, where stock is the issue.
