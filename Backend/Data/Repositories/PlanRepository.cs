@@ -37,6 +37,4 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
         .AsSplitQuery()
         .ToListAsync();
     }
-
-
 }

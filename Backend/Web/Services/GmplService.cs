@@ -85,7 +85,7 @@ public class GmplService
             throw new Exception($"Error while reading GMPL model file: '{Path.GetFullPath(modFile)}'");
         }
 
-       
+
     }
 
     ~GmplService()
@@ -114,7 +114,7 @@ public class GmplService
         {
             throw ex;
         }
-        
+
     }
 
     private async Task<PlanResponseDto> MapPlanToResponseDto(Plan plan)
@@ -174,7 +174,7 @@ public class GmplService
         List<BoatPerson> existingAssignments = new List<BoatPerson>();
         List<BoatTool> existingTools = new List<BoatTool>();
 
-        List<Plan> plans = await _planRepository.GetAllAsync();
+        List<Plan> plans = await repository.GetAllFullAsync();
         var latestPlan = plans.LastOrDefault();
         if (latestPlan != null && latestPlan.PlanBoats != null)
         {
@@ -297,7 +297,7 @@ public class GmplService
                         break;
                 }
             }
-            
+
             List<BoatPlanDto> boats = new List<BoatPlanDto>();
             for (int i = 0; i < request.BoatNumber; i++)
             {
@@ -313,7 +313,7 @@ public class GmplService
                 List<TaskToolDto> tools = toolOnBoat[i]
                     .Select(kv => new TaskToolDto { ToolId = kv.Key + 1, RequiredAmount = kv.Value })
                     .ToList();
-               
+
                 List<TaskScheduleDto> tasks = new List<TaskScheduleDto>();
                 foreach (int tid in taskOnBoat[i])
                 {
@@ -371,7 +371,7 @@ public class GmplService
             }
 
             //var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
-            
+
             PlanResponseDto response = new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, boats);
             List<PlanBoat> planBoats = new List<PlanBoat>();
             for (int i = 0; i < boats.Count; i++)
@@ -427,9 +427,18 @@ public class GmplService
                 DateTimeOffset.UtcNow,
                 planBoats
             );
+            await _planRepository.AddAsync(entity);
+            List<TaskSchedule> TaskIds = entity.PlanBoats.SelectMany(x => x.TaskSchedules).ToList();
 
 
-            await _planRepository.AddAsync( entity);
+            foreach (TaskSchedule i in TaskIds)
+            {
+                var s = i.TaskItem;
+                s.IsCompleted = true;
+                await taskItemService.UpdateTaskItem(i.TaskId,
+                    (TaskItemUpdateDto)mapper.Map(s, typeof(TaskItem), typeof(TaskItemUpdateDto)));
+            }
+
             return response;
         }
         catch (Exception ex)
@@ -445,7 +454,7 @@ public class GmplService
         List<int> personIds,
         List<int> toolIds,
         List<TurbineResponseDto> turbines,
-        List<PlanBoat> existingPlans,
+        List<PlanBoat> existingPlans, //mit selben datum
         List<BoatPerson> existingAssignments,
         List<BoatTool> existingTools,
         List<TaskItemDetailDto> taskItemDetails)
@@ -573,19 +582,36 @@ public class GmplService
         sb.AppendLine(";");
         sb.AppendLine();
 
-        // Fixed Order
-        sb.AppendLine("param fixedOrder :=");
-        foreach (var taskId in taskIds)
+        // Fixed Start Time
+        sb.AppendLine("param fixedStartTime :="); // 0 not fixed the other in what boat so 1 on boat 1 etc.
+
+
+        foreach (int taskId in taskIds)
         {
-            var existingSchedule = existingPlans
+            TaskSchedule? existingSchedule = existingPlans
                 .SelectMany(p => p.TaskSchedules)
                 .FirstOrDefault(ts => ts.TaskId == taskId);
 
+            int index = 0;
             if (existingSchedule != null)
             {
+                var sorted = existingPlans.SelectMany(x => x.TaskSchedules).Where(x => x.BoatNumber == existingSchedule.BoatNumber).Select(y => new { y.TaskId, y.StartTime }).OrderBy(z => z.StartTime).ToList();
+                index = sorted
+                    .Select((x, i) => new { x.TaskId, i })
+                    .FirstOrDefault(x => x.TaskId == taskId)?.i ?? 0;
+                index++;
+            }
+
+
+            if (existingSchedule != null && index != 0)
+            {
                 // TODO: Order aus existingSchedule holen
-                int order = 1;
-                sb.AppendLine($"\tta_{taskId} {order}");
+                //int order = 1;
+                sb.AppendLine($"\tta_{taskId} {(index + 1)}");
+            }
+            else
+            {
+                sb.AppendLine($"\tta_{taskId} {-1}");
             }
         }
         sb.AppendLine(";");
@@ -635,7 +661,7 @@ public class GmplService
             if (end == start) return 1.0f;
 
             float priority = (float)((currentTime - start).TotalHours / (end - start).TotalHours);
-            return Math.Clamp(priority, 0.0f, 1.0f);
+            return Math.Clamp(priority, 0.0f, 1.0f) * 10f;
         }
 
         return 0.0f;
