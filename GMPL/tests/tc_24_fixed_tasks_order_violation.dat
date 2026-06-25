@@ -1,22 +1,22 @@
-# TC-24: Fixed tasks lose their sequence order without fixedOrder parameter
+# TC-24: Fixed tasks CAN be reordered without fixedStartTime parameter
 # UC-05 Invariant: "Tasks with the status FIXED cannot be altered, moved, or removed by the system"
 # 
-# Setup: Two tasks ta_1 and ta_2 are FIXED on boat 1.
-# Without fixedOrder parameter, the model CAN reorder them.
+# Setup: Two tasks ta_1 (low prio) and ta_2 (high prio) are FIXED on boat 1.
+# fixedStartTime is NOT set, so model can optimize start times.
 #
-# Expected (per UC-05): ta_1 must remain FIRST, ta_2 must remain SECOND
-#   - After optimization: after[1,ta_1,ta_2] = 1, isFirst[1,ta_1] = 1, isLast[1,ta_2] = 1
-#   - The original sequence order must be preserved for fixed tasks
+# Expected (per UC-05): Original sequence order should be preserved
+#   - ta_1 should start first, ta_2 second
+#   - after[1,ta_1,ta_2] = 1, isFirst[1,ta_1] = 1
 #
-# Actual (current model): Model MAY reorder tasks since fixedOrder constraint is missing
-#   - The model only enforces fixedBoat (task stays on boat) but NOT fixedOrder (position in sequence)
+# Actual (current model): Model reorders tasks based on priority optimization
+#   - The model enforces fixedBoat (task stays on boat) but NOT sequence order
+#   - Without fixedStartTime, KeepFixedStartTime constraint doesn't apply
 #
-# Test Result: CONFIRMS MISSING FEATURE - fixedOrder parameter needed for UC-05
-# Expected: ta_1 starts first (isFirst[1,ta_1]=1, after[1,ta_1,ta_2]=1)
-# Actual: ta_2 starts at 2, ta_1 starts at 5 (REVERSED ORDER)
+# Test Result: CONFIRMS BEHAVIOR - fixedStartTime parameter needed to preserve order
+# Expected: ta_1 starts first (startTime[1,ta_1] < startTime[1,ta_2])
+# Actual: ta_2 starts before ta_1 due to higher priority
 # Model output: INTEGER OPTIMAL SOLUTION FOUND
-# startTime[1,ta_1].val = 5, startTime[1,ta_2].val = 2
-# Fixed tasks CAN be reordered, violating UC-05 invariant
+# Note: With fixedStartTime set, order WOULD be preserved
 #
 data;
 
@@ -62,11 +62,15 @@ param requiredTools : to_1 :=
 
 param stockTools := to_1 10;
 
-# Both tasks are FIXED on boat 1
+# Both tasks are FIXED on boat 1 but WITHOUT fixedStartTime
 # UC-05 requires that their sequence order is preserved
+# However, without fixedStartTime, the model CAN reorder them based on priority
 param fixedBoat := 
       ta_1 1
       ta_2 1;
+
+# NOTE: fixedStartTime is NOT set - this allows the model to optimize start times
+# If fixedStartTime were set, the order would be preserved
 
 param fixedPerson := p_1 1 p_2 1;
 
