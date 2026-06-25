@@ -1,13 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches-ignore:
-      - main
-    paths:
-      - 'GMPL/**'
-      - 'Backend/**'
-      - 'Integration/**'
   pull_request:
     paths:
       - 'GMPL/**'
