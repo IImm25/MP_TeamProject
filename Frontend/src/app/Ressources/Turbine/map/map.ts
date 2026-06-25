@@ -55,26 +55,13 @@ export class Map implements AfterViewInit {
 
     this.turbines().forEach(turbine => {
 
-      const popupContent = document.createElement('div');
-      popupContent.classList.add("map-marker");
-
-      popupContent.innerHTML = `
-        <h2>${turbine.name}</h2>
-        <p>Lat: ${turbine.latitude}, Long: ${turbine.longitude}</p>
-      `;
-
       const marker = L.marker([turbine.latitude, turbine.longitude], { icon: Map.turbineIcon }) // lat first!
-        .bindPopup(popupContent)
         .addTo(this.markerLayer);
       
-
-
-
-      marker.addEventListener("contextmenu", () => {
+      marker.addEventListener("click", () => {
         this.selectedTurbine.set(turbine);
         this.visible.set(true);
       });
-
 
     });
 
