@@ -29,6 +29,8 @@ public class AppDbContext : DbContext
 	public DbSet<BoatTool> BoolTools => Set<BoatTool>();
 	public DbSet<BoatSchedule> BoatSchedules => Set<BoatSchedule>();
 	public DbSet<TaskSchedule> TaskSchedules => Set<TaskSchedule>();
+    public DbSet<PlanQuery> PlanQueries => Set<PlanQuery>();
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

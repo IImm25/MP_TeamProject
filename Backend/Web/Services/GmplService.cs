@@ -31,7 +31,7 @@ public class GmplService
     private readonly IMapper mapper;
     private readonly IRepository<Plan> _planRepository;
     private readonly IPlanRepository repository;
-
+    private readonly IRepository<PlanQuery> planQueryRepository;
     private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
         var match = Regex.Match(colName, columnRegex);
@@ -66,7 +66,8 @@ public class GmplService
         TurbineService turbineService,
         IMapper mapper,
         IPlanRepository repository,
-        IRepository<Plan> planRepository
+        IRepository<Plan> planRepository,
+        IRepository<PlanQuery> planQueryRepo
         )
     {
         this.personService = personService;
@@ -77,6 +78,8 @@ public class GmplService
         this.mapper = mapper;
         this._planRepository = planRepository;
         this.repository = repository;
+        this.planQueryRepository = planQueryRepo;
+
 
         prob = GLPKDllWrapper.glp_create_prob();
         tran = GLPKDllWrapper.glp_mpl_alloc_wksp();
@@ -101,7 +104,7 @@ public class GmplService
         {
             var plans = await repository.GetAllFullAsync();
 
-            Plan p = plans.Where(x => x.Date == date).FirstOrDefault();
+            Plan p = plans.Where(x => x.Date == date).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
 
             if (p == null) return null;
             else
@@ -112,7 +115,22 @@ public class GmplService
         }
         catch (Exception ex)
         {
-            throw ex;
+            throw new Exception("Error: " + ex.Message);
+        }
+
+    }
+
+    public async Task<PlanQuery?> GetPlanQueryAsync(DateOnly date)
+    {
+        try
+        {
+            List<PlanQuery> queries = await planQueryRepository.GetAllAsync();
+            PlanQuery? fitlered = queries.Where(x => x.PlanDate == date).FirstOrDefault();
+            return fitlered;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error: " + ex.Message);
         }
 
     }
@@ -427,7 +445,7 @@ public class GmplService
                 DateTimeOffset.UtcNow,
                 planBoats
             );
-            await _planRepository.AddAsync(entity);
+            //await _planRepository.AddAsync(entity);
             List<TaskSchedule> TaskIds = entity.PlanBoats.SelectMany(x => x.TaskSchedules).ToList();
 
 
@@ -439,6 +457,10 @@ public class GmplService
                     (TaskItemUpdateDto)mapper.Map(s, typeof(TaskItem), typeof(TaskItemUpdateDto)));
             }
 
+            //planquery
+            string jsonstring = JsonStringGenerator(request);
+            await planQueryRepository.AddAsync(new PlanQuery(entity.Id, jsonstring));
+
             return response;
         }
         catch (Exception ex)
@@ -446,6 +468,16 @@ public class GmplService
             if (File.Exists(datFile)) File.Delete(datFile);
             throw new Exception($"Fehler in Solve: {ex.Message}", ex);
         }
+    }
+
+    private string JsonStringGenerator(PlanRequestDto requestDto)
+    {
+        return @$"{{
+            maxWorkHours : {requestDto.MaxWorkHours},
+            boatNumber : {requestDto.BoatNumber},
+            time : {requestDto.Time},
+            boatSpeed : {requestDto.BoatSpeed}
+            }}";
     }
     private async Task<string> CreateDataFileAsync(
         PlanRequestDto info,
@@ -576,7 +608,7 @@ public class GmplService
         foreach (var taskId in taskIds)
         {
             var existingPlan = existingPlans.FirstOrDefault(p => p.TaskSchedules.Any(ts => ts.TaskId == taskId));
-            int boatNumber = existingPlan?.BoatNumber ?? 0;
+            int boatNumber = existingPlan?.BoatNumber ?? -1;
             sb.AppendLine($"\tta_{taskId} {boatNumber}");
         }
         sb.AppendLine(";");
@@ -622,7 +654,7 @@ public class GmplService
         foreach (var personId in personIds)
         {
             var existingAssignment = existingAssignments.FirstOrDefault(a => a.PersonId == personId);
-            int boatNumber = existingAssignment?.BoatNumber ?? 0;
+            int boatNumber = existingAssignment?.BoatNumber ?? -1;
             sb.AppendLine($"\tp_{personId} {boatNumber}");
         }
         sb.AppendLine(";");

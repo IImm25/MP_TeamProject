@@ -7,7 +7,7 @@
 
 set TASKS;
 set PEOPLE;
-set QUALIS; #qualifications
+set QUALIS; # qualifications
 set TOOLS;
 set PLACES;
 
@@ -29,16 +29,16 @@ param stockTools{TOOLS};
 
 # new parameters for the extended model
 param drivingSpeed; # in km/h
-param taskPrio{TASKS}; #priority of the task (for the objective function)
-param taskLocation{TASKS} symbolic in PLACES; #location of the task
-param distance{PLACES, PLACES}; #distance matrix in km
+param taskPrio{TASKS}; # priority of the task (for the objective function)
+param taskLocation{TASKS} symbolic in PLACES; # location of the task
+param distance{PLACES, PLACES}; # distance matrix in km
 
-# 0 = free, >0 = task is locked to that boat number
-param fixedBoat{TASKS} integer, default 0;
-# position of fixed task in the committed sequence (0 = not fixed)
-param fixedOrder{TASKS} integer, default 0;
-# 0 = free, >0 = person is locked to that boat number
-param fixedPerson{PEOPLE} integer, default 0;
+# -1 = free, >= 0 = task is locked to that boat number
+param fixedBoat{TASKS} integer, default -1;
+# start time of fixed task in the committed sequence (-1 = not fixed)
+param fixedStartTime{TASKS} default -1;
+# -1 = free, >= 0 = person is locked to that boat number
+param fixedPerson{PEOPLE} integer, default -1;
 # how many of each tool are locked to each boat
 param fixedToolAmount{BOATS, TOOLS} integer, default 0;
 
@@ -46,16 +46,16 @@ param fixedToolAmount{BOATS, TOOLS} integer, default 0;
 * define decision variables
 */
 
-#1 when task is on this boat, else 0
+# 1 when task is on this boat, else 0
 var taskOnBoat{BOATS,TASKS} binary;
 
-#specifies if boat is used (ensures that boats are filled from the front)
+# specifies if boat is used (ensures that boats are filled from the front)
 var boatUsage{BOATS} binary;
 
-#specifies if person is on that boat or not
+# specifies if person is on that boat or not
 var personOnBoat{BOATS,PEOPLE} binary;
 
-#specifies amount of a tool per boat
+# specifies amount of a tool per boat
 var toolOnBoat{BOATS,TOOLS} integer >= 0;
 
 # 1 if task ta1 is directly followed by task ta2 on boat b
@@ -94,29 +94,30 @@ var travelToHarbor{BOATS, TASKS} >= 0;
 
 # --- time ---
 
-#maximal working hours per used boat
+# maximal working hours per used boat (if no fixed tasks are on this boat)
 s.t. TimeLimit{b in BOATS}:
     lastTaskStart[b]
     + sum{ta in TASKS} (duration[ta] * isLast[b, ta])
     + sum{ta in TASKS} (travelTime[taskLocation[ta], harbor] * isLast[b, ta])
     <= maxWorkingHours * boatUsage[b];
 
+
 # --- task assignment ---
 
-#complete each task at most one time (or not at all)
+# complete each task at most one time (or not at all)
 s.t. DoneAtMostOnce{ta in TASKS}:
 		sum{b in BOATS} (taskOnBoat[b,ta]) <= 1;
 
-#at least one task must be done (plannen on a boat)
+# at least one task must be done (plannen on a boat)
 s.t. AtLeastOneTaskGlobal:
 		sum{b in BOATS, ta in TASKS} (taskOnBoat[b,ta]) >= 1;
 		
-#use boat in ascending order (breaking the symmetry)
+# use boat in ascending order (breaking the symmetry)
 s.t. Order{b in BOATS: b > 1}:
 		boatUsage[b] <= sum{ta in TASKS} (taskOnBoat[b-1,ta]);
 		
-/*s.t. UsageRequiresTask{b in BOATS: b > 1}:
-		boatUsage[b] <= sum{ta in TASKS} (taskOnBoat[b,ta]);*/
+s.t. UsageRequiresTask{b in BOATS: b > 1}:
+		boatUsage[b] <= sum{ta in TASKS} (taskOnBoat[b,ta]);
 
 
 /*people relevante constrains*/
@@ -125,18 +126,18 @@ s.t. Order{b in BOATS: b > 1}:
 s.t. QualiCheck{b in BOATS, ta in TASKS, q in QUALIS: requiredQualis[ta,q] >= 1}:
 		sum{p in PEOPLE} (hasQuali[p,q] * personOnBoat[b,p]) >= (requiredQualis[ta,q] * taskOnBoat[b,ta]);
 
-#each person can only be on one boat at a time
+# each person can only be on one boat at a time
 s.t. PersonOneBoat{p in PEOPLE}:
 		sum{b in BOATS} personOnBoat[b,p] <= 1;
 	
 	
 /*tool relevante constrains*/
 
-#The amount of tools on boad must be at least equal to the most demanding task to be carried out on that boat.
+# The amount of tools on boad must be at least equal to the most demanding task to be carried out on that boat.
 s.t. ToolAvailable{b in BOATS, ta in TASKS, t in TOOLS: requiredTools[ta,t] > 0}:
 		toolOnBoat[b,t] >= requiredTools[ta,t] * taskOnBoat[b,ta];
 	
-#total stock across all boats
+# total stock across all boats
 s.t. GlobalToolStock{t in TOOLS}:
     sum{b in BOATS} toolOnBoat[b,t] <= stockTools[t];
 
@@ -232,25 +233,16 @@ s.t. CalcTravelToHarbor{b in BOATS, ta in TASKS}:
 
 # --- havarie replanning constraints ---
 
-# fixed first tasks must be marked as such (so no predecessor is allowed)
-s.t. KeepFixedFirst{ta in TASKS: fixedBoat[ta] > 0 and fixedOrder[ta] = 1}:
-    isFirst[fixedBoat[ta], ta] = 1;
+#fixed tasks keep their original start time
+s.t. KeepFixedStartTime{ta in TASKS: fixedBoat[ta] >= 0 and fixedStartTime[ta] >= 0}:
+    startTime[fixedBoat[ta], ta] = fixedStartTime[ta];
 
 # fixed tasks stay on their assigned boat
-s.t. KeepFixedTasks{ta in TASKS: fixedBoat[ta] > 0}:
+s.t. KeepFixedTasks{ta in TASKS: fixedBoat[ta] >= 0}:
     taskOnBoat[fixedBoat[ta], ta] = 1;
 
-# fixed task sequence is preserved via after variable
-s.t. KeepFixedOrder{ta1 in TASKS, ta2 in TASKS:
-        ta1 <> ta2
-        and fixedBoat[ta1] > 0
-        and fixedBoat[ta2] > 0
-        and fixedBoat[ta1] = fixedBoat[ta2]
-        and fixedOrder[ta1] + 1 = fixedOrder[ta2]}:
-    after[fixedBoat[ta1], ta1, ta2] = 1;
-
 # people stay on their assigned boat
-s.t. KeepPeople{p in PEOPLE: fixedPerson[p] > 0}:
+s.t. KeepPeople{p in PEOPLE: fixedPerson[p] >= 0}:
     personOnBoat[fixedPerson[p], p] = 1;
 
 # tools stay on their assigned boat in the correct quantity

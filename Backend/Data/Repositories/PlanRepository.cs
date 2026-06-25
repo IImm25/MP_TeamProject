@@ -16,6 +16,16 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
     {
         var plan = await context.Plans
             .Include(x => x.PlanBoats)
+            .ThenInclude(b => b.Persons)
+                .ThenInclude(bp => bp.Person)
+        .Include(x => x.PlanBoats)
+            .ThenInclude(b => b.Tools)
+        .Include(x => x.PlanBoats)
+            .ThenInclude(b => b.TaskSchedules)
+                .ThenInclude(ts => ts.TaskItem)
+        .Include(x => x.PlanBoats)
+            .ThenInclude(b => b.BoatSchedules)
+        .AsSplitQuery()
             .FirstOrDefaultAsync(p => p.Id == id);
 
         return plan;
@@ -36,5 +46,14 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
             .ThenInclude(b => b.BoatSchedules)
         .AsSplitQuery()
         .ToListAsync();
+    }
+
+    
+    public async Task DeleteFullAsync(int id)
+    {
+        var plan = await context.Plans.FindAsync(id);
+        if (plan == null) return;
+        context.Plans.Remove(plan);
+        await context.SaveChangesAsync();
     }
 }

@@ -29,6 +29,7 @@ builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IRepository<Qualification>, Repository<Qualification>>();
 builder.Services.AddScoped<IRepository<Tool>, Repository<Tool>>();
 builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
+builder.Services.AddScoped<IRepository<PlanQuery>, Repository<PlanQuery>>();
 
 builder.Services.AddScoped<IRepository<PersonQualification>, Repository<PersonQualification>>();
 builder.Services.AddScoped<IRepository<TaskQualification>, Repository<TaskQualification>>();

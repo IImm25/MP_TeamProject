@@ -1,6 +1,7 @@
 ﻿using Backend.Data.DTO;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Backend.Web.Controllers;
 
 [ApiController]
@@ -39,5 +40,13 @@ public class GMPLController : ControllerBase
     public async Task<ActionResult<PlanResponseDto>> DeletePlan(DateOnly date)
     {
         return Ok();
+    }
+
+    [HttpGet("/queries/{querydate}")]
+    public async Task<ActionResult<PlanResponseDto>> GetPlanQueryAsync(DateOnly querydate)
+    {
+        var result = await gmplService.GetPlanQueryAsync(querydate);
+        if (result == null) return NotFound();
+        return Ok(result);
     }
 }
