@@ -237,6 +237,41 @@ p-inputnumber,
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+.view-switcher-container {
+  display: flex;
+  align-items: center;
+}
+.view-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a1a1aa;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.view-btn.left {
+  border-radius: 4px 0 0 4px;
+}
+.view-btn.right {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+.view-btn.active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
 @media (max-width: 768px) {
   .p-dialog {
     width: 95vw !important;

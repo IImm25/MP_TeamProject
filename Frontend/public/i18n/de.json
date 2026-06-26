@@ -135,6 +135,8 @@
     "LONGITUDE": "Längengrad",
     "NEW_TURBINE": "Neues Windrad",
     "COORDINATES": "Koordinaten",
+    "TABLE": "Tabelle",
+    "MAP": "Karte",
     "DIALOG": {
       "NEW": "Neues Windrad",
       "EDIT": "Windrad bearbeiten",

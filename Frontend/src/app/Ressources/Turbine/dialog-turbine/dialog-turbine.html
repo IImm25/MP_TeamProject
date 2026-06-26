@@ -75,6 +75,7 @@
       severity="secondary"
       (onClick)="visible.set(false)"
     />
+    <p-button [label]="'TASKS.NEW_TASK' | translate" icon="pi pi-plus" (onClick)="createNewTask()" />
     @if (type !== 'Detail') {
       <p-button
         [label]="'COMMON.SAVE' | translate"
@@ -85,3 +86,4 @@
     }
   </ng-template>
 </p-dialog>
+<app-dialog-task type="New" [(visible)]="taskCreateVisible" [selectedTurbine]="currentTurbine"/>

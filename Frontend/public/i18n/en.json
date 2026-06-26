@@ -135,6 +135,8 @@
     "LONGITUDE": "Longitude",
     "NEW_TURBINE": "New Wind Turbine",
     "COORDINATES": "Coordinates",
+    "TABLE": "Table",
+    "MAP": "Map",
     "DIALOG": {
       "NEW": "New Wind Turbine",
       "EDIT": "Edit Wind Turbine",

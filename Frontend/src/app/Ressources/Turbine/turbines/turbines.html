@@ -5,64 +5,104 @@
     <div class="title-group">
       <h1 class="title">{{ 'TURBINES.TURBINES' | translate }}</h1>
     </div>
-    <p-button
-      [label]="'TURBINES.NEW_TURBINE' | translate"
-      icon="pi pi-plus"
-      [raised]="true"
-      severity="secondary"
-      (onClick)="selectedTurbine.set(null); visible.set(true)"
-    />
+    <div class="header-controls">
+      <p-button
+        [label]="'TURBINES.NEW_TURBINE' | translate"
+        icon="pi pi-plus"
+        [raised]="true"
+        severity="secondary"
+        (onClick)="selectedTurbine.set(null); visible.set(true)"
+      />
+      <div class="view-switcher-container">
+        <button
+          type="button"
+          class="view-btn left"
+          [class.active]="currentView() === 'table'"
+          (click)="currentView.set('table')"
+        >
+          <i class="pi pi-table"></i> {{ 'TURBINES.TABLE' | translate }}
+        </button>
+        <button
+          type="button"
+          class="view-btn right"
+          [class.active]="currentView() === 'map'"
+          (click)="currentView.set('map')"
+        >
+          <i class="pi pi-map"></i> {{ 'TURBINES.MAP' | translate }}
+        </button>
+      </div>
+    </div>
   </header>
 
-  <div class="table-container">
-    <p-table [value]="turbines()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
-      <ng-template pTemplate="header">
-        <tr>
-          <th pSortableColumn="name">{{ 'TURBINES.NAME' | translate }} <p-sortIcon field="name"/></th>
-          <th>{{ 'TURBINES.COORDINATES' | translate }}</th>
-          <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
-        </tr>
-      </ng-template>
+  @if (currentView() === 'table') {
+    <div class="table-container">
+      <p-table [value]="turbines()" [paginator]="true" [rows]="5" sortField="name" [sortOrder]="1">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="name">
+              {{ 'TURBINES.NAME' | translate }} <p-sortIcon field="name" />
+            </th>
+            <th>{{ 'TURBINES.COORDINATES' | translate }}</th>
+            <th class="right">{{ 'COMMON.ACTIONS' | translate }}</th>
+          </tr>
+        </ng-template>
 
-      <ng-template pTemplate="body" let-turbine>
-        <tr>
-          <td>{{ turbine.name }}</td>
-          <td><span class="coordinate-text">{{ turbine.latitude | number:'1.4-6' }}, {{ turbine.longitude | number:'1.4-6' }}</span></td>
-          <td>
-            <div class="action-buttons">
-              <p-button
-                icon="pi pi-pencil"
-                [text]="true"
-                [rounded]="true"
-                severity="secondary"
-                class="btn-edit"
-                (onClick)="openEditOrDetail(turbine, 'Edit')"
-              />
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                [rounded]="true"
-                severity="secondary"
-                class="btn-delete"
-                (onClick)="deleteTurbine(turbine)"
-              />
-              <p-button
-                icon="pi pi-ellipsis-h"
-                [text]="true"
-                [rounded]="true"
-                severity="secondary"
-                (onClick)="openEditOrDetail(turbine, 'Detail')"
-              />
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+        <ng-template pTemplate="body" let-turbine>
+          <tr>
+            <td>{{ turbine.name }}</td>
+            <td>
+              <span class="coordinate-text"
+                >{{ turbine.latitude | number: '1.4-6' }},
+                {{ turbine.longitude | number: '1.4-6' }}</span
+              >
+            </td>
+            <td>
+              <div class="action-buttons">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="secondary"
+                  class="btn-edit"
+                  (onClick)="openEditOrDetail(turbine, 'Edit')"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="secondary"
+                  class="btn-delete"
+                  (onClick)="deleteTurbine(turbine)"
+                />
+                <p-button
+                  icon="pi pi-ellipsis-h"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="secondary"
+                  (onClick)="openEditOrDetail(turbine, 'Detail')"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+
+  @if (currentView() === 'map') {
+    <div class="map-container">
+      <app-map />
+    </div>
+  }
 </div>
 
 @if (visible()) {
-  <app-dialog-turbine [type]="type()" [selectedTurbine]="selectedTurbine()" [(visible)]="visible" (onSave)="loadTurbines()" />
+  <app-dialog-turbine
+    [type]="type()"
+    [selectedTurbine]="selectedTurbine()"
+    [(visible)]="visible"
+    (onSave)="loadTurbines()"
+  />
 }
 
 <p-confirmDialog />
