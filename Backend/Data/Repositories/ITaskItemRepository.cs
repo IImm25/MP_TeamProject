@@ -6,5 +6,6 @@ namespace Backend.Data.Repositories
     {
         Task<TaskItem?> GetFullByIdAsync(int id);
         Task<List<TaskItem>> GetAllFullAsync();
+        Task<bool> UpdateTaskStatus(int id, bool value);
     }
 }

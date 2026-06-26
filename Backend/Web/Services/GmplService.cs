@@ -29,8 +29,9 @@ public class GmplService
     private readonly ToolService toolService;
     private readonly TurbineService turbineService;
     private readonly IMapper mapper;
-    private readonly IRepository<Plan> _planRepository;
-    private readonly IPlanRepository repository;
+    private readonly Harbor harbor = new Harbor(54.433304330384395f, 13.031369793515506f);
+
+    private readonly IPlanRepository planRepository;
     private readonly IRepository<PlanQuery> planQueryRepository;
     private static (string VarName, List<int> Indices) parseColumnName(string colName)
     {
@@ -76,10 +77,8 @@ public class GmplService
         this.toolService = toolService;
         this.turbineService = turbineService;
         this.mapper = mapper;
-        this._planRepository = planRepository;
-        this.repository = repository;
+        this.planRepository = repository;
         this.planQueryRepository = planQueryRepo;
-
 
         prob = GLPKDllWrapper.glp_create_prob();
         tran = GLPKDllWrapper.glp_mpl_alloc_wksp();
@@ -87,8 +86,6 @@ public class GmplService
         {
             throw new Exception($"Error while reading GMPL model file: '{Path.GetFullPath(modFile)}'");
         }
-
-
     }
 
     ~GmplService()
@@ -97,83 +94,8 @@ public class GmplService
         GLPKDllWrapper.glp_delete_prob(prob);
         //Glpk.glp_free_env();
     }
-
-    public async Task<PlanResponseDto> GetPlan(DateOnly date)
-    {
-        try
-        {
-            var plans = await repository.GetAllFullAsync();
-
-            Plan p = plans.Where(x => x.Date == date).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
-
-            if (p == null) return null;
-            else
-            {
-                var response = await MapPlanToResponseDto(p);
-                return response;
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error: " + ex.Message);
-        }
-
-    }
-
-    public async Task<PlanQuery?> GetPlanQueryAsync(DateOnly date)
-    {
-        try
-        {
-            List<PlanQuery> queries = await planQueryRepository.GetAllAsync();
-            PlanQuery? fitlered = queries.Where(x => x.PlanDate == date).FirstOrDefault();
-            return fitlered;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error: " + ex.Message);
-        }
-
-    }
-
-    private async Task<PlanResponseDto> MapPlanToResponseDto(Plan plan)
-    {
-        List<BoatPlanDto> boatDtos = new List<BoatPlanDto>();
-
-        foreach (PlanBoat planBoat in plan.PlanBoats)
-        {
-            List<PersonSummaryDto> persons = planBoat.Persons
-                .Select(bp => mapper.Map<PersonSummaryDto>(bp.Person))
-                .ToList();
-
-            List<TaskToolDto> tools = planBoat.Tools
-                .Select(bt => new TaskToolDto
-                {
-                    ToolId = bt.ToolId,
-                    RequiredAmount = bt.RequiredAmount
-                }).ToList();
-
-            List<TaskScheduleDto> taskSchedules = planBoat.TaskSchedules
-                .Select(ts => new TaskScheduleDto(
-                    ts.StartTime,
-                    mapper.Map<TaskItemSummaryDto>(ts.TaskItem)
-                )).ToList();
-
-            List<BoatScheduleDto> boatSchedules = planBoat.BoatSchedules
-                .Select(bs => new BoatScheduleDto(bs.Departure, bs.Arrival))
-                .ToList();
-
-            boatDtos.Add(new BoatPlanDto(taskSchedules, boatSchedules, persons, tools));
-        }
-
-        return new PlanResponseDto(plan.Date, plan.CreatedAt, boatDtos);
-    }
-
-
-
-
     public async Task<PlanResponseDto> Solve(PlanRequestDto request)
     {
-
         List<int> taskIds = (await taskItemService.GetAll()).Select(t => t.Id).ToList();
         List<int> personIds = (await personService.GetAll()).Select(p => p.Id).ToList();
         List<int> toolIds = (await toolService.GetAll()).Select(t => t.Id).ToList();
@@ -187,13 +109,12 @@ public class GmplService
             if (task != null) taskItemDetails.Add(task);
         }
 
-
         List<PlanBoat> existingPlans = new List<PlanBoat>();
         List<BoatPerson> existingAssignments = new List<BoatPerson>();
         List<BoatTool> existingTools = new List<BoatTool>();
 
-        List<Plan> plans = await repository.GetAllFullAsync();
-        var latestPlan = plans.LastOrDefault();
+        List<Plan> plans = await planRepository.GetAllFullAsync();
+        var latestPlan = plans.Where(x => x.Date == DateOnly.FromDateTime(request.Time)).LastOrDefault();
         if (latestPlan != null && latestPlan.PlanBoats != null)
         {
             existingPlans = latestPlan.PlanBoats.ToList();
@@ -248,7 +169,6 @@ public class GmplService
             }
 
             GLPKDllWrapper.glp_mpl_postsolve(tran, prob, GLPKDllWrapper.GLP_MIP);
-
 
             var taskOnBoat = new HashSet<int>[request.BoatNumber];
             var personOnBoat = new HashSet<int>[request.BoatNumber];
@@ -388,85 +308,82 @@ public class GmplService
                 boats.Add(new BoatPlanDto(tasks, boatSchedules, persons, tools));
             }
 
-            //var (toolDiff, qualDiff) = await Validate(taskIds, personIds, toolIds, qualIds);
+            await SavePlanAndTaskStatus(request, boats);
 
-            PlanResponseDto response = new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, boats);
-            List<PlanBoat> planBoats = new List<PlanBoat>();
-            for (int i = 0; i < boats.Count; i++)
-            {
-                int boatNumber = i + 1; // 1-basiert
-                BoatPlanDto boatDto = boats[i];
-
-                List<BoatPerson> boatPersons = boatDto.Persons
-                    .Select(p => new BoatPerson
-                    {
-                        BoatNumber = boatNumber,
-                        PersonId = p.Id
-                    }).ToList();
-
-                List<BoatTool> boatTools = boatDto.Tools
-                    .Select(t => new BoatTool
-                    {
-                        BoatNumber = boatNumber,
-                        ToolId = t.ToolId,
-                        RequiredAmount = t.RequiredAmount
-                    }).ToList();
-
-                List<BoatSchedule> boatSchedules = boatDto.BoatSchedules
-                    .Select((s, idx) => new BoatSchedule
-                    {
-                        BoatNumber = boatNumber,
-                        TripNumber = idx + 1,
-                        Departure = s.Departure,
-                        Arrival = s.Arrival
-                    }).ToList();
-
-                List<TaskSchedule> taskSchedules = boatDto.TaskSchedules
-                    .Select(ts => new TaskSchedule
-                    {
-                        BoatNumber = boatNumber,
-                        TaskId = ts.Task.Id,
-                        TaskItem = null!, // Navigation ignorieren, nur IDs setzen
-                        StartTime = ts.StartTime
-                    }).ToList();
-
-                planBoats.Add(new PlanBoat
-                {
-                    BoatNumber = boatNumber,
-                    Persons = boatPersons,
-                    Tools = boatTools,
-                    BoatSchedules = boatSchedules,
-                    TaskSchedules = taskSchedules
-                });
-            }
-
-            Plan entity = new Plan(
-                DateOnly.FromDateTime(request.Time),
-                DateTimeOffset.UtcNow,
-                planBoats
-            );
-            //await _planRepository.AddAsync(entity);
-            List<TaskSchedule> TaskIds = entity.PlanBoats.SelectMany(x => x.TaskSchedules).ToList();
-
-
-            foreach (TaskSchedule i in TaskIds)
-            {
-                var s = i.TaskItem;
-                s.IsCompleted = true;
-                await taskItemService.UpdateTaskItem(i.TaskId,
-                    (TaskItemUpdateDto)mapper.Map(s, typeof(TaskItem), typeof(TaskItemUpdateDto)));
-            }
-
-            //planquery
-            string jsonstring = JsonStringGenerator(request);
-            await planQueryRepository.AddAsync(new PlanQuery(entity.Id, jsonstring));
-
-            return response;
+            return new PlanResponseDto(DateOnly.FromDateTime(request.Time), DateTimeOffset.UtcNow, boats);
         }
         catch (Exception ex)
         {
             if (File.Exists(datFile)) File.Delete(datFile);
             throw new Exception($"Fehler in Solve: {ex.Message}", ex);
+        }
+    }
+
+    private async Task SavePlanAndTaskStatus(PlanRequestDto request, List<BoatPlanDto> boats)
+    {
+        //saving the plan
+        List<PlanBoat> planBoats = new List<PlanBoat>();
+        for (int i = 0; i < boats.Count; i++)
+        {
+            int boatNumber = i + 1; // 1-basiert
+            BoatPlanDto boatDto = boats[i];
+
+            List<BoatPerson> boatPersons = boatDto.Persons
+                .Select(p => new BoatPerson
+                {
+                    BoatNumber = boatNumber,
+                    PersonId = p.Id
+                }).ToList();
+
+            List<BoatTool> boatTools = boatDto.Tools
+                .Select(t => new BoatTool
+                {
+                    BoatNumber = boatNumber,
+                    ToolId = t.ToolId,
+                    RequiredAmount = t.RequiredAmount
+                }).ToList();
+
+            List<BoatSchedule> boatSchedules = boatDto.BoatSchedules
+                .Select((s, idx) => new BoatSchedule
+                {
+                    BoatNumber = boatNumber,
+                    TripNumber = idx + 1,
+                    Departure = s.Departure,
+                    Arrival = s.Arrival
+                }).ToList();
+
+            List<TaskSchedule> taskSchedules = boatDto.TaskSchedules
+                .Select(ts => new TaskSchedule
+                {
+                    BoatNumber = boatNumber,
+                    TaskId = ts.Task.Id,
+                    TaskItem = null!, // Navigation ignorieren, nur IDs setzen
+                    StartTime = ts.StartTime
+                }).ToList();
+
+            planBoats.Add(new PlanBoat
+            {
+                BoatNumber = boatNumber,
+                Persons = boatPersons,
+                Tools = boatTools,
+                BoatSchedules = boatSchedules,
+                TaskSchedules = taskSchedules
+            });
+        }
+
+        Plan entity = new Plan(
+                DateOnly.FromDateTime(request.Time),
+                DateTimeOffset.UtcNow,
+                planBoats
+            );
+        await planRepository.AddAsync(entity);
+        await planQueryRepository.AddAsync(new PlanQuery(entity.Id, JsonStringGenerator(request)));
+
+
+        List<TaskSchedule> TaskIds = planBoats.SelectMany(x => x.TaskSchedules).ToList();
+        foreach (TaskSchedule i in TaskIds)
+        {
+            bool res = await taskItemService.UpdateTaskStatus(i.TaskId, true);
         }
     }
 
@@ -585,7 +502,7 @@ public class GmplService
 
         // Distance Matrix
         var turbineEntities = turbines.Select(t => new Turbine(t.Name, t.Latitude, t.Longitude) { Id = t.Id }).ToList();
-        float[,] distances = CalculateTurbineDistances(turbineEntities, new Harbor(54.433304330384395f, 13.031369793515506f));
+        float[,] distances = CalculateTurbineDistances(turbineEntities, harbor);
 
         var locationNames = new List<string> { "w_0" };
         locationNames.AddRange(turbines.Select(t => $"w_{t.Id}"));
@@ -616,8 +533,6 @@ public class GmplService
 
         // Fixed Start Time
         sb.AppendLine("param fixedStartTime :="); // 0 not fixed the other in what boat so 1 on boat 1 etc.
-
-
         foreach (int taskId in taskIds)
         {
             TaskSchedule? existingSchedule = existingPlans
@@ -634,11 +549,8 @@ public class GmplService
                 index++;
             }
 
-
             if (existingSchedule != null && index != 0)
             {
-                // TODO: Order aus existingSchedule holen
-                //int order = 1;
                 sb.AppendLine($"\tta_{taskId} {(index + 1)}");
             }
             else
@@ -677,7 +589,6 @@ public class GmplService
         }
         sb.AppendLine(";");
         sb.AppendLine();
-
         sb.AppendLine("end;");
 
         return sb.ToString();

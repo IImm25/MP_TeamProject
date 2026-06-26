@@ -9,7 +9,7 @@ namespace Backend.Web.Controllers;
 public class GMPLController : ControllerBase
 {
     private readonly GmplService gmplService;
-
+    private readonly PlanService planService;
     public GMPLController(GmplService gmplService)
     {
         this.gmplService = gmplService; // ← injiziertes Objekt direkt verwenden
@@ -18,7 +18,7 @@ public class GMPLController : ControllerBase
     [HttpGet("{date}")]
     public async Task<ActionResult<PlanResponseDto>> GetPlan(DateOnly date)
     {
-        return Ok(gmplService.GetPlan(date));
+        return Ok(planService.GetPlan(date));
     }
 
     [HttpPost("")]
@@ -45,7 +45,7 @@ public class GMPLController : ControllerBase
     [HttpGet("/queries/{querydate}")]
     public async Task<ActionResult<PlanResponseDto>> GetPlanQueryAsync(DateOnly querydate)
     {
-        var result = await gmplService.GetPlanQueryAsync(querydate);
+        var result = await planService.GetPlanQueryAsync(querydate);
         if (result == null) return NotFound();
         return Ok(result);
     }

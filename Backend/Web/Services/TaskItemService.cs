@@ -115,6 +115,10 @@ namespace Backend.Web.Services
         {
             return await tasks.DeleteAsync(id);
         }
+        public async Task<bool> UpdateTaskStatus(int id, bool value)
+        {
+            return await tasks.UpdateTaskStatus(id, value);
+        }
 
     }
 }

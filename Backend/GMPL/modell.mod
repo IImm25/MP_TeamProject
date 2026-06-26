@@ -165,6 +165,10 @@ s.t. ChainComplete{b in BOATS, ta in TASKS}:
     sum{ta2 in TASKS: ta2 <> ta} after[b, ta, ta2] + isLast[b, ta]
     = taskOnBoat[b, ta];
 
+# boat usage must be set if task on boat is set
+s.t. ForceBoatUsage{b in BOATS, ta in TASKS}:
+    boatUsage[b] >= taskOnBoat[b, ta];
+
 # every task on a boat must either have a predecessor OR be the first task
 s.t. ChainCompleteFirst{b in BOATS, ta in TASKS}:
     sum{ta2 in TASKS: ta2 <> ta} after[b, ta2, ta] + isFirst[b, ta]
@@ -200,11 +204,11 @@ s.t. DefIsLastLB{b in BOATS, ta in TASKS}:
 # --- start times ---
 
 # first task starts after harbor travel
-s.t. StartFirst{b in BOATS, ta in TASKS}:
+s.t. StartFirst{b in BOATS, ta in TASKS: fixedStartTime[ta] < 0}:
     startTime[b, ta] >= travelTime[harbor, taskLocation[ta]] * isFirst[b, ta];
 
 # successor starts after predecessor finishes + travel
-s.t. StartAfter{b in BOATS, ta1 in TASKS, ta2 in TASKS: ta1 <> ta2}:
+s.t. StartAfter{b in BOATS, ta1 in TASKS, ta2 in TASKS: ta1 <> ta2 and fixedStartTime[ta2] < 0}:
     startTime[b, ta2] >= startTime[b, ta1]
                         + duration[ta1]
                         + travelTime[taskLocation[ta1], taskLocation[ta2]]
@@ -245,9 +249,17 @@ s.t. KeepFixedTasks{ta in TASKS: fixedBoat[ta] >= 0}:
 s.t. KeepPeople{p in PEOPLE: fixedPerson[p] >= 0}:
     personOnBoat[fixedPerson[p], p] = 1;
 
+# if boat has at # if the boat has at least one task no additional personal can be added 
+s.t. NoAdditionalPeople{b in BOATS, p in PEOPLE: fixedPerson[p] != b}:
+    personOnBoat[b, p] <= 1 - (if sum{ta in TASKS: fixedBoat[ta] == b} 1 > 0 then 1 else 0);
+
 # tools stay on their assigned boat in the correct quantity
 s.t. KeepTools{b in BOATS, t in TOOLS: fixedToolAmount[b,t] > 0}:
     toolOnBoat[b, t] >= fixedToolAmount[b, t];
+
+# if the boat has at least one task no additional tools can be added
+s.t. NoAdditionalTools{b in BOATS, t in TOOLS: sum{ta in TASKS: fixedBoat[ta] == b} 1 > 0}:
+    toolOnBoat[b, t] = fixedToolAmount[b, t];
 
 
 /**

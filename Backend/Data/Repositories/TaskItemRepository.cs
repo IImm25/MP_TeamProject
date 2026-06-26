@@ -33,5 +33,17 @@
                 .Include (t => t.Location)
                 .ToListAsync();
         }
+
+        public async Task<bool> UpdateTaskStatus(int id, bool val)
+        {
+            var task = context.Tasks.Where(x => x.Id == id).FirstOrDefault();
+            if (task == null) return false;
+            else
+            {
+                task.IsCompleted = val;
+                await context.SaveChangesAsync();
+                return true;
+            }
+        }
     }
 }
