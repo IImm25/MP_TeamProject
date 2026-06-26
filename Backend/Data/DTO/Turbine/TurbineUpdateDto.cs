@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO;
+﻿namespace Backend.Data.DTO.Turbine;
 
 public record TurbineUpdateDto(
 	string? Name,

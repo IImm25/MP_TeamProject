@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO;
+﻿namespace Backend.Data.DTO.Person;
 
 public record PersonUpdateDto(
 	string? Firstname,

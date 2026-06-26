@@ -1,4 +1,4 @@
-﻿using Backend.Data.DTO;
+﻿using Backend.Data.DTO.Turbine;
 using AutoMapper;
 using Backend.Data.Entitites;
 

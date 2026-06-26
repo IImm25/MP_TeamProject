@@ -5,8 +5,11 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using AutoMapper;
-using Backend.Data.DTO;
 using Backend.GMPL;
+using Backend.Data.DTO;
+using Backend.Data.DTO.Plan;
+using Backend.Data.DTO.TaskItem;
+using Backend.Data.DTO.Person;
 
 public class GmplService
 {

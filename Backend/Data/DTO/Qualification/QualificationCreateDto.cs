@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO.Create;
+﻿namespace Backend.Data.DTO.Qualification;
 
 public record QualificationCreateDto(
 	string Name,

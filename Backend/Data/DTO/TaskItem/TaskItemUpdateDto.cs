@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO;
+﻿namespace Backend.Data.DTO.TaskItem;
 
 public record TaskItemUpdateDto(
 	string? Name,

@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO;
+﻿namespace Backend.Data.DTO.Plan;
 
 public record PlanRequestDto(
     float MaxTime,

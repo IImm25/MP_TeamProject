@@ -1,5 +1,4 @@
-﻿using Backend.Data.DTO;
-using Backend.Data.DTO.Create;
+﻿using Backend.Data.DTO.Qualification;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO.Create;
+﻿namespace Backend.Data.DTO.Person;
 
 public record PersonCreateDto(
 	string Firstname,

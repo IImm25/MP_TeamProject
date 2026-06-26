@@ -1,4 +1,6 @@
-﻿namespace Backend.Data.DTO;
+﻿using Backend.Data.DTO.Turbine;
+
+namespace Backend.Data.DTO.TaskItem;
 
 public record TaskItemDetailDto(
 	int Id,

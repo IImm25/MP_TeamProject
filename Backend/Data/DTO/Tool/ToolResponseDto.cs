@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO;
+﻿namespace Backend.Data.DTO.Tool;
 
 public record ToolResponseDto(
 	int Id,

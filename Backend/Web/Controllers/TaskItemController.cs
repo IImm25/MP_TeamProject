@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Backend.Data.DTO;
-using Backend.Data.DTO.Create;
+using Backend.Data.DTO.TaskItem;
 using Backend.Data.Mappers;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Http.HttpResults;

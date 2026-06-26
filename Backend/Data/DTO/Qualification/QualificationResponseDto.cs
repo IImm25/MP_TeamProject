@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO;
+﻿namespace Backend.Data.DTO.Qualification;
 
 public record QualificationResponseDto(
 	int Id,

@@ -1,4 +1,6 @@
-﻿namespace Backend.Data.DTO;
+﻿using Backend.Data.DTO.Qualification;
+
+namespace Backend.Data.DTO.Person;
 
 public record PersonDetailDto(
 	int Id,

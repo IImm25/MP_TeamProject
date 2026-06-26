@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Backend.Data.DTO;
+using Backend.Data.DTO.Turbine;
 using Backend.Data.Entitites;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Http.HttpResults;

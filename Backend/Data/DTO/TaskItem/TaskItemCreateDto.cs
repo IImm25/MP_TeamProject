@@ -1,4 +1,4 @@
-﻿namespace Backend.Data.DTO.Create;
+﻿namespace Backend.Data.DTO.TaskItem;
 
 public record TaskItemCreateDto(
 	string Name,
