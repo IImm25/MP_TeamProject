@@ -159,15 +159,20 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("JsonQuery")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("BoatNumber")
+                        .HasColumnType("integer");
 
-                    b.Property<DateOnly>("PlanDate")
-                        .HasColumnType("date");
+                    b.Property<float>("BoatSpeed")
+                        .HasColumnType("real");
+
+                    b.Property<float>("MaxWorkHours")
+                        .HasColumnType("real");
 
                     b.Property<int>("PlanId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

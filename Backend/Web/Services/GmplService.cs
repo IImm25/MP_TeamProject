@@ -33,31 +33,7 @@ public class GmplService
 
     private readonly IPlanRepository planRepository;
     private readonly IRepository<PlanQuery> planQueryRepository;
-    private static (string VarName, List<int> Indices) parseColumnName(string colName)
-    {
-        var match = Regex.Match(colName, columnRegex);
-
-        if (!match.Success)
-            return ("", []);
-
-        string name = match.Groups[1].Value;
-        string indexRaw = match.Groups[2].Value;
-
-        var indices = new List<int>();
-
-        if (!string.IsNullOrWhiteSpace(indexRaw))
-        {
-            foreach (var part in indexRaw.Split(','))
-            {
-                var cleaned = Regex.Replace(part.Trim(), @"^[A-Za-z]+_", "");
-
-                if (int.TryParse(cleaned, out int id))
-                    indices.Add(id - 1); // From GMPL 1 indexed to 0 indexed
-            }
-        }
-        return (name, indices);
-    }
-
+    
     // Konstruktor mit DI-Parametern
     public GmplService(
         PersonService personService,
@@ -318,6 +294,30 @@ public class GmplService
             throw new Exception($"Fehler in Solve: {ex.Message}", ex);
         }
     }
+    private static (string VarName, List<int> Indices) parseColumnName(string colName)
+    {
+        var match = Regex.Match(colName, columnRegex);
+
+        if (!match.Success)
+            return ("", []);
+
+        string name = match.Groups[1].Value;
+        string indexRaw = match.Groups[2].Value;
+
+        var indices = new List<int>();
+
+        if (!string.IsNullOrWhiteSpace(indexRaw))
+        {
+            foreach (var part in indexRaw.Split(','))
+            {
+                var cleaned = Regex.Replace(part.Trim(), @"^[A-Za-z]+_", "");
+
+                if (int.TryParse(cleaned, out int id))
+                    indices.Add(id - 1); // From GMPL 1 indexed to 0 indexed
+            }
+        }
+        return (name, indices);
+    }
 
     private async Task SavePlanAndTaskStatus(PlanRequestDto request, List<BoatPlanDto> boats)
     {
@@ -377,7 +377,7 @@ public class GmplService
                 planBoats
             );
         await planRepository.AddAsync(entity);
-        await planQueryRepository.AddAsync(new PlanQuery(entity.Id, JsonStringGenerator(request)));
+        await planQueryRepository.AddAsync(new PlanQuery(entity.Id, request));
 
 
         List<TaskSchedule> TaskIds = planBoats.SelectMany(x => x.TaskSchedules).ToList();
@@ -385,16 +385,6 @@ public class GmplService
         {
             bool res = await taskItemService.UpdateTaskStatus(i.TaskId, true);
         }
-    }
-
-    private string JsonStringGenerator(PlanRequestDto requestDto)
-    {
-        return @$"{{
-            maxWorkHours : {requestDto.MaxWorkHours},
-            boatNumber : {requestDto.BoatNumber},
-            time : {requestDto.Time},
-            boatSpeed : {requestDto.BoatSpeed}
-            }}";
     }
     private async Task<string> CreateDataFileAsync(
         PlanRequestDto info,

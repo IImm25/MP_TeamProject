@@ -43,13 +43,29 @@ public class PlanService
         try
         {
             List<PlanQuery> queries = await planQueryRepository.GetAllAsync();
-            PlanQuery? fitlered = queries.Where(x => x.PlanDate == date).FirstOrDefault();
+            PlanQuery? fitlered = queries.Where(x => DateOnly.FromDateTime(x.Time) == date).FirstOrDefault();
             return fitlered;
         }
         catch (Exception ex)
         {
             throw new Exception("Error: " + ex.Message);
         }
+    }
+    public async Task<bool> DeletePlan(DateOnly date)
+    {
+        try
+        {
+            var plans = await repository.GetAllFullAsync();
+            int id = plans.Where(x => x.Date.Equals(date)).Select(x => x.Id).FirstOrDefault();
+
+            await repository.DeleteFullAsync(id);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error: " + ex.Message);
+        }
+        
     }
     private PlanResponseDto MapPlanToResponseDto(Plan plan)
     {

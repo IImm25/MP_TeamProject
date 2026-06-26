@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260625192530_AddPlanQuery")]
-    partial class AddPlanQuery
+    [Migration("20260626211019_AddPlanQueryCleanUp")]
+    partial class AddPlanQueryCleanUp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -162,12 +162,20 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("JsonQuery")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("BoatNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("BoatSpeed")
+                        .HasColumnType("real");
+
+                    b.Property<float>("MaxWorkHours")
+                        .HasColumnType("real");
 
                     b.Property<int>("PlanId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

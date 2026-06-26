@@ -39,14 +39,25 @@ public class GMPLController : ControllerBase
     [HttpDelete("{date}")]
     public async Task<ActionResult<PlanResponseDto>> DeletePlan(DateOnly date)
     {
-        return Ok();
+        try
+        {
+            bool res = await planService.DeletePlan(date);
+
+            return res ? Ok() : NotFound();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, ex.Message);
+        }
+       
     }
 
     [HttpGet("/queries/{querydate}")]
-    public async Task<ActionResult<PlanResponseDto>> GetPlanQueryAsync(DateOnly querydate)
+    public async Task<ActionResult<PlanRequestDto>> GetPlanQueryAsync(DateOnly querydate)
     {
         var result = await planService.GetPlanQueryAsync(querydate);
         if (result == null) return NotFound();
-        return Ok(result);
+        return Ok(new PlanRequestDto(result.MaxWorkHours, result.BoatNumber, result.Time, result.BoatSpeed);
     }
 }

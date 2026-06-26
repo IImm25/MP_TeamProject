@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260625202651_AddPlanQuery2")]
-    partial class AddPlanQuery2
+    [Migration("20260626210936_remQueries")]
+    partial class remQueries
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -152,29 +152,6 @@ namespace Backend.Migrations
                     b.HasKey("PlanId", "BoatNumber");
 
                     b.ToTable("Boats");
-                });
-
-            modelBuilder.Entity("Backend.Data.Entitites.PlanQuery", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("JsonQuery")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateOnly>("PlanDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PlanQueries");
                 });
 
             modelBuilder.Entity("Backend.Data.Entitites.Qualification", b =>
