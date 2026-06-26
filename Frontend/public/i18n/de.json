@@ -10,6 +10,7 @@
   },
   "MENU": {
     "SCHEDULER": "Planung",
+    "SCHEDULE-VIEW": "Planansicht",
     "ADMINISTRATION": "Verwaltung",
     "TASKS": "Aufgaben",
     "EMPLOYEES": "Mitarbeiter",
@@ -30,6 +31,7 @@
       "NEW": "Neue Aufgabe",
       "EDIT": "Aufgabe bearbeiten",
       "DETAIL": "Aufgabe anzeigen",
+      "ACCIDENT": "Havarie",
       "CORE": "Allgemein",
       "NAME_PLACEHOLDER": "Gib eine Aufgabenbezeichnung ein!",
       "START_DATE_PLACEHOLDER": "TT.MM.JJJJ",
@@ -170,6 +172,8 @@
   "SCHEDULE": {
     "TITLE": "Planung",
     "BOAT": "Boot",
+    "ACCIDENT": "Havarie",
+    "WEATHER": "Wetteränderung",
     "CARDS": "Allgemein",
     "GANTT": "Gantt",
     "CARD": {
@@ -181,6 +185,11 @@
       "NO_EMPLOYEE": "Kein Mitarbeiter",
       "NO_TOOL": "Kein Werkzeug",
       "TRAVEL": "Fahrt"
+    },
+    "WEATHERDIALOG": {
+      "TITLE": "Wetter",
+      "DATE": "Datum",
+      "SPEED": "Angepasste Geschwindigkeit (km/h)"
     }
   },
   "MESSAGES": {

@@ -10,6 +10,7 @@
   },
   "MENU": {
     "SCHEDULER": "Scheduler",
+    "SCHEDULE-VIEW": "Schedule View",
     "ADMINISTRATION": "Administration",
     "TASKS": "Tasks",
     "EMPLOYEES": "Employees",
@@ -30,6 +31,7 @@
       "NEW": "New Task",
       "EDIT": "Edit Task",
       "DETAIL": "View Task",
+      "ACCIDENT": "Accident",
       "CORE": "General",
       "NAME_PLACEHOLDER": "Enter a task name!",
       "START_DATE_PLACEHOLDER": "MM/DD/YYYY",
@@ -169,6 +171,8 @@
   "SCHEDULE": {
     "TITLE": "Schedule",
     "BOAT": "Boat",
+    "ACCIDENT": "Accident",
+    "WEATHER": "Weather Change",
     "CARDS": "General",
     "GANTT": "Gantt",
     "CARD": {
@@ -180,6 +184,11 @@
       "NO_EMPLOYEE": "No employee",
       "NO_TOOL": "No tool",
       "TRAVEL": "Travel"
+    },
+    "WEATHERDIALOG": {
+      "TITLE": "Weather",
+      "DATE": "Date",
+      "SPEED": "New Speed (km/h)"
     }
   },
   "MESSAGES": {

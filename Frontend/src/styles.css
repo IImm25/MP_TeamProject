@@ -221,6 +221,16 @@ p-inputnumber,
   width: 100%;
 }
 
+.p-datepicker.open-upward {
+  transform: translateY(calc(-100% - 2.5rem)) !important;
+  transform-origin: bottom center !important;
+}
+
+.p-select.open-upward {
+  transform: translateY(calc(-100% - 2.5rem)) !important;
+  transform-origin: bottom center !important;
+}
+
 .p-select.p-disabled {
   background-color: var(--bg-color) !important;
   color: var(--text-color) !important;
@@ -235,6 +245,41 @@ p-inputnumber,
 :host ::ng-deep .p-toast-message {
   margin-bottom: 0.5rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+.view-switcher-container {
+  display: flex;
+  align-items: center;
+}
+.view-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a1a1aa;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.view-btn.left {
+  border-radius: 4px 0 0 4px;
+}
+.view-btn.right {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+.view-btn.active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
 }
 
 @media (max-width: 768px) {

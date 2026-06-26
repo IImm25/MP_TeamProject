@@ -18,6 +18,19 @@
         />
       </div>
 
+      <p-button
+        [label]="'SCHEDULE.ACCIDENT' | translate"
+        icon="pi pi-exclamation-triangle"
+        (onClick)="openTask(null, 'Accident')"
+        severity="danger"
+      />
+
+      <p-button
+        [label]="'SCHEDULE.WEATHER' | translate"
+        icon="pi pi-cloud"
+        (click)="weatherVisible.set(true)"
+      />
+
       <div class="view-switcher-container">
         <button
           type="button"
@@ -73,7 +86,7 @@
                           <p-chip
                             [label]="schedule.task.name"
                             icon="pi pi-list"
-                            (click)="openTask(schedule.task)"
+                            (click)="openTask(schedule.task, 'Detail')"
                             styleClass="clickable-chip"
                           />
                         }
@@ -145,7 +158,7 @@
                           <p-chip
                             [label]="schedule.task.name"
                             icon="pi pi-list"
-                            (click)="openTask(schedule.task)"
+                            (click)="openTask(schedule.task, 'Detail')"
                             styleClass="clickable-chip"
                           />
                         }
@@ -211,7 +224,7 @@
               <div class="gantt-label-cell" (click)="op.toggle($event)">
                 <div class="boat-title">
                   <i class="pi pi-compass"></i>
-                  <span>{{ 'SCHEDULE.BOAT' | translate }} {{ bIndex + 1 }}</span>
+                  <span> {{ 'SCHEDULE.BOAT' | translate }} {{ bIndex + 1 }}</span>
                 </div>
                 <span class="click-info-hint"
                   >{{ 'SCHEDULE.GANTTVIEW.DETAILS' | translate }} <i class="pi pi-chevron-down"></i
@@ -241,7 +254,7 @@
                     class="gantt-bar task"
                     [style.left]="calculatePosition(schedule.startTime)"
                     [style.width]="calculateWidth(schedule.task.durationHours)"
-                    (click)="openTask(schedule.task)"
+                    (click)="openTask(schedule.task, 'Detail')"
                   >
                     <span class="bar-title">{{ schedule.task.name }}</span>
                     <span class="bar-time"
@@ -253,7 +266,38 @@
                 }
               </div>
 
-              <p-popover #op>...</p-popover>
+              <p-popover #op>
+                <div class="popover-details">
+                  <h4><i class="pi pi-users"></i> {{ 'MENU.EMPLOYEES' | translate }}</h4>
+                  <div class="popover-chips">
+                    @for (person of boat.persons; track person.id) {
+                      <p-chip
+                        [label]="person.firstname + ' ' + person.lastname"
+                        icon="pi pi-user"
+                        (click)="openEmployee(person)"
+                      />
+                    } @empty {
+                      <span class="empty-hint">{{
+                        'SCHEDULE.GANTTVIEW.NO_EMPLOYEES' | translate
+                      }}</span>
+                    }
+                  </div>
+                  <h4 class="mt-3"><i class="pi pi-wrench"></i> {{ 'MENU.TOOLS' | translate }}</h4>
+                  <div class="popover-chips">
+                    @for (t of boat.tools; track t.toolId) {
+                      <p-chip
+                        [label]="getToolName(t.toolId) + ' (' + t.requiredAmount + 'x)'"
+                        icon="pi pi-wrench"
+                        (click)="openTool(t.toolId, t.requiredAmount)"
+                      />
+                    } @empty {
+                      <span class="empty-hint">{{
+                        'SCHEDULE.GANTTVIEW.NO_TOOLS' | translate
+                      }}</span>
+                    }
+                  </div>
+                </div>
+              </p-popover>
             </div>
           }
         </div>
@@ -262,7 +306,7 @@
   </div>
 
   @if (taskVisible()) {
-    <app-dialog-task [type]="'Detail'" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
+    <app-dialog-task [type]="taskType()" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
   }
   @if (employeeVisible()) {
     <app-dialog-employee
@@ -278,5 +322,9 @@
       [requiredAmount]="requiredAmount()"
       [(visible)]="toolVisible"
     />
+  }
+
+  @if (weatherVisible()) {
+    <app-weather-dialog [(visible)]="weatherVisible" />
   }
 </div>

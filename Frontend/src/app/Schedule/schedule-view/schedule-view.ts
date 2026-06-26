@@ -8,10 +8,10 @@ import { Tool } from '../../Models/tool';
 import { CardModule } from 'primeng/card';
 import { ChipModule } from 'primeng/chip';
 import { PopoverModule } from 'primeng/popover';
-import { DatePickerModule } from 'primeng/datepicker'; // Import für den Datepicker
-import { FormsModule } from '@angular/forms'; // Für ngModel Kopplung
+import { DatePickerModule } from 'primeng/datepicker';
+import { FormsModule } from '@angular/forms';
 import { AccordionModule } from 'primeng/accordion';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { DialogTask } from '../../Ressources/Task/dialog-task/dialog-task';
 import { DialogEmployee } from '../../Ressources/Employee/dialog-employee/dialog-employee';
 import { DialogTool } from '../../Ressources/Tool/dialog-tool/dialog-tool';
@@ -20,6 +20,8 @@ import { forkJoin, switchMap } from 'rxjs';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Qualification } from '../../Models/qualification';
+import { Button } from 'primeng/button';
+import { WeatherDialog } from '../weather-dialog/weather-dialog';
 
 @Component({
   selector: 'app-schedule-view',
@@ -37,6 +39,8 @@ import { Qualification } from '../../Models/qualification';
     DialogEmployee,
     DialogTool,
     ToastModule,
+    Button,
+    WeatherDialog
   ],
   providers: [MessageService],
   templateUrl: './schedule-view.html',
@@ -47,28 +51,30 @@ export class ScheduleView implements OnInit {
   private http = inject(HttpService);
 
   // Steuersignale für Ansicht und Datum
-  currentView = signal<'cards' | 'gantt'>('cards');
-  selectedDate = signal<Date>(new Date());
+  currentView: WritableSignal<'cards' | 'gantt'> = signal('cards');
+  selectedDate: WritableSignal<Date> = signal(new Date());
 
-  planResponse = signal<PlanResponse>({ date: '', createdAt: '', boats: [] });
-  boats = signal<Boat[]>([]);
-  unusedResources = signal<Boat>({ taskSchedules: [], persons: [], tools: [], boatSchedules: [] });
+  planResponse: WritableSignal<PlanResponse> = signal({ date: '', createdAt: '', boats: [] });
+  boats: WritableSignal<Boat[]> = signal([]);
+  unusedResources: WritableSignal<Boat> = signal({ taskSchedules: [], persons: [], tools: [], boatSchedules: [] });
 
-  travelTimes = signal<TravelTime[]>([]);
+  travelTimes: WritableSignal<TravelTime[]> = signal([]);
 
-  allTasks = signal<Task[]>([]);
-  allEmployees = signal<Employee[]>([]);
-  allTools = signal<Tool[]>([]);
-  allQualifications = signal<Qualification[]>([]);
+  allTasks: WritableSignal<Task[]> = signal([]);
+  allEmployees: WritableSignal<Employee[]> = signal([]);
+  allTools: WritableSignal<Tool[]> = signal([]);
+  allQualifications: WritableSignal<Qualification[]> = signal([]);
 
   // Dialog-Toggles
-  selectedTask = signal<Task | null>(null);
-  taskVisible = signal(false);
-  selectedEmployee = signal<Employee | null>(null);
-  employeeVisible = signal(false);
-  selectedTool = signal<Tool | null>(null);
-  requiredAmount = signal(0);
-  toolVisible = signal(false);
+  selectedTask: WritableSignal<Task | null> = signal(null);
+  taskVisible: WritableSignal<boolean> = signal(false);
+  taskType: WritableSignal<'Accident' | 'Detail'> = signal('Detail');
+  selectedEmployee: WritableSignal<Employee | null> = signal(null);
+  employeeVisible: WritableSignal<boolean> = signal(false);
+  selectedTool: WritableSignal<Tool | null> = signal(null);
+  requiredAmount: WritableSignal<number> = signal(0);
+  toolVisible: WritableSignal<boolean> = signal(false);
+  weatherVisible: WritableSignal<boolean> = signal(false);
 
   ngOnInit(): void {
     forkJoin({
@@ -147,11 +153,18 @@ export class ScheduleView implements OnInit {
         : `${minutes}m`;
   }
 
-  openTask(taskSummary: TaskSummary) {
-    const fullTask = this.allTasks().find((t) => t.id === taskSummary.id);
-    if (fullTask) {
-      this.selectedTask.set(fullTask);
+  openTask(taskSummary: TaskSummary | null, mode: 'Accident' | 'Detail') {
+    if (!taskSummary && mode === 'Accident') {
+      this.selectedTask.set(null);
       this.taskVisible.set(true);
+      this.taskType.set('Accident');
+    } else if (taskSummary && mode === 'Detail') {
+      const fullTask = this.allTasks().find((t) => t.id === taskSummary.id);
+      if (fullTask) {
+        this.selectedTask.set(fullTask);
+        this.taskVisible.set(true);
+        this.taskType.set(mode);
+      }
     }
   }
 

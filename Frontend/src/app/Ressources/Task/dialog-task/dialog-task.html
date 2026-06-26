@@ -5,7 +5,9 @@
       ? ('TASKS.DIALOG.NEW' | translate)
       : type === 'Detail'
         ? ('TASKS.DIALOG.DETAIL' | translate)
-        : ('TASKS.DIALOG.EDIT' | translate)
+        : type === 'Accident'
+          ? ('TASKS.DIALOG.ACCIDENT' | translate)
+          : ('TASKS.DIALOG.EDIT' | translate)
   "
   [modal]="true"
   [draggable]="false"

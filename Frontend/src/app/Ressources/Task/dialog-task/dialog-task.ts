@@ -56,7 +56,7 @@ export class DialogTask implements OnInit {
 
   @Output() taskSaved = new EventEmitter<void>();
 
-  @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' = 'New';
+  @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' | 'Accident' = 'New';
 
   @Input() set selectedTask(val: Task | null) {
     this.currentTask = val;
@@ -260,7 +260,7 @@ export class DialogTask implements OnInit {
           this.visible.set(false);
         },
       });
-    } else if (this.type === 'New') {
+    } else if (this.type === 'New' || this.type === 'Accident') {
       const payload: TaskCreate = {
         name: val.name || '',
         durationHours: totalDuration,
