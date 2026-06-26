@@ -27,6 +27,13 @@ export class Map implements AfterViewInit {
     popupAnchor: [0, -32]
   });
 
+  private static harbourIcon = L.icon({
+    iconUrl: 'harbour.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+  });
+
   private static harbour: L.LatLngExpression = [54.433304330384395, 13.031369793515506];
 
   ngAfterViewInit(): void {
@@ -57,7 +64,7 @@ export class Map implements AfterViewInit {
 
       const marker = L.marker([turbine.latitude, turbine.longitude], { icon: Map.turbineIcon }) // lat first!
         .addTo(this.markerLayer);
-      
+
       marker.addEventListener("click", () => {
         this.selectedTurbine.set(turbine);
         this.visible.set(true);
@@ -65,7 +72,7 @@ export class Map implements AfterViewInit {
 
     });
 
-    L.marker(Map.harbour) // lat first!
+    L.marker(Map.harbour, { icon: Map.harbourIcon }) // lat first!
       .bindPopup("Barhöft Hafen")
       .addTo(this.markerLayer);
   }
