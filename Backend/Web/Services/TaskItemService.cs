@@ -42,7 +42,7 @@ namespace Backend.Web.Services
                 taskItem.RequiredQualifications.Add(new TaskQualification
                 {
                     QualificationId = reqQual.QualificationId,
-                    RequiredAmount = reqQual.requiredAmount
+                    RequiredAmount = reqQual.RequiredAmount
                 });
             }
             await tasks.AddAsync(taskItem);
@@ -102,7 +102,7 @@ namespace Backend.Web.Services
                     taskItem.RequiredQualifications.Add(new TaskQualification
                     {
                         QualificationId = reqQual.QualificationId,
-                        RequiredAmount = reqQual.requiredAmount
+                        RequiredAmount = reqQual.RequiredAmount
                     });
                 }
             }

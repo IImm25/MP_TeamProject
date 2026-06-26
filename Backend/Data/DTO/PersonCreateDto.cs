@@ -1,8 +1,7 @@
 ﻿namespace Backend.Data.DTO.Create;
 
-public class PersonCreateDto
-{
-    public required string Firstname { get; set; }
-    public required string Lastname { get; set; }
-    public List<int> QualificationIds { get; set; } = [];
-}
+public record PersonCreateDto(
+	string Firstname,
+	string Lastname,
+	List<int> QualificationIds
+);

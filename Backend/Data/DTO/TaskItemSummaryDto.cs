@@ -1,12 +1,10 @@
-﻿namespace Backend.Data.DTO
-{
-    public class TaskItemSummaryDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public float DurationHours { get; set; }
-        public bool IsCompleted { get; set; }
-        public DateOnly ExecutionIntervalStart { get; set; }
-        public DateOnly ExecutionIntervalEnd { get; set; }
-    }
-}
+﻿namespace Backend.Data.DTO;
+
+public record TaskItemSummaryDto(
+	int Id,
+	string Name,
+	float DurationHours,
+	bool isCompleted,
+	DateOnly ExecutionIntervalStart,
+	DateOnly ExecutionIntervalEnd
+);
