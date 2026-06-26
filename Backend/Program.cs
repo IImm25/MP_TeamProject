@@ -25,6 +25,7 @@ builder.Services.AddSwaggerGen();
 // registering repositories to Dependency Injection
 builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IRepository<Qualification>, Repository<Qualification>>();
 builder.Services.AddScoped<IRepository<Tool>, Repository<Tool>>();
 builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
