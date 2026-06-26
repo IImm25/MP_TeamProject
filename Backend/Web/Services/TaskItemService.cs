@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Backend.Data.DTO.Plan;
 using Backend.Data.DTO.TaskItem;
 using Backend.Data.Entitites;
 using Backend.Data.Repositories;
@@ -58,6 +59,12 @@ namespace Backend.Web.Services
         {
             return mapper.Map<TaskItemDetailDto?>(await tasks.GetFullByIdAsync(id));
         }
+
+        public async Task<SingleTaskScheduleDto?> GetScheduleByTaskId(int id)
+        {
+            return mapper.Map<SingleTaskScheduleDto?>(await tasks.GetTaskScheduleByTaskIdAsync(id));
+        }
+
 
         public async Task<TaskItemDetailDto?> UpdateTaskItem(int id, TaskItemUpdateDto update)
         {

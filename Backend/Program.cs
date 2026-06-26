@@ -1,4 +1,5 @@
 ﻿using Backend.Data;
+using Backend.Data.DTO.Plan;
 using Backend.Data.Entitites;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
@@ -41,7 +42,7 @@ builder.Services.AddScoped<PersonService>();
 builder.Services.AddScoped<QualificationService>();
 builder.Services.AddScoped<TaskItemService>();
 builder.Services.AddScoped<ToolService>();
-builder.Services.AddScoped<GmplService>();
+builder.Services.AddScoped<PlanService>();
 builder.Services.AddScoped<TurbineService>();
 
 builder.Services.AddAutoMapper(cfg => {
@@ -55,6 +56,7 @@ builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonDetailMapper>();
     cfg.AddProfile<PersonQualificationMapper>();
     cfg.AddProfile<TurbineMapper>();
+    cfg.AddProfile<SingleTaskScheduleMapper>();
 });
 
 

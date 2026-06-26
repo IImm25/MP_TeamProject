@@ -1,5 +1,6 @@
 ﻿namespace Backend.Data.Repositories
 {
+    using System;
     using Backend.Data.Entitites;
     using Microsoft.EntityFrameworkCore;
 
@@ -30,8 +31,18 @@
                     .ThenInclude(tq => tq.Qualification)
                 .Include(t => t.RequiredTools)
                     .ThenInclude(tt => tt.Tool)
-                .Include (t => t.Location)
+                .Include(t => t.Location)
                 .ToListAsync();
+        }
+
+        public async Task<TaskSchedule?> GetTaskScheduleByTaskIdAsync(int taskId)
+        {
+            return await context.TaskSchedules
+                .Where(ts => ts.TaskId == taskId)
+                .Include(ts => ts.Boat)
+                .ThenInclude(b => b.Plan)
+                .OrderByDescending(ts => ts.Boat.Plan.CreatedAt)
+                .FirstOrDefaultAsync();
         }
     }
 }
