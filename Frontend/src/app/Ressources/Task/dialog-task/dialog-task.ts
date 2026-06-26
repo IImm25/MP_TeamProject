@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   inject,
+  input,
   Input,
   model,
   OnInit,
@@ -58,6 +59,12 @@ export class DialogTask implements OnInit {
 
   @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' | 'Accident' = 'New';
 
+  @Input() set selectedTurbine(turbine: Turbine | null) {
+    if (turbine && this.type === 'New') {
+      this.taskForm.patchValue({ location: turbine });
+    }
+  }
+
   @Input() set selectedTask(val: Task | null) {
     this.currentTask = val;
 
@@ -104,12 +111,14 @@ export class DialogTask implements OnInit {
         name: '',
         durationHours: 0,
         durationMinutes: 0,
-        location: null,
+        location: this.selectedTurbine,
         executionIntervalStart: null,
         executionIntervalEnd: null,
         qualifications: [],
         tools: [],
       });
+      console.log(this.selectedTurbine);
+      console.log(this.taskForm.value);
       if (this.type !== 'Detail') {
         this.taskForm.enable();
       }

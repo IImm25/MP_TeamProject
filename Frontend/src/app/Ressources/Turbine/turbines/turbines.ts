@@ -17,6 +17,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { Map } from "../map/map";
 
 @Component({
   selector: 'app-turbines',
@@ -34,7 +35,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     TooltipModule,
     TranslatePipe,
     DialogTurbine,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    Map
 ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './turbines.html',
@@ -49,6 +51,7 @@ export class Turbines implements OnInit {
   selectedTurbine: WritableSignal<Turbine | null> = signal(null);
   visible: WritableSignal<boolean> = signal(false);
   turbines: WritableSignal<Turbine[]> = signal([]);
+  currentView: WritableSignal<'table' | 'map'> = signal('table');
 
   ngOnInit() {
     this.loadTurbines();

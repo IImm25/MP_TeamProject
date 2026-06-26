@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - 'GMPL/**'
+      - 'Backend/**'
+      - 'Integration/**'
+  workflow_dispatch:
+
+jobs:
+  test-gmpl:
+    name: GMPL Model Tests
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install glpsol
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq glpk-utils
+          echo "Installed: $(glpsol --version 2>&1 | head -n 1)"
+
+      - name: Run GMPL Tests
+        run: |
+          chmod +x GMPL/run_tests.sh
+          cd GMPL
+          bash run_tests.sh | tee ../test-results.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmpl-test-results
+          path: test-results.txt
+          retention-days: 30
+
+      - name: Comment Results on Pull Request
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let results = '';
+            try {
+              results = fs.readFileSync('test-results.txt', 'utf8');
+            } catch (e) {
+              results = 'Test results could not be read.';
+            }
+
+            const statsLine = results.split('\n').find(l => l.startsWith('Statistik:')) || '';
+            const success = !results.includes('[FAIL]');
+            const status = success ? 'PASSED' : 'FAILED';
+
+            const body = `## GMPL Model Tests: ${status}\n\n` +
+              `**${statsLine}**\n\n` +
+              `<details>\n<summary>Full Output</summary>\n\n` +
+              `\`\`\`\n${results}\n\`\`\`\n</details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run Integration Tests
+        run: |
+          dotnet test Integration \
+            --no-build \
+            --configuration Release \
+            -- \
+            --report-trx
+            
+      - name: Debug TRX Files
+        if: always()
+        run: |
+          find . -name "*.trx"
+            
+      - name: Debug Test Results
+        if: always()
+        run: |
+          echo "=== Aktuelles Verzeichnis ==="
+          pwd
+          
+          echo "=== Suche nach TRX-Dateien ==="
+          find . -type f -name "*.trx"
+          
+          echo "=== Inhalt von TestResults ==="
+          ls -la TestResults || true
+          
+          echo "=== Rekursiver Inhalt von TestResults ==="
+          find TestResults || true
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: MSTest Results
+          path: '**/*.trx'
+          reporter: dotnet-trx
+
+      - name: Upload Test Results as Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 14
