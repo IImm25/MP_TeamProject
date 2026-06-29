@@ -94,12 +94,13 @@ var travelToHarbor{BOATS, TASKS} >= 0;
 
 # --- time ---
 
-# maximal working hours per used boat (if no fixed tasks are on this boat)
+# maximal working hours per used boat (bypassed if the last task is fixed)
 s.t. TimeLimit{b in BOATS}:
     lastTaskStart[b]
     + sum{ta in TASKS} (duration[ta] * isLast[b, ta])
     + sum{ta in TASKS} (travelTime[taskLocation[ta], harbor] * isLast[b, ta])
-    <= maxWorkingHours * boatUsage[b];
+    <= maxWorkingHours * boatUsage[b]
+        + (sum{ta in TASKS: fixedStartTime[ta] >= 0} isLast[b, ta]) * 2 * maxWorkingHours;
 
 
 # --- task assignment ---
@@ -213,6 +214,10 @@ s.t. StartAfter{b in BOATS, ta1 in TASKS, ta2 in TASKS: ta1 <> ta2 and fixedStar
                         + duration[ta1]
                         + travelTime[taskLocation[ta1], taskLocation[ta2]]
                         - (1 - after[b, ta1, ta2]) * 2 * maxWorkingHours;
+
+# successor starts after predecessor finishes (alternative for StartAfter for fixed tasks)
+s.t. StartAfterForFixedTasks{b in BOATS, ta1 in TASKS, ta2 in TASKS: ta1 <> ta2 and fixedStartTime[ta1] >= 0 and fixedStartTime[ta2] >= 0}:
+    fixedStartTime[ta2] >= fixedStartTime[ta1] + duration[ta1] - (1 - after[b, ta1, ta2]) * 2 * maxWorkingHours;
 
 # start time = 0 if task not on boat
 s.t. StartOnlyIfAssigned{b in BOATS, ta in TASKS}:
