@@ -20,9 +20,6 @@ namespace Backend.Data.Repositories
                 .ThenInclude(pq => pq.Qualification)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            // Debug
-            Console.WriteLine($"Person: {person?.Firstname}");
-            Console.WriteLine($"Qualifications count: {person?.Qualifications?.Count ?? 0}");
             return person;
         }
 
