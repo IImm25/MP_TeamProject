@@ -20,18 +20,18 @@ namespace Backend.Data.Repositories
         public async Task<T?> GetByIdAsync(int id)
             => await _dbSet.FindAsync(id);
 
-        public async Task<T> AddAsync(T entity)
+        public async Task<int> AddAsync(T entity)
         {
             _dbSet.Add(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return (int)_context.Entry(entity).Property("Id").CurrentValue!;
         }
 
-        public async Task<T?> UpdateAsync(T entity)
+        public async Task<int> UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return (int)_context.Entry(entity).Property("Id").CurrentValue!;
         }
 
         public async Task<bool> DeleteAsync(int id)

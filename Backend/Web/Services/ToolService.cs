@@ -22,7 +22,8 @@ namespace Backend.Web.Services
         public async Task<ToolResponseDto> CreateTool(ToolCreateDto create)
         {
             Tool tool = new Tool(create.Name, create.AvailableStock);
-            return mapper.Map<ToolResponseDto>(await tools.AddAsync(tool));
+            int id = await tools.AddAsync(tool); 
+            return mapper.Map<ToolResponseDto>(await tools.GetByIdAsync(id));
         }
 
         public async Task<List<ToolResponseDto>> GetAll()
@@ -45,7 +46,8 @@ namespace Backend.Web.Services
             if (update.Name != null) tool.Name = update.Name;
             if (update.AvailableStock is int stock) tool.AvailableStock = stock;
 
-            return mapper.Map<ToolResponseDto?>(await tools.UpdateAsync(tool));
+            await tools.UpdateAsync(tool);
+            return mapper.Map<ToolResponseDto?>(await tools.GetByIdAsync(id));
         }
 
         public async Task<bool> DeleteTool(int id)

@@ -1,4 +1,4 @@
-﻿using Backend.Data.DTO.Turbine;
+﻿using Backend.Data.DTO.Location;
 
 namespace Backend.Data.DTO.TaskItem;
 
@@ -9,7 +9,7 @@ public record TaskItemDetailDto(
 	bool IsCompleted,
 	DateOnly ExecutionIntervalStart,
 	DateOnly ExecutionIntervalEnd,
-	TurbineResponseDto Location,
+	LocationResponseDto Location,
 	List<TaskQualificationDto> RequiredQualifications,
 	List<TaskToolDto> RequiredTools
 );

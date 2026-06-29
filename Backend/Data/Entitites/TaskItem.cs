@@ -14,7 +14,7 @@ namespace Backend.Data.Entitites
         public DateOnly ExecutionIntervalEnd { get; set; }
 
         public int LocationId { get; set; }
-        public Turbine Location { get; set; } = null!;
+        public Location Location { get; set; } = null!;
         public ICollection<TaskQualification> RequiredQualifications { get; set; } = [];
         public ICollection<TaskTool> RequiredTools { get; set; } = [];
         public TaskItem(string name, float durationHours, DateOnly exectionIntervalStart, DateOnly executionIntervalEnd)

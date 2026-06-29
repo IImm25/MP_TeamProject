@@ -1,17 +1,19 @@
 ﻿namespace Backend.Data.Entitites
 {
-    public class Turbine
+    public class Location
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public float Latitude { get; set; }
         public float Longitude { get; set; }
-        public Turbine() { }
-        public Turbine(string name, float latitude, float longitude)
+        public bool IsHarbour { get; set; }
+        public Location() { }
+        public Location(string name, float latitude, float longitude, bool isHarbour)
         {
             Name = name;
             Latitude = latitude;
             Longitude = longitude;
+            IsHarbour = isHarbour;
         }
     }
 }

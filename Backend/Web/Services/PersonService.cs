@@ -24,13 +24,12 @@ namespace Backend.Web.Services
             {
                 person.Qualifications.Add(new PersonQualification
                 {
-                    PersonId = person.Id,
                     QualificationId = qId
                 });
             }
-            await persons.AddAsync(person);
-            var saved = await persons.GetFullByIdAsync(person.Id);
-            return mapper.Map<PersonDetailDto>(saved);
+
+            int id = await persons.AddAsync(person);
+            return mapper.Map<PersonDetailDto>(persons.GetFullByIdAsync(person.Id));
         }
 
         public async Task<List<PersonSummaryDto>> GetAll()
@@ -56,22 +55,21 @@ namespace Backend.Web.Services
             if (update.Firstname != null) person.Firstname = update.Firstname;
             if (update.Lastname != null) person.Lastname = update.Lastname;
 
-            // clear old relations
-            person.Qualifications.Clear();
+            if (update.QualificationIds!.Count != 0) {
+                person.Qualifications.Clear();
 
-            // add new relations
-            foreach (var qId in update.QualificationIds)
-            {
-                person.Qualifications.Add(new PersonQualification
+                foreach (var qId in update.QualificationIds)
                 {
-                    PersonId = person.Id,
-                    QualificationId = qId
-                });
+                    person.Qualifications.Add(new PersonQualification
+                    {
+                        PersonId = person.Id,
+                        QualificationId = qId
+                    });
+                }
             }
-
+       
             await persons.UpdateAsync(person);
-
-            return mapper.Map<PersonDetailDto>(person);
+            return mapper.Map<PersonDetailDto>(await persons.GetFullByIdAsync(id));
         }
 
         public async Task<bool> DeletePerson(int id)
