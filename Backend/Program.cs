@@ -1,4 +1,5 @@
-﻿using Backend.Data;
+﻿using AutoMapper;
+using Backend.Data;
 using Backend.Data.DTO.Plan;
 using Backend.Data.Entitites;
 using Backend.Data.Mappers;
@@ -64,6 +65,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
+
+var mapper = app.Services.GetRequiredService<IMapper>();
+mapper.ConfigurationProvider.AssertConfigurationIsValid();
+
 
 app.UseCors("AllowAngular");
 
