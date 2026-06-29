@@ -36,6 +36,11 @@ public static class GLPKDllWrapper
         public int[] _reserved;
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] public delegate int GlpTermHook(IntPtr info, IntPtr message);
+
+    [DllImport(Lib)] public static extern void glp_term_hook(GlpTermHook hook,IntPtr info);
+    [DllImport(Lib)] public static extern int glp_term_out(int flag);
+
     [DllImport(Lib)] public static extern IntPtr glp_create_prob();
     [DllImport(Lib)] public static extern void glp_delete_prob(IntPtr lp);
     [DllImport(Lib)] public static extern void glp_free_env();
