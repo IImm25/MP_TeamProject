@@ -60,7 +60,7 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
 
         return await context.Plans
             .Where(p => p.Date >= start && p.Date < end)
-            .OrderByDescending(p => p.Date)
+            .OrderByDescending(p => p.CreatedAt)
             .IncludeFullPlanDetails()
             .AsSplitQuery()
             .FirstOrDefaultAsync();

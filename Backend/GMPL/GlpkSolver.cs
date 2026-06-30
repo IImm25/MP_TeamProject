@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static Backend.GMPL.GLPKDllWrapper;
 
 namespace Backend.GMPL;
@@ -159,32 +160,47 @@ public class GlpkSolver : IGlpkSolver
                         break;
 
                     case "taskOnBoat":
-                        if (val != 0) SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]);
+                        if (val != 0)
+                        {
+                            targetBoat.Tasks.Add(new SolverTaskSchedule { TaskId = indices[1] });
+                        }
                         break;
 
                     case "startTime":
-                        if (rawVal > Epsilon)
-                            SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]).StartTime = TimeOnly.FromTimeSpan(TimeSpan.FromHours(rawVal + 8)); // 8 Uhr Arbeitsstart
+                        var stTask = targetBoat.Tasks.FirstOrDefault(t => t.TaskId == indices[1]);
+                        if (stTask != null)
+                        {
+                            stTask.StartTime = TimeOnly.FromTimeSpan(TimeSpan.FromHours(rawVal + 8));
+                        }
                         break;
 
                     case "isFirst":
-                        if (val != 0)
-                            SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]).IsFirst = true;
+                        var ifTask = targetBoat.Tasks.FirstOrDefault(t => t.TaskId == indices[1]);
+                        if (ifTask != null && val != 0)
+                        {
+                            ifTask.IsFirst = true;
+                        }
                         break;
 
                     case "isLast":
-                        if (val != 0)
-                            SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]).IsLast = true;
+                        var ilTask = targetBoat.Tasks.FirstOrDefault(t => t.TaskId == indices[1]);
+                        if (ilTask != null && val != 0)
+                        {
+                            ilTask.IsLast = true;
+                        }
                         break;
 
                     case "travelToHarbor":
-                        if (rawVal > Epsilon)
-                            SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]).TravelToHarbor = TimeSpan.FromHours(rawVal);
+                        var ttHtask = targetBoat.Tasks.FirstOrDefault(t => t.TaskId == indices[1]);
+                        if (ttHtask != null)
+                        {
+                            ttHtask.TravelToHarbor = TimeSpan.FromHours(rawVal);
+                        }
                         break;
 
                     case "travelBetween":
                         // indices[0] = Boat, indices[1] = Task1, indices[2] = Task2
-                        if (rawVal > Epsilon && indices.Count >= 3)
+                        if (rawVal > 0 && indices.Count >= 3 && targetBoat.IsUsed)
                         {
                             int t1 = indices[1];
                             int t2 = indices[2];

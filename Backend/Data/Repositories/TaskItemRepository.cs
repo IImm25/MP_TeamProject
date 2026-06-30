@@ -81,14 +81,16 @@
                     .Where(ts => newestPlanIdQuery.Contains(ts.PlanId))
                     .Select(ts => ts.TaskItemId)
                     .Contains(t.Id))
+                .Where(t => !context.TaskSchedules
+                    .Any(ts => ts.TaskItemId == t.Id && ts.Boat.Plan.Date < date))
                 .IncludeFullTaskItemDetails()
                 .ToListAsync();
         }
 
-        public async Task<List<TaskItem>> GetAllOpenUnscheduledTasksByDateAsync(DateOnly date)
+        public async Task<List<TaskItem>> GetAllOpenUnscheduledTasksBeforeDateAsync(DateOnly date)
         {
             var newestPlanIdQuery = context.Plans
-                .Where(p => p.Date == date)
+                .Where(p => p.Date <= date)
                 .OrderByDescending(p => p.CreatedAt)
                 .Select(p => p.Id)
                 .Take(1);

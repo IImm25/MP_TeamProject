@@ -48,7 +48,7 @@ public class PlanService
     public async Task<PlanResponseDto?> GeneratePlan(DateOnly date, PlanRequestDto request)
     {
         var now = DateTime.UtcNow;
-
+        var today = DateOnly.FromDateTime(now);
 
         int totalDays = date.DayNumber - DateOnly.FromDateTime(now).DayNumber;
 
@@ -61,12 +61,12 @@ public class PlanService
 
         for (int i = 0; i <= totalDays; i++)
         {
-            DateOnly day = date.AddDays(i);
+            DateOnly day = today.AddDays(i);
             await _activeJobs.GetOrAdd(day, async (targetDay) =>
             {
                 try
                 {
-                    var openTasks = await taskRepo.GetAllOpenUnscheduledTasksByDateAsync(targetDay);
+                    var openTasks = await taskRepo.GetAllOpenUnscheduledTasksBeforeDateAsync(targetDay);
                     var scheduledTasks = await taskRepo.GetAllScheduledTasksByDateAsync(targetDay);
                     List<TaskSchedule> ongoingTasks = [];
 
@@ -88,7 +88,15 @@ public class PlanService
                     }
 
                     
-                    if (openTasks.Count == 0) return null;
+                    if (openTasks.Count == 0)
+                    {
+                        var plan = new Plan
+                        {
+                            CreatedAt = now,
+                            Date = day,
+                        };
+                        await planRepo.AddAsync(plan);
+                    }
 
                     
                     var persons = await personRepo.GetAllFullAsync();
