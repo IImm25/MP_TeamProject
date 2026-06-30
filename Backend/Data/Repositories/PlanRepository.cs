@@ -3,6 +3,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Data.Repositories;
 
+public static class PlanQueryExtensions
+{
+    public static IQueryable<Plan> IncludeFullPlanDetails(this IQueryable<Plan> query)
+    {
+        return query
+            .Include(x => x.Boats)
+                .ThenInclude(b => b.Persons)
+                    .ThenInclude(bp => bp.Person)
+            .Include(x => x.Boats)
+                .ThenInclude(b => b.Tools)
+            .Include(x => x.Boats)
+                .ThenInclude(b => b.TaskSchedules)
+                    .ThenInclude(ts => ts.TaskItem)
+            .Include(x => x.Boats)
+                .ThenInclude(b => b.BoatSchedules)
+                    .ThenInclude(bs => bs.Origin)
+            .Include(x => x.Boats)
+                .ThenInclude(b => b.BoatSchedules)
+                    .ThenInclude(bs => bs.Destination);
+    }
+}
+
 public class PlanRepository : Repository<Plan>, IPlanRepository
 {
     private readonly AppDbContext context;
@@ -15,37 +37,20 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
     public async Task<Plan?> GetFullPlanByIdAsync(int id)
     {
         var plan = await context.Plans
-            .Include(x => x.Boats)
-            .ThenInclude(b => b.Persons)
-                .ThenInclude(bp => bp.Person)
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.Tools)
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.TaskSchedules)
-                .ThenInclude(ts => ts.TaskItem)
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.BoatSchedules)
-        .AsSplitQuery()
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .Where(p => p.Id == id)
+            .IncludeFullPlanDetails()
+            .AsSplitQuery()
+            .FirstOrDefaultAsync();
 
         return plan;
     }
 
     public async Task<List<Plan>> GetAllFullAsync()
-    {         
+    {
         return await context.Plans
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.Persons)
-                .ThenInclude(bp => bp.Person)
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.Tools)
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.TaskSchedules)
-                .ThenInclude(ts => ts.TaskItem)
-        .Include(x => x.Boats)
-            .ThenInclude(b => b.BoatSchedules)
-        .AsSplitQuery()
-        .ToListAsync();
+            .IncludeFullPlanDetails()
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
     public async Task<Plan?> GetLatestPlanForDayAsync(DateOnly day)
@@ -56,18 +61,16 @@ public class PlanRepository : Repository<Plan>, IPlanRepository
         return await context.Plans
             .Where(p => p.Date >= start && p.Date < end)
             .OrderByDescending(p => p.Date)
-            .Include(x => x.Boats)
-                .ThenInclude(b => b.Persons)
-                    .ThenInclude(bp => bp.Person)
-            .Include(x => x.Boats)
-                .ThenInclude(b => b.Tools)
-            .Include(x => x.Boats)
-                .ThenInclude(b => b.TaskSchedules)
-                    .ThenInclude(ts => ts.TaskItem)
-            .Include(x => x.Boats)
-                .ThenInclude(b => b.BoatSchedules)
+            .IncludeFullPlanDetails()
             .AsSplitQuery()
             .FirstOrDefaultAsync();
     }
 
+    public async Task<DateOnly?> GetLastDateWithPlansAsync()
+    {
+        return await context.Plans
+            .OrderByDescending(p => p.Date)
+            .Select(p => (DateOnly?)p.Date) // cast to nullable to avoid getting weird default data of 01.01.0001
+            .FirstOrDefaultAsync();
+    }
 }
