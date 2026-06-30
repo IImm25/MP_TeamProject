@@ -4,5 +4,6 @@ public record LocationResponseDto(
 	int Id,
 	string Name,
 	float Latitude,
-	float Longitude
+	float Longitude,
+	bool IsHarbour
 );
