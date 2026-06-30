@@ -24,7 +24,8 @@ namespace Backend.Web.Services
         public async Task<QualificationResponseDto> CreateQualification(QualificationCreateDto create)
         {
             Qualification qualification = new Qualification(create.Name, create.Description);
-            return mapper.Map<QualificationResponseDto>(await qualifications.AddAsync(qualification));
+            int id = await qualifications.AddAsync(qualification);
+            return mapper.Map<QualificationResponseDto>(await qualifications.GetByIdAsync(id));
         }
 
         public async Task<List<QualificationResponseDto>> GetAll()
@@ -39,15 +40,16 @@ namespace Backend.Web.Services
 
         public async Task<QualificationResponseDto?> UpdateQualification(int id, QualificationUpdateDto update)
         {
-            var tool = await qualifications.GetByIdAsync(id);
-            if (tool == null)
+            var qualification = await qualifications.GetByIdAsync(id);
+            if (qualification == null)
             {
                 return null;
             }
-            if (update.Name != null) tool.Name = update.Name;
-            if (update.Description != null) tool.Description = update.Description;
+            if (update.Name != null) qualification.Name = update.Name;
+            if (update.Description != null) qualification.Description = update.Description;
 
-            return mapper.Map<QualificationResponseDto?>(await qualifications.UpdateAsync(tool));
+            await qualifications.UpdateAsync(qualification);
+            return mapper.Map<QualificationResponseDto>(await qualifications.GetByIdAsync(id));
         }
 
         public async Task<bool> DeleteQualification(int id)
