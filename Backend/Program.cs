@@ -58,6 +58,7 @@ builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonQualificationMapper>();
     cfg.AddProfile<LocationMapper>();
     cfg.AddProfile<SingleTaskScheduleMapper>();
+    cfg.AddProfile<PlanMapper>();
 });
 
 
