@@ -132,6 +132,8 @@ public class GlpkSolver : IGlpkSolver
                 solverResult.Boats.Add(new SolverBoat { BoatNumber = i+1 });
             }
 
+            const double Epsilon = 1e-6;
+
             for (int j = 1; j <= numCols; j++)
             {
                 string colName = GLPKDllWrapper.GetColName(prob, j);
@@ -161,7 +163,7 @@ public class GlpkSolver : IGlpkSolver
                         break;
 
                     case "startTime":
-                        if (rawVal > 0)
+                        if (rawVal > Epsilon)
                             SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]).StartTime = TimeOnly.FromTimeSpan(TimeSpan.FromHours(rawVal + 8)); // 8 Uhr Arbeitsstart
                         break;
 
@@ -176,13 +178,13 @@ public class GlpkSolver : IGlpkSolver
                         break;
 
                     case "travelToHarbor":
-                        if (rawVal > 0)
+                        if (rawVal > Epsilon)
                             SolverTaskSchedule.GetOrCreateTask(targetBoat, indices[1]).TravelToHarbor = TimeSpan.FromHours(rawVal);
                         break;
 
                     case "travelBetween":
                         // indices[0] = Boat, indices[1] = Task1, indices[2] = Task2
-                        if (rawVal > 0 && indices.Count >= 3)
+                        if (rawVal > Epsilon && indices.Count >= 3)
                         {
                             int t1 = indices[1];
                             int t2 = indices[2];
