@@ -33,13 +33,4 @@ public class PlanController : ControllerBase
         return plan != null ? Ok(plan) : NotFound();
     }
 
-    [HttpDelete("{date}")]
-    public async Task<ActionResult<PlanResponseDto>> DeletePlan(DateOnly date)
-    {
-        return Ok();
-    }
-
-
-
-
 } 
