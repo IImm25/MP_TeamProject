@@ -1,9 +1,7 @@
 ﻿namespace Backend.Data.DTO.Plan;
 
 public record PlanRequestDto(
-    float MaxTime,
+    float MaxWorkHours,
     int BoatNumber,
-    List<int> TaskItemIds,
-    List<int> PersonIds,
-    List<int> ToolIds
+    float BoatSpeed
 );

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Backend.Data;
-using Backend.Data.DTO.Plan;
 using Backend.Data.Entitites;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
+using Backend.GMPL;
 using Backend.Web.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,6 +45,11 @@ builder.Services.AddScoped<TaskItemService>();
 builder.Services.AddScoped<ToolService>();
 builder.Services.AddScoped<PlanService>();
 builder.Services.AddScoped<LocationService>();
+
+// register singletons
+builder.Services.AddSingleton<IGlpkSolver,GlpkSolver>();
+builder.Services.AddSingleton<IGmplInputBuilder,GmplInputBuilder>();
+
 
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonSummaryMapper>();

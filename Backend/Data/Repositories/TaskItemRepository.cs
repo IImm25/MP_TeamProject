@@ -117,7 +117,7 @@
             return await context.TaskSchedules
                 .Where(ts => newestPlanIdQuery.Contains(ts.PlanId))
                 .Where(ts => ts.StartTime <= referenceTime)
-                .Where(ts => (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours <= (double)ts.TaskItem.DurationHours)
+                .Where(ts => (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours < (double)ts.TaskItem.DurationHours)
 
                 .Include(ts => ts.TaskItem)
                     .ThenInclude(t => t.RequiredQualifications)
@@ -148,13 +148,47 @@
             return await context.Tasks
                 .Where(t => context.TaskSchedules
                     .Where(ts => newestPlanIdQuery.Contains(ts.PlanId))
-                    .Where(ts => ts.StartTime > referenceTime || (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours > (double)ts.TaskItem.DurationHours)
+                    .Where(ts => ts.StartTime > referenceTime || (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours >= (double)ts.TaskItem.DurationHours)
                     .Select(ts => ts.TaskItemId)
                     .Contains(t.Id))
                 .IncludeFullTaskItemDetails()
                 .ToListAsync();
         }
 
+        public async Task SetAllScheduledTasksBeforeDateTimeAsCompleted(DateTime dateTime)
+        {
+            DateOnly targetDate = DateOnly.FromDateTime(dateTime);
+            TimeSpan targetTimeSpan = TimeOnly.FromDateTime(dateTime).ToTimeSpan();
 
+            var newestPlanIdQuery = context.Plans
+                .Where(p => p.Date == targetDate)
+                .OrderByDescending(p => p.CreatedAt)
+                .Select(p => p.Id)
+                .Take(1);
+
+            var completedTasks = await context.Tasks
+                .Where(t => !t.IsCompleted) // Nur Tasks laden, die noch nicht als erledigt markiert sind
+                .Where(t => context.TaskSchedules
+                    .Any(ts =>
+                        // SZENARIO A: Der Task war an einem vergangenen Tag eingeplant -> Automatisch beendet!
+                        ts.Boat.Plan.Date < targetDate
+                        ||
+                        // SZENARIO B: Der Task ist am aktuellen Tag eingeplant UND die Dauer ist abgelaufen
+                        (ts.Boat.Plan.Id == newestPlanIdQuery.FirstOrDefault() &&
+                         (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours >= (double)t.DurationHours)
+                    )
+                )
+                .ToListAsync();
+
+            if (completedTasks.Count == 0) return;
+
+            foreach (var task in completedTasks)
+            {
+                task.IsCompleted = true;
+            }
+
+            
+            await context.SaveChangesAsync();
+        }
     }
 }
