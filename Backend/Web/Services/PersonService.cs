@@ -29,7 +29,7 @@ namespace Backend.Web.Services
             }
 
             int id = await persons.AddAsync(person);
-            return mapper.Map<PersonDetailDto>(persons.GetFullByIdAsync(person.Id));
+            return mapper.Map<PersonDetailDto>(await persons.GetFullByIdAsync(id));
         }
 
         public async Task<List<PersonSummaryDto>> GetAll()
