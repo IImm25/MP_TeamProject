@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Backend.Data.DTO.Tool;
 using Backend.Data.Entitites;
 using Backend.Data.Repositories;
@@ -45,7 +44,7 @@ namespace Backend.Web.Services
             }
             if (update.Name != null) tool.Name = update.Name;
             if (update.AvailableStock is int stock) tool.AvailableStock = stock;
-
+            
             await tools.UpdateAsync(tool);
             return mapper.Map<ToolResponseDto?>(await tools.GetByIdAsync(id));
         }
@@ -53,19 +52,6 @@ namespace Backend.Web.Services
         public async Task<bool> DeleteTool(int id)
         {
             return await tools.DeleteAsync(id);
-        }
-
-        public async Task<List<int>> GetTaskToolRequirements(int taskId, List<int> toolIds)
-        {
-            var task = await taskItems.GetFullByIdAsync(taskId);
-            if (task == null) return toolIds.Select(_ => 0).ToList();
-
-            var requiredTools = task.RequiredTools
-                .ToDictionary(x => x.ToolId, x => x.RequiredAmount);
-
-            return toolIds
-                .Select(id => requiredTools.GetValueOrDefault(id))
-                .ToList();
         }
     }
 }
