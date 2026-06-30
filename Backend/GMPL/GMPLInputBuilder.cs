@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 using Backend.Data.DTO.Plan;
 using Backend.Data.Entitites;
@@ -21,17 +22,14 @@ public interface IGmplInputBuilder
 
 public class GmplInputBuilder : IGmplInputBuilder
 {
-    private static float CalculateTaskPriority(TaskItem task, DateOnly date, float scalar = 1.0f)
+    private static float CalculateTaskPriority(TaskItem task, DateTime dateTime, float scalar = 1.0f)
     {
-        float priority = 0.0f;
-        var current = date.DayNumber;
-        var start = task.ExecutionIntervalStart.DayNumber;
-        var end = task.ExecutionIntervalEnd.DayNumber;
+        DateTime start = task.ExecutionIntervalStart.ToDateTime(TimeOnly.MinValue);
+        DateTime end = task.ExecutionIntervalEnd.ToDateTime(TimeOnly.MaxValue);
 
-        if (current >= start)
-        {
-            priority = (current - start) / (float)(end - start);
-        }
+        if (dateTime < start) return 0.0f;
+
+        float priority = (float)((dateTime - start).TotalSeconds / (end - start).TotalSeconds);
 
         return Math.Clamp(priority, 0.0f, 1.0f) * scalar;
     }
@@ -39,7 +37,7 @@ public class GmplInputBuilder : IGmplInputBuilder
     public string CreateDataFileContent(PlanRequestDto info, List<TaskItem> tasks, List<TaskSchedule> inProgress, List<Person> persons, List<Qualification> qualifications, List<Tool> tools, List<Location> locations)
     {
         var sb = new StringBuilder();
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var now = DateTime.UtcNow;
 
         sb.AppendLine("data;");
         sb.AppendLine();
@@ -132,7 +130,7 @@ public class GmplInputBuilder : IGmplInputBuilder
         sb.AppendLine("param taskPrio :=");
         foreach (var task in tasks)
         {
-            sb.AppendLine($"\tta_{task.Id} {CalculateTaskPriority(task, today).ToString(CultureInfo.InvariantCulture)}");
+            sb.AppendLine($"\tta_{task.Id} {CalculateTaskPriority(task, now).ToString(CultureInfo.InvariantCulture)}");
         }
         sb.AppendLine(";");
 
