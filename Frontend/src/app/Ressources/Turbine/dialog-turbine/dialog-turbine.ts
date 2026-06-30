@@ -8,6 +8,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { DialogTask } from "../../Task/dialog-task/dialog-task";
 
 @Component({
   selector: 'app-dialog-turbine',
@@ -19,13 +20,17 @@ import { InputNumberModule } from 'primeng/inputnumber';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    InputNumberModule,],
+    InputNumberModule,
+    DialogTask
+],
   templateUrl: './dialog-turbine.html',
   styleUrl: './dialog-turbine.css',
 })
 export class DialogTurbine {
   private fb = inject(FormBuilder);
   private httpService = inject(HttpService);
+
+  taskCreateVisible = signal<boolean>(false);
 
   @Input({required: true}) type: 'Edit' | 'New' | 'Detail' = 'New';
   @Input() set selectedTurbine (turbine: Turbine | null) {
@@ -81,5 +86,9 @@ export class DialogTurbine {
       this.onSave.emit();
       this.visible.set(false);
     });
+  }
+
+  public createNewTask() {
+      this.taskCreateVisible.set(true);
   }
 }

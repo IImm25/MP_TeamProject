@@ -94,12 +94,12 @@ jobs:
             --configuration Release \
             -- \
             --report-trx
-
+            
       - name: Debug TRX Files
         if: always()
         run: |
           find . -name "*.trx"
-
+            
       - name: Debug Test Results
         if: always()
         run: |

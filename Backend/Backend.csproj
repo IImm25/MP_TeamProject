@@ -7,20 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="lib\glpk_4_65.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="lib\glpk_4_65.dll">
+    <Content Include="GMPL\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
-<ItemGroup>
-  <Content Include="GMPL\**\*">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </Content>
-</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
@@ -35,6 +25,13 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="lib\glpk.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <TargetPath>glpk.dll</TargetPath>
+    </None>
   </ItemGroup>
 
 </Project>

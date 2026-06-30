@@ -1,5 +1,5 @@
-# Tolles Projekt
-
+# Offshore Windpark Maintenance Scheduling
+[![CI](https://github.com/IImm25/MP_TeamProject/actions/workflows/gmpl-tests.yml/badge.svg)](https://github.com/IImm25/MP_TeamProject/actions/workflows/gmpl-tests.yml)
 ## Projektaufgabe Teil 1
 Bei der Wartung von offshore Windparks müssen Arbeiten an den einzelnen Anlagen durchgeführt
 werden. Jede Aufgabe macht den Einsatz von bestimmten Werkzeugen und Personal mit bestimmten
