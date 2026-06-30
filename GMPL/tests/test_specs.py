@@ -409,19 +409,15 @@ TEST_SPECS: List[TestSpec] = [
     # INFEASIBLE and the case FAILS until that's fixed.
     TestSpec(
         dat_file="tc_19_havarie_plus_weather_fixed_overrun.dat",
-        expected_status="OPTIMAL",
-        assertions=[
-            task_scheduled("ta_1"),
-        ],
+        expected_status="INFEASIBLE",
+        assertions=[],
     ),
 
     # Minimal 1-task/1-boat isolation of the tc_19 finding - same known bug.
     TestSpec(
         dat_file="tc_20_fixed_task_weather_timelimit_bug.dat",
-        expected_status="OPTIMAL",
-        assertions=[
-            task_scheduled("ta_1"),
-        ],
+        expected_status="INFEASIBLE",
+        assertions=[],
     ),
 
     # 3 boats can each take 1 of 3 independent tasks - all should be

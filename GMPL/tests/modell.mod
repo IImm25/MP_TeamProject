@@ -266,6 +266,9 @@ toolOnBoat[b, t] >= fixedToolAmount[b, t];
 s.t. NoAdditionalTools{b in BOATS, t in TOOLS: sum{ta in TASKS: fixedBoat[ta] == b} 1 > 0}:
 toolOnBoat[b, t] = fixedToolAmount[b, t];
 
+# Completely prevents a free task from running before a fixed task on the same boot
+s.t. NoLooseTaskBeforeFixed{b in BOATS, ta_loose in TASKS, ta_fixed in TASKS: ta_loose <> ta_fixed and fixedStartTime[ta_loose] < 0 and fixedStartTime[ta_fixed] >= 0}:
+after[b, ta_loose, ta_fixed] = 0;
 
 /**
 * maximize function
