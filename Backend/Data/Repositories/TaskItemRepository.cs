@@ -166,28 +166,31 @@
                 .Select(p => p.Id)
                 .Take(1);
 
-            var completedTasks = await context.Tasks
-                .Where(t => !t.IsCompleted) // Nur Tasks laden, die noch nicht als erledigt markiert sind
-                .Where(t => context.TaskSchedules
-                    .Any(ts =>
-                        // SZENARIO A: Der Task war an einem vergangenen Tag eingeplant -> Automatisch beendet!
-                        ts.Boat.Plan.Date < targetDate
-                        ||
-                        // SZENARIO B: Der Task ist am aktuellen Tag eingeplant UND die Dauer ist abgelaufen
-                        (ts.Boat.Plan.Id == newestPlanIdQuery.FirstOrDefault() &&
-                         (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours >= (double)t.DurationHours)
-                    )
-                )
+
+            var todayCompletedTaskIds = await context.TaskSchedules
+                .Where(ts => newestPlanIdQuery.Contains(ts.PlanId))
+                .Where(ts => (targetTimeSpan - ts.StartTime.ToTimeSpan()).TotalHours >= (double)ts.TaskItem.DurationHours)
+                .Select(ts => ts.TaskItemId)
                 .ToListAsync();
 
-            if (completedTasks.Count == 0) return;
+            var pastScheduledTaskIds = await context.TaskSchedules
+                .Where(ts => ts.Boat.Plan.Date < targetDate)
+                .Select(ts => ts.TaskItemId)
+                .ToListAsync();
 
-            foreach (var task in completedTasks)
+            var allCompletedTaskIds = todayCompletedTaskIds.Union(pastScheduledTaskIds).ToList();
+
+            var tasksToUpdate = await context.Tasks
+                .Where(t => !t.IsCompleted && allCompletedTaskIds.Contains(t.Id))
+                .ToListAsync();
+
+            if (tasksToUpdate.Count == 0) return;
+
+            foreach (var task in tasksToUpdate)
             {
                 task.IsCompleted = true;
             }
 
-            
             await context.SaveChangesAsync();
         }
     }
