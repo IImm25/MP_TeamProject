@@ -38,7 +38,7 @@
         public async Task<TaskSchedule?> GetTaskScheduleByTaskIdAsync(int taskId)
         {
             return await context.TaskSchedules
-                .Where(ts => ts.TaskId == taskId)
+                .Where(ts => ts.TaskItemId == taskId)
                 .Include(ts => ts.Boat)
                 .ThenInclude(b => b.Plan)
                 .OrderByDescending(ts => ts.Boat.Plan.CreatedAt)

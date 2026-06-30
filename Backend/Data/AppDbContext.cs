@@ -88,7 +88,7 @@ public class AppDbContext : DbContext
 
 		// TaskSchedule
         modelBuilder.Entity<TaskSchedule>()
-			.HasKey(x => new { x.PlanId, x.BoatNumber, x.TaskId });
+			.HasKey(x => new { x.PlanId, x.BoatNumber, x.TaskItemId });
 
 		modelBuilder.Entity<TaskSchedule>()
 			.HasOne(x => x.Boat)
