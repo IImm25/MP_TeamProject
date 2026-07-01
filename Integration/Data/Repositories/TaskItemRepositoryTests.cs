@@ -24,11 +24,11 @@ namespace Backend.Data.Repositories.Tests
 
             var qual = new Qualification(expectedQualName, "");
             var tool = new Tool(expectedToolName, 1);
-            var turbine = new Turbine { Name = "turbine" };
+            var turbine = new Location { Name = "turbine" };
 
             Db.Qualifications.Add(qual);
             Db.Tools.Add(tool);
-            Db.Turbines.Add(turbine);
+            Db.Locations.Add(turbine);
             await Db.SaveChangesAsync();
 
             var task = new TaskItem("taskName", 6, _intervalStart, _intervalEnd) { LocationId = turbine.Id };
@@ -57,8 +57,8 @@ namespace Backend.Data.Repositories.Tests
         [TestMethod]
         public async Task GivenTaskWithoutRelations_WhenGetFullByIdAsyncCalled_ThenReturnsTaskWithEmptyCollections()
         {
-            var turbine = new Turbine { Name = "turbine" };
-            Db.Turbines.Add(turbine);
+            var turbine = new Location { Name = "turbine" };
+            Db.Locations.Add(turbine);
             await Db.SaveChangesAsync();
 
             var task = new TaskItem("noQualNoToolTask", 2, _intervalStart, _intervalEnd) { LocationId = turbine.Id };
@@ -75,9 +75,9 @@ namespace Backend.Data.Repositories.Tests
         public async Task GivenMultipleTasksWithRelations_WhenGetAllFullAsyncCalled_ThenReturnsAllWithProperties()
         {
             var qual = new Qualification("Safety", "Desc");
-            var turbine = new Turbine { Name = "turbine" };
+            var turbine = new Location { Name = "turbine" };
             Db.Qualifications.Add(qual);
-            Db.Turbines.Add(turbine);
+            Db.Locations.Add(turbine);
             await Db.SaveChangesAsync();
 
             var task1 = new TaskItem("Task 1", 1, _intervalStart, _intervalEnd) { LocationId = turbine.Id };

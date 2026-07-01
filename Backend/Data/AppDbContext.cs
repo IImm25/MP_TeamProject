@@ -20,7 +20,7 @@ public class AppDbContext : DbContext
 	public DbSet<TaskQualification> TaskQualifications => Set<TaskQualification>();
 
 	public DbSet<TaskTool> TaskTools => Set<TaskTool>();
-	public DbSet<Turbine> Turbines => Set<Turbine>();
+	public DbSet<Location> Locations => Set<Location>();
 
 	public DbSet<Plan> Plans => Set<Plan>();
 	public DbSet<PlanBoat> Boats => Set<PlanBoat>();
@@ -30,7 +30,7 @@ public class AppDbContext : DbContext
 	public DbSet<BoatSchedule> BoatSchedules => Set<BoatSchedule>();
 	public DbSet<TaskSchedule> TaskSchedules => Set<TaskSchedule>();
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
 
@@ -88,7 +88,7 @@ public class AppDbContext : DbContext
 
 		// TaskSchedule
         modelBuilder.Entity<TaskSchedule>()
-			.HasKey(x => new { x.PlanId, x.BoatNumber, x.TaskId });
+			.HasKey(x => new { x.PlanId, x.BoatNumber, x.TaskItemId });
 
 		modelBuilder.Entity<TaskSchedule>()
 			.HasOne(x => x.Boat)
@@ -120,28 +120,29 @@ public class AppDbContext : DbContext
 			new Qualification { Id = 19, Name = "Turbine Control Systems", Description = "Understanding control logic and turbine automation." },
 			new Qualification { Id = 20, Name = "Preventive Maintenance Planning", Description = "Planning and scheduling turbine maintenance tasks." }
 		);
-        modelBuilder.Entity<Turbine>().HasData(
-            new Turbine { Id = 1,  Name = "B1",  Latitude = 54.61092f, Longitude = 12.63000f },
-            new Turbine { Id = 2,  Name = "B2",  Latitude = 54.60553f, Longitude = 12.63000f },
-            new Turbine { Id = 3,  Name = "B3",  Latitude = 54.60014f, Longitude = 12.63000f },
-            new Turbine { Id = 4,  Name = "B4",  Latitude = 54.59475f, Longitude = 12.63000f },
-            new Turbine { Id = 5,  Name = "B5",  Latitude = 54.58936f, Longitude = 12.63000f },
-            new Turbine { Id = 6,  Name = "B6",  Latitude = 54.58397f, Longitude = 12.63000f },
-            new Turbine { Id = 7,  Name = "B7",  Latitude = 54.61658f, Longitude = 12.64239f },
-            new Turbine { Id = 8,  Name = "B8",  Latitude = 54.61119f, Longitude = 12.64239f },
-            new Turbine { Id = 9,  Name = "B9",  Latitude = 54.60581f, Longitude = 12.64239f },
-            new Turbine { Id = 10, Name = "B10", Latitude = 54.60042f, Longitude = 12.64239f },
-            new Turbine { Id = 11, Name = "B11", Latitude = 54.59503f, Longitude = 12.64239f },
-            new Turbine { Id = 12, Name = "B12", Latitude = 54.62033f, Longitude = 12.65475f },
-            new Turbine { Id = 13, Name = "B13", Latitude = 54.61494f, Longitude = 12.65475f },
-            new Turbine { Id = 14, Name = "B14", Latitude = 54.60956f, Longitude = 12.65475f },
-            new Turbine { Id = 15, Name = "B15", Latitude = 54.60447f, Longitude = 12.65508f },
-            new Turbine { Id = 16, Name = "B16", Latitude = 54.62358f, Longitude = 12.66714f },
-            new Turbine { Id = 17, Name = "B17", Latitude = 54.61819f, Longitude = 12.66714f },
-            new Turbine { Id = 18, Name = "B18", Latitude = 54.61281f, Longitude = 12.66714f },
-            new Turbine { Id = 19, Name = "B19", Latitude = 54.62714f, Longitude = 12.67950f },
-            new Turbine { Id = 20, Name = "B20", Latitude = 54.62175f, Longitude = 12.67950f },
-            new Turbine { Id = 21, Name = "B21", Latitude = 54.63067f, Longitude = 12.69189f }
+        modelBuilder.Entity<Location>().HasData(
+			new Location { Id = 1,  Name = "Habour", Latitude = 54.43330f, Longitude = 13.03136f , IsHarbour = true },
+            new Location { Id = 2,  Name = "B1",     Latitude = 54.61092f, Longitude = 12.63000f , IsHarbour = false},
+            new Location { Id = 3,  Name = "B2",     Latitude = 54.60553f, Longitude = 12.63000f , IsHarbour = false},
+            new Location { Id = 4,  Name = "B3",     Latitude = 54.60014f, Longitude = 12.63000f , IsHarbour = false},
+            new Location { Id = 5,  Name = "B4",     Latitude = 54.59475f, Longitude = 12.63000f , IsHarbour = false},
+            new Location { Id = 6,  Name = "B5",     Latitude = 54.58936f, Longitude = 12.63000f , IsHarbour = false},
+            new Location { Id = 7,  Name = "B6",     Latitude = 54.58397f, Longitude = 12.63000f , IsHarbour = false},
+            new Location { Id = 8,  Name = "B7",     Latitude = 54.61658f, Longitude = 12.64239f , IsHarbour = false},
+            new Location { Id = 9,  Name = "B8",     Latitude = 54.61119f, Longitude = 12.64239f , IsHarbour = false},
+            new Location { Id = 10,  Name = "B9",    Latitude = 54.60581f, Longitude = 12.64239f , IsHarbour = false},
+            new Location { Id = 11, Name = "B10",    Latitude = 54.60042f, Longitude = 12.64239f , IsHarbour = false},
+            new Location { Id = 12, Name = "B11",    Latitude = 54.59503f, Longitude = 12.64239f , IsHarbour = false},
+            new Location { Id = 13, Name = "B12",    Latitude = 54.62033f, Longitude = 12.65475f , IsHarbour = false},
+            new Location { Id = 14, Name = "B13",    Latitude = 54.61494f, Longitude = 12.65475f , IsHarbour = false},
+            new Location { Id = 15, Name = "B14",    Latitude = 54.60956f, Longitude = 12.65475f , IsHarbour = false},
+            new Location { Id = 16, Name = "B15",    Latitude = 54.60447f, Longitude = 12.65508f , IsHarbour = false},
+            new Location { Id = 17, Name = "B16",    Latitude = 54.62358f, Longitude = 12.66714f , IsHarbour = false},
+            new Location { Id = 18, Name = "B17",    Latitude = 54.61819f, Longitude = 12.66714f , IsHarbour = false},
+            new Location { Id = 19, Name = "B18",    Latitude = 54.61281f, Longitude = 12.66714f , IsHarbour = false},
+            new Location { Id = 20, Name = "B19",    Latitude = 54.62714f, Longitude = 12.67950f , IsHarbour = false},
+            new Location { Id = 21, Name = "B20",    Latitude = 54.62175f, Longitude = 12.67950f , IsHarbour = false},
+            new Location { Id = 22, Name = "B21",    Latitude = 54.63067f, Longitude = 12.69189f , IsHarbour = false}
         );
-	}
+    }
 }

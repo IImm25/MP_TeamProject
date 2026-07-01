@@ -10,5 +10,9 @@
         public TimeOnly Departure {  get; set; }
         public TimeOnly Arrival { get; set; }
 
+        public int OriginId { get; set; }
+        public Location Origin { get; set; } = null!;
+        public int DestinationId { get; set; }
+        public Location Destination { get; set; } = null!;
     }
 }

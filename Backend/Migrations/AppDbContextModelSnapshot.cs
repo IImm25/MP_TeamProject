@@ -57,7 +57,17 @@ namespace Backend.Migrations
                     b.Property<TimeOnly>("Departure")
                         .HasColumnType("time without time zone");
 
+                    b.Property<int>("DestinationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OriginId")
+                        .HasColumnType("integer");
+
                     b.HasKey("PlanId", "BoatNumber", "TripNumber");
+
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("OriginId");
 
                     b.ToTable("BoatSchedules");
                 });
@@ -81,6 +91,210 @@ namespace Backend.Migrations
                     b.HasIndex("ToolId");
 
                     b.ToTable("BoolTools");
+                });
+
+            modelBuilder.Entity("Backend.Data.Entitites.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsHarbour")
+                        .HasColumnType("boolean");
+
+                    b.Property<float>("Latitude")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Longitude")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Locations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsHarbour = true,
+                            Latitude = 54.4333f,
+                            Longitude = 13.03136f,
+                            Name = "Habour"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsHarbour = false,
+                            Latitude = 54.61092f,
+                            Longitude = 12.63f,
+                            Name = "B1"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsHarbour = false,
+                            Latitude = 54.60553f,
+                            Longitude = 12.63f,
+                            Name = "B2"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsHarbour = false,
+                            Latitude = 54.60014f,
+                            Longitude = 12.63f,
+                            Name = "B3"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsHarbour = false,
+                            Latitude = 54.59475f,
+                            Longitude = 12.63f,
+                            Name = "B4"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsHarbour = false,
+                            Latitude = 54.58936f,
+                            Longitude = 12.63f,
+                            Name = "B5"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsHarbour = false,
+                            Latitude = 54.58397f,
+                            Longitude = 12.63f,
+                            Name = "B6"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            IsHarbour = false,
+                            Latitude = 54.61658f,
+                            Longitude = 12.64239f,
+                            Name = "B7"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            IsHarbour = false,
+                            Latitude = 54.61119f,
+                            Longitude = 12.64239f,
+                            Name = "B8"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            IsHarbour = false,
+                            Latitude = 54.60581f,
+                            Longitude = 12.64239f,
+                            Name = "B9"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            IsHarbour = false,
+                            Latitude = 54.60042f,
+                            Longitude = 12.64239f,
+                            Name = "B10"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            IsHarbour = false,
+                            Latitude = 54.59503f,
+                            Longitude = 12.64239f,
+                            Name = "B11"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            IsHarbour = false,
+                            Latitude = 54.62033f,
+                            Longitude = 12.65475f,
+                            Name = "B12"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            IsHarbour = false,
+                            Latitude = 54.61494f,
+                            Longitude = 12.65475f,
+                            Name = "B13"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            IsHarbour = false,
+                            Latitude = 54.60956f,
+                            Longitude = 12.65475f,
+                            Name = "B14"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            IsHarbour = false,
+                            Latitude = 54.60447f,
+                            Longitude = 12.65508f,
+                            Name = "B15"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            IsHarbour = false,
+                            Latitude = 54.62358f,
+                            Longitude = 12.66714f,
+                            Name = "B16"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            IsHarbour = false,
+                            Latitude = 54.61819f,
+                            Longitude = 12.66714f,
+                            Name = "B17"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            IsHarbour = false,
+                            Latitude = 54.61281f,
+                            Longitude = 12.66714f,
+                            Name = "B18"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            IsHarbour = false,
+                            Latitude = 54.62714f,
+                            Longitude = 12.6795f,
+                            Name = "B19"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            IsHarbour = false,
+                            Latitude = 54.62175f,
+                            Longitude = 12.6795f,
+                            Name = "B20"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            IsHarbour = false,
+                            Latitude = 54.63067f,
+                            Longitude = 12.69189f,
+                            Name = "B21"
+                        });
                 });
 
             modelBuilder.Entity("Backend.Data.Entitites.Person", b =>
@@ -354,16 +568,13 @@ namespace Backend.Migrations
                     b.Property<int>("BoatNumber")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TaskId")
+                    b.Property<int>("TaskItemId")
                         .HasColumnType("integer");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
 
-                    b.Property<int>("TaskItemId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("PlanId", "BoatNumber", "TaskId");
+                    b.HasKey("PlanId", "BoatNumber", "TaskItemId");
 
                     b.HasIndex("TaskItemId");
 
@@ -408,178 +619,6 @@ namespace Backend.Migrations
                     b.ToTable("Tools");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entitites.Turbine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<float>("Latitude")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Longitude")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Turbines");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Latitude = 54.61092f,
-                            Longitude = 12.63f,
-                            Name = "B1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Latitude = 54.60553f,
-                            Longitude = 12.63f,
-                            Name = "B2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Latitude = 54.60014f,
-                            Longitude = 12.63f,
-                            Name = "B3"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Latitude = 54.59475f,
-                            Longitude = 12.63f,
-                            Name = "B4"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Latitude = 54.58936f,
-                            Longitude = 12.63f,
-                            Name = "B5"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Latitude = 54.58397f,
-                            Longitude = 12.63f,
-                            Name = "B6"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Latitude = 54.61658f,
-                            Longitude = 12.64239f,
-                            Name = "B7"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Latitude = 54.61119f,
-                            Longitude = 12.64239f,
-                            Name = "B8"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Latitude = 54.60581f,
-                            Longitude = 12.64239f,
-                            Name = "B9"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Latitude = 54.60042f,
-                            Longitude = 12.64239f,
-                            Name = "B10"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Latitude = 54.59503f,
-                            Longitude = 12.64239f,
-                            Name = "B11"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Latitude = 54.62033f,
-                            Longitude = 12.65475f,
-                            Name = "B12"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Latitude = 54.61494f,
-                            Longitude = 12.65475f,
-                            Name = "B13"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Latitude = 54.60956f,
-                            Longitude = 12.65475f,
-                            Name = "B14"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Latitude = 54.60447f,
-                            Longitude = 12.65508f,
-                            Name = "B15"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Latitude = 54.62358f,
-                            Longitude = 12.66714f,
-                            Name = "B16"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Latitude = 54.61819f,
-                            Longitude = 12.66714f,
-                            Name = "B17"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Latitude = 54.61281f,
-                            Longitude = 12.66714f,
-                            Name = "B18"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Latitude = 54.62714f,
-                            Longitude = 12.6795f,
-                            Name = "B19"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Latitude = 54.62175f,
-                            Longitude = 12.6795f,
-                            Name = "B20"
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Latitude = 54.63067f,
-                            Longitude = 12.69189f,
-                            Name = "B21"
-                        });
-                });
-
             modelBuilder.Entity("Backend.Data.Entitites.BoatPerson", b =>
                 {
                     b.HasOne("Backend.Data.Entitites.Person", "Person")
@@ -601,6 +640,18 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entitites.BoatSchedule", b =>
                 {
+                    b.HasOne("Backend.Data.Entitites.Location", "Destination")
+                        .WithMany()
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entitites.Location", "Origin")
+                        .WithMany()
+                        .HasForeignKey("OriginId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Backend.Data.Entitites.PlanBoat", "Boat")
                         .WithMany("BoatSchedules")
                         .HasForeignKey("PlanId", "BoatNumber")
@@ -608,6 +659,10 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Boat");
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("Origin");
                 });
 
             modelBuilder.Entity("Backend.Data.Entitites.BoatTool", b =>
@@ -661,7 +716,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entitites.TaskItem", b =>
                 {
-                    b.HasOne("Backend.Data.Entitites.Turbine", "Location")
+                    b.HasOne("Backend.Data.Entitites.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)

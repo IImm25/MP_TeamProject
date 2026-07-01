@@ -20,10 +20,10 @@ namespace Backend.Data.Repositories.Tests
         {
             var qual = new Qualification("qualName", "qualDesc");
 
-            var result = await _repo.AddAsync(qual);
+            var id = await _repo.AddAsync(qual);
 
-            Assert.AreNotEqual(0, result.Id);
-            Assert.IsTrue(await Db.Qualifications.AnyAsync(q => q.Id == result.Id));
+            Assert.AreNotEqual(0, id);
+            Assert.IsTrue(await Db.Qualifications.AnyAsync(q => q.Id == id));
         }
 
         [TestMethod]

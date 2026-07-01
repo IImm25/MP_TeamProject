@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Backend.Data.DTO;
+using Backend.Data.DTO.Person;
 using Backend.Data.Entitites;
 
 namespace Backend.Data.Mappers

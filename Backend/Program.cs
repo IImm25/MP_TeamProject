@@ -1,7 +1,9 @@
-﻿using Backend.Data;
+﻿using AutoMapper;
+using Backend.Data;
 using Backend.Data.Entitites;
 using Backend.Data.Mappers;
 using Backend.Data.Repositories;
+using Backend.GMPL;
 using Backend.Web.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +27,7 @@ builder.Services.AddSwaggerGen();
 // registering repositories to Dependency Injection
 builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IRepository<Qualification>, Repository<Qualification>>();
 builder.Services.AddScoped<IRepository<Tool>, Repository<Tool>>();
 builder.Services.AddScoped<IRepository<TaskItem>, Repository<TaskItem>>();
@@ -33,15 +36,20 @@ builder.Services.AddScoped<IRepository<PersonQualification>, Repository<PersonQu
 builder.Services.AddScoped<IRepository<TaskQualification>, Repository<TaskQualification>>();
 builder.Services.AddScoped<IRepository<TaskTool>, Repository<TaskTool>>();
 
-builder.Services.AddScoped<IRepository<Turbine>, Repository<Turbine>>();
+builder.Services.AddScoped<IRepository<Location>, Repository<Location>>();
 
 // registering services for Dependency Injection
 builder.Services.AddScoped<PersonService>();
 builder.Services.AddScoped<QualificationService>();
 builder.Services.AddScoped<TaskItemService>();
 builder.Services.AddScoped<ToolService>();
-builder.Services.AddScoped<GmplService>();
-builder.Services.AddScoped<TurbineService>();
+builder.Services.AddScoped<PlanService>();
+builder.Services.AddScoped<LocationService>();
+
+// register singletons
+builder.Services.AddSingleton<IGlpkSolver,GlpkSolver>();
+builder.Services.AddSingleton<IGmplInputBuilder,GmplInputBuilder>();
+
 
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PersonSummaryMapper>();
@@ -53,7 +61,9 @@ builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<QualificationResponseMapper>();
     cfg.AddProfile<PersonDetailMapper>();
     cfg.AddProfile<PersonQualificationMapper>();
-    cfg.AddProfile<TurbineMapper>();
+    cfg.AddProfile<LocationMapper>();
+    cfg.AddProfile<SingleTaskScheduleMapper>();
+    cfg.AddProfile<PlanMapper>();
 });
 
 
@@ -61,6 +71,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
+
+var mapper = app.Services.GetRequiredService<IMapper>();
+mapper.ConfigurationProvider.AssertConfigurationIsValid();
+
 
 app.UseCors("AllowAngular");
 

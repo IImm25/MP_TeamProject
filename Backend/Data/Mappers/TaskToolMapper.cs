@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Backend.Data.DTO;
+using Backend.Data.DTO.TaskItem;
 using Backend.Data.Entitites;
 
 namespace Backend.Data.Mappers

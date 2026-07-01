@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Backend.Data.DTO;
-using Backend.Data.DTO.Create;
+using Backend.Data.DTO.Plan;
+using Backend.Data.DTO.TaskItem;
 using Backend.Data.Entitites;
 using Backend.Data.Repositories;
 
@@ -10,13 +10,13 @@ namespace Backend.Web.Services
     {
         private readonly ITaskItemRepository tasks;
         private readonly IMapper mapper;
-        private readonly IRepository<Turbine> turbines;
+        private readonly IRepository<Location> locations;
 
-        public TaskItemService(ITaskItemRepository tasks, IMapper mapper, IRepository<Turbine> turbines)
+        public TaskItemService(ITaskItemRepository tasks, IMapper mapper, IRepository<Location> locations)
         {
             this.tasks = tasks;
             this.mapper = mapper;
-            this.turbines = turbines;
+            this.locations = locations;
         }
 
         public async Task<TaskItemDetailDto> CreateTaskItem(TaskItemCreateDto create)
@@ -24,9 +24,9 @@ namespace Backend.Web.Services
             TaskItem taskItem = new TaskItem(create.Name, create.DurationHours, create.ExecutionIntervalStart, create.ExecutionIntervalEnd);
             taskItem.IsCompleted = false;
 
-            var turbine = await turbines.GetByIdAsync(create.LocationId);
-            if (turbine == null) throw new Exception($"Turbine with id ${create.LocationId}");
-            taskItem.Location = turbine;
+            var location = await locations.GetByIdAsync(create.LocationId);
+            if (location == null) throw new Exception($"Turbine with id ${create.LocationId}");
+            taskItem.Location = location;
 
             foreach (var reqTool in create.RequiredTools)
             {
@@ -42,12 +42,11 @@ namespace Backend.Web.Services
                 taskItem.RequiredQualifications.Add(new TaskQualification
                 {
                     QualificationId = reqQual.QualificationId,
-                    RequiredAmount = reqQual.requiredAmount
+                    RequiredAmount = reqQual.RequiredAmount
                 });
             }
-            await tasks.AddAsync(taskItem);
-            var saved = await tasks.GetFullByIdAsync(taskItem.Id);
-            return mapper.Map<TaskItemDetailDto>(saved);
+            int id = await tasks.AddAsync(taskItem);
+            return mapper.Map<TaskItemDetailDto>(await tasks.GetFullByIdAsync(id));
         }
 
         public async Task<List<TaskItemSummaryDto>> GetAll()
@@ -59,6 +58,12 @@ namespace Backend.Web.Services
         {
             return mapper.Map<TaskItemDetailDto?>(await tasks.GetFullByIdAsync(id));
         }
+
+        public async Task<SingleTaskScheduleDto?> GetScheduleByTaskId(int id)
+        {
+            return mapper.Map<SingleTaskScheduleDto?>(await tasks.GetTaskScheduleByTaskIdAsync(id));
+        }
+
 
         public async Task<TaskItemDetailDto?> UpdateTaskItem(int id, TaskItemUpdateDto update)
         {
@@ -76,7 +81,7 @@ namespace Backend.Web.Services
 
             if (update.LocationId != null)
             {
-                var turbine = await turbines.GetByIdAsync((int)update.LocationId);
+                var turbine = await locations.GetByIdAsync((int)update.LocationId);
                 if (turbine == null) throw new Exception($"Turbine with id ${update.LocationId}");
                 taskItem.Location = turbine;
             }
@@ -102,13 +107,13 @@ namespace Backend.Web.Services
                     taskItem.RequiredQualifications.Add(new TaskQualification
                     {
                         QualificationId = reqQual.QualificationId,
-                        RequiredAmount = reqQual.requiredAmount
+                        RequiredAmount = reqQual.RequiredAmount
                     });
                 }
             }
 
-
-            return mapper.Map<TaskItemDetailDto>(await tasks.UpdateAsync(taskItem));
+            await tasks.UpdateAsync(taskItem);
+            return mapper.Map<TaskItemDetailDto>(await tasks.GetFullByIdAsync(id));
         }
 
         public async Task<bool> DeleteTaskItem(int id)

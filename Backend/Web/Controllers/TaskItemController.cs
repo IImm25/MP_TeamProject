@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Backend.Data.DTO;
-using Backend.Data.DTO.Create;
+using Backend.Data.DTO.Plan;
+using Backend.Data.DTO.TaskItem;
 using Backend.Data.Mappers;
 using Backend.Web.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -33,6 +33,15 @@ namespace Backend.Web.Controllers
             var task = await service.GetTaskItem(id);
             return task != null ? Ok(task) : NotFound();
         }
+
+        [HttpGet("{id}/plan")]
+        public async Task<ActionResult<SingleTaskScheduleDto>> GetPlanByTaskId(int id)
+        {
+            var schedule = await service.GetScheduleByTaskId(id);
+            return schedule != null ? Ok(schedule) : NotFound();
+        }
+
+
 
         [HttpPost("")]
         public async Task<ActionResult<TaskItemDetailDto>> PostTaskItem([FromBody] TaskItemCreateDto dto)
