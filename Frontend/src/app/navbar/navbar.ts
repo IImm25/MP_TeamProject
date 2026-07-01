@@ -32,6 +32,7 @@ export class Navbar implements OnInit, OnDestroy {
         'MENU.TOOLS',
         'MENU.TURBINES',
         'MENU.SCHEDULER',
+        'MENU.SCHEDULE-VIEW',
       ])
       .subscribe({
         next: (translations) => {
@@ -50,7 +51,10 @@ export class Navbar implements OnInit, OnDestroy {
             {
               label: translations['MENU.SCHEDULER'],
               icon: 'pi pi-calendar',
-              routerLink: ['/scheduler'],
+              items: [
+                { label: translations['MENU.SCHEDULER'], icon: 'pi pi-calculator', routerLink: ['/scheduler'] },
+                { label: translations['MENU.SCHEDULE-VIEW'], icon: 'pi pi-calendar', routerLink: ['/schedule-view'] },
+              ],
             },
           ];
           this.cd.detectChanges();

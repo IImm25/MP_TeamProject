@@ -1,0 +1,12 @@
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+
+<div id="map"></div>
+
+@if (visible()) {
+  <app-dialog-turbine type="Detail" [selectedTurbine]="selectedTurbine()" [(visible)]="visible" />
+}

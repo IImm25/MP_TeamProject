@@ -5,7 +5,9 @@
       ? ('TASKS.DIALOG.NEW' | translate)
       : type === 'Detail'
         ? ('TASKS.DIALOG.DETAIL' | translate)
-        : ('TASKS.DIALOG.EDIT' | translate)
+        : type === 'Accident'
+          ? ('TASKS.DIALOG.ACCIDENT' | translate)
+          : ('TASKS.DIALOG.EDIT' | translate)
   "
   [modal]="true"
   [draggable]="false"
@@ -137,6 +139,8 @@
                   class="w-full"
                   [class.detail]="type === 'Detail'"
                   [placeholder]="'TASKS.DIALOG.LOCATION_PLACEHOLDER' | translate"
+                  appendTo="body"
+                  panelStyleClass="open-upward"
                 />
                 @if (taskForm.controls.location.invalid && taskForm.controls.location.touched) {
                   <div class="error-message">

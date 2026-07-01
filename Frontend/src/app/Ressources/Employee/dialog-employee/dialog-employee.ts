@@ -87,6 +87,11 @@ export class DialogEmployee implements OnInit {
         : this.httpService.createEmployee(payload);
 
     request.subscribe(() => {
+    this.employeeForm.reset({
+        firstname: '',
+        lastname: '',
+        qualifications: [],
+      });
       this.onSave.emit();
       this.visible.set(false);
     });

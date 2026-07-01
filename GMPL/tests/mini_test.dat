@@ -1,0 +1,109 @@
+data;
+
+set TASKS  := ta_1 ta_2 ta_3 ta_4;  # ta_4 = havarie task
+set PEOPLE := p_1 p_2 p_3;
+set QUALIS := q_1;
+set TOOLS  := to_1 to_2;
+set PLACES := w_1 w_2 w_3 w_4;      # w_1 = harbor, w_2-w_4 = turbine locations
+
+param amountBoats := 2;
+param maxWorkingHours := 8;         # working hours per boat per day
+param drivingSpeed := 18;           # km/h new speed (original 18)
+
+# --- task durations in hours ---
+param duration :=
+	ta_1	2.0
+    ta_2    3.0
+    ta_3    2.0
+    ta_4 	1.5;
+
+# --- qualifications per person (1 = has qualification) ---
+param hasQuali : q_1 :=
+    p_1		1
+    p_2		1
+    p_3		1;
+
+# --- required qualifications per task ---
+param requiredQualis : q_1 :=
+    ta_1    1
+    ta_2    1
+    ta_3    1
+    ta_4	1;
+
+# --- required tools per task ---
+# ta_1 and ta_4 need to_1
+# ta_2 needs both tools
+# ta_3 needs to_2
+param requiredTools : to_1  to_2 :=
+    ta_1	1	0
+    ta_2    1   1                   # needs both tools simultaneously
+    ta_3    0   1
+    ta_4    1   0;
+
+# --- total tool stock available across all boats ---
+# to_2 is scarce (only 1 available) -> ta_2 and ta_3 cannot be on different boats
+param stockTools :=
+    to_1	3                       # sufficient stock
+    to_2	2;                      # scarce - limits planning flexibility
+
+# --- task priorities (higher = more urgent) ---
+# priority of havarie task must exceed sum of all normal task priorities
+# sum of normal priorities: 3 + 9 + 5 = 17 -> havarie >= 18
+param taskPrio :=
+    ta_1	3                       # low priority
+    ta_2	9                       # high priority
+    ta_3	5                       # medium priority
+    ta_4	18;                     # havarie: dominates all others combined
+
+# --- task locations ---
+param taskLocation :=
+    ta_1	w_2
+    ta_2	w_2                     # turbine at w_2 (same as ta_1, no travel between them)
+    ta_3	w_3
+    ta_4	w_4;
+
+# --- distance matrix in km ---
+# w_1 = harbor
+# w_1 -> w_2 = 36km -> 1.0h
+# w_1 -> w_3 = 54km -> 1.5h
+# w_1 -> w_4 = 18km -> 0.5h
+# w_2 -> w_3 = 18km -> 0.5h
+# w_2 -> w_4 = 36km -> 1.0h
+# w_3 -> w_4 = 54km -> 1.5h
+param distance : w_1  w_2  w_3  w_4 :=
+          w_1    0   36   54   18
+          w_2   36    0   18   36
+          w_3   54   18    0   54
+          w_4   18   36   54    0;
+
+# --- fixed tasks: -1 = free, >=0 = fixed on that boat ---
+# ta_1 and ta_2 are already planned/in progress on boat 1
+# ta_3 and ta_4 are free to be assigned by the solver
+param fixedBoat :=
+    ta_1	2
+    ta_2	2
+    ta_3	1
+    ta_4 	1;
+
+# --- start time of fixed tasks on their boat (-1 = not fixed) ---
+param fixedStartTime :=
+    ta_1	4.0
+    ta_2	1.0
+	ta_3	3.5
+	ta_4	0.5;
+
+# --- people locked to their boats ---
+# p_1 and p_2 are already on boat 1
+# p_3 could be assigned to an empty boat that starts only now
+param fixedPerson :=
+    p_1     2                       # locked to boat 2
+    p_2     1                       # locked to boat 1
+    p_3     -1;                     
+
+# --- tools locked to their boats ---
+# locks how many of each tool are on each boat
+param fixedToolAmount : to_1  to_2 :=
+    1                   1    1
+    2                   1    1;
+
+end;

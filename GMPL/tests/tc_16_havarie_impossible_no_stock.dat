@@ -1,0 +1,71 @@
+# TC-16: A fresh havarie task that NO boat can take, even though boats/people/tools exist
+# in principle - because the only tool stock left is committed elsewhere and no free boat
+# slot remains workable in time. This is the canonical UC-05 Alt Flow 7a scenario:
+# "the system detects that no active boat carries the required tools or qualified personnel
+# on sea, or the working time limit would be completely exhausted" - the system should abort
+# the re-optimization for THIS task only, not declare the whole model infeasible (since ta_1
+# can still run standalone).
+# Setup: 2 boats. Boat 1 runs ta_1 (fixed, long task, nearly exhausts its time budget).
+# Boat 2 is NOT used/fixed at all (free), but the new havarie task ta_2 requires a tool
+# (to_2) of which the global stock is 0 (none in the warehouse) - so NO boat, free or not,
+# can ever satisfy ToolAvailable for ta_2.
+# Expect: OPTIMAL, ta_1 scheduled normally, ta_2 NEVER scheduled on any boat (stockTools=0
+# makes it mathematically impossible, independent of which boat is chosen).
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1;
+set TOOLS  := to_1 to_2;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 2;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 2.0
+      ta_2 2.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 9;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1  0  36  36
+                 w_2 36   0  36
+                 w_3 36  36   0;
+
+param hasQuali : q_1 :=
+      p_1        1
+      p_2        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1;
+
+param requiredTools : to_1 to_2 :=
+      ta_1         1   0
+      ta_2         0   1;
+
+# to_2 (needed by ta_2) has ZERO units anywhere in the warehouse
+param stockTools :=
+      to_1 5
+      to_2 0;
+
+param fixedBoat :=
+      ta_1 1
+      ta_2 -1;
+
+param fixedPerson := p_1 1 p_2 -1;
+
+param fixedToolAmount : to_1 to_2 :=
+      1            1   0
+      2            0   0;
+
+end;

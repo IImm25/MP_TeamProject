@@ -1,0 +1,51 @@
+# TC-06: Two tasks compete for one boat with tight time budget
+# ta_1 prio=9 (critical), ta_2 prio=1 (low)
+# Only one fits within maxWorkingHours
+# Expect: OPTIMAL, ta_1 scheduled (higher priority wins)
+# UC-04: objective function must prefer higher priority tasks
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 1;
+param maxWorkingHours := 4;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+# Travel w_1->w_2 = 1h each way. Task 2h. Total per task = 4h exactly.
+# Two tasks would need 8h - does not fit in 4h with one boat.
+param duration :=
+      ta_1 2.0
+      ta_2 2.0;
+
+param taskPrio :=
+      ta_1 9
+      ta_2 1;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1  0  36  36
+                 w_2 36   0  36
+                 w_3 36  36   0;
+
+param hasQuali : q_1 :=
+      p_1        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1;
+
+param stockTools := to_1 5;
+
+end;

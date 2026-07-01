@@ -1,0 +1,73 @@
+# TC-15: The ONLY person holding the required qualification for the new havarie task
+# is already fixedPerson-committed to a different, currently running boat - AND that boat's
+# remaining time budget (after the running task) is too tight to also absorb the new task.
+# p_1 (only one with q_2) is fixed to boat 1 on a long-running task ta_1.
+# ta_2 (new havarie task) requires q_2, which only p_1 holds. p_1 cannot be on boat 2
+# (PersonOneBoat), so ta_2 can ONLY be done on boat 1 - but boat 1's time budget is already
+# almost exhausted by ta_1 + travel, leaving no room for ta_2 + its travel.
+# Expect: OPTIMAL but ta_2 NOT scheduled - the model must correctly leave ta_2 unassigned,
+# since the only qualified person is locked onto a boat with no remaining capacity.
+# Maps directly to UC-05 Alt Flow 7a: "no active boat carries ... qualified personnel on sea
+# ... or the working time limit would be completely exhausted".
+data;
+
+set TASKS  := ta_1 ta_2;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1 q_2;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3;
+
+param amountBoats    := 2;
+param maxWorkingHours := 7;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+# ta_1 is long (5h) and already running -> boat 1 budget: 1h travel out + 5h task + ...
+# leaves only 1h spare, not enough for ta_2 (2h task + travel).
+param duration :=
+      ta_1 5.0
+      ta_2 2.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 9;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3;
+
+param distance : w_1 w_2 w_3 :=
+                 w_1  0  36  36
+                 w_2 36   0  36
+                 w_3 36  36   0;
+
+# p_1 holds BOTH q_1 and q_2 (is the only q_2 holder in the entire team).
+# p_2 holds neither qualification needed for ta_2.
+param hasQuali : q_1 q_2 :=
+      p_1        1   1
+      p_2        1   0;
+
+param requiredQualis : q_1 q_2 :=
+      ta_1        1   0
+      ta_2        0   1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1;
+
+param stockTools := to_1 10;
+
+# ta_1 already running on boat 1
+param fixedBoat :=
+      ta_1 1
+      ta_2 -1;
+
+# p_1 (the only q_2 holder) is irrevocably already on boat 1 with the running task
+param fixedPerson := p_1 1 p_2 -1;
+
+param fixedToolAmount : to_1 :=
+      1            1
+      2            0;
+
+end;
+

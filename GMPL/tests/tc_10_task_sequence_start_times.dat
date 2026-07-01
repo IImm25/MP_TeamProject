@@ -1,0 +1,55 @@
+# TC-10: Three tasks on one boat - verify that start times form a valid chain
+# harbor->w_2(1h) task1(1h) w_2->w_3(0.5h) task2(1h) w_3->w_4(1.5h) task3(1h) w_4->harbor(0.5h)
+# Total = 1+1+0.5+1+1.5+1+0.5 = 6.5h -> fits in 8h
+# Expect: OPTIMAL, all 3 tasks scheduled, startTime[1,ta_2] > startTime[1,ta_1]
+# UC-04: route/sequencing constraints must be respected
+data;
+
+set TASKS  := ta_1 ta_2 ta_3;
+set PEOPLE := p_1;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3 w_4;
+
+param amountBoats    := 1;
+param maxWorkingHours := 8;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 1.0
+      ta_2 1.0
+      ta_3 1.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 5
+      ta_3 5;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3
+      ta_3 w_4;
+
+param distance : w_1 w_2 w_3 w_4 :=
+                 w_1  0  36  18  18
+                 w_2 36   0  18  54
+                 w_3 18  18   0  54
+                 w_4 18  54  54   0;
+
+param hasQuali : q_1 :=
+      p_1        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1
+      ta_3        1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1
+      ta_3         1;
+
+param stockTools := to_1 5;
+
+end;

@@ -10,6 +10,7 @@
   },
   "MENU": {
     "SCHEDULER": "Planung",
+    "SCHEDULE-VIEW": "Planansicht",
     "ADMINISTRATION": "Verwaltung",
     "TASKS": "Aufgaben",
     "EMPLOYEES": "Mitarbeiter",
@@ -30,6 +31,7 @@
       "NEW": "Neue Aufgabe",
       "EDIT": "Aufgabe bearbeiten",
       "DETAIL": "Aufgabe anzeigen",
+      "ACCIDENT": "Havarie",
       "CORE": "Allgemein",
       "NAME_PLACEHOLDER": "Gib eine Aufgabenbezeichnung ein!",
       "START_DATE_PLACEHOLDER": "TT.MM.JJJJ",
@@ -135,6 +137,8 @@
     "LONGITUDE": "Längengrad",
     "NEW_TURBINE": "Neues Windrad",
     "COORDINATES": "Koordinaten",
+    "TABLE": "Tabelle",
+    "MAP": "Karte",
     "DIALOG": {
       "NEW": "Neues Windrad",
       "EDIT": "Windrad bearbeiten",
@@ -154,29 +158,41 @@
   },
   "SCHEDULER": {
     "TITLE": "Einsatzplanung",
-    "STEPS": {
-      "CORE": "Allgemein",
-      "TASKS": "Aufgaben",
-      "EMPLOYEES": "Mitarbeiter",
-      "TOOLS": "Werkzeuge"
-    },
-    "CORE": {
-      "MAX_WORK_TIME": "Maximale Arbeitszeit (h)",
-      "BOAT_AMOUNT": "Anzahl der Boote"
-    },
+    "HEADER": "Planungseinstellungen",
+    "MAX_WORK_HOURS": "Maximale Arbeitszeit (h)",
+    "BOAT_NUMBER": "Anzahl der Boote",
+    "DATE": "Datum",
+    "BOAT_SPEED": "Geschwindigkeit (km/h)",
     "VALIDATION": {
-      "MAX_WORK_TIME_REQUIRED": "Maximale Arbeitszeit ist erforderlich",
-      "BOAT_AMOUNT_REQUIRED": "Anzahl der Boote ist erforderlich",
-      "TASKS_REQUIRED": "Mindestens eine Aufgabe wird benötigt",
-      "EMPLOYEES_REQUIRED": "Mindestens ein Mitarbeiter wird benötigt",
-      "TOOLS_REQUIRED": "Mindestens ein Werkzeug wird benötigt"
+      "MAX_WORK_HOURS_REQUIRED": "Maximale Arbeitszeit ist erforderlich",
+      "BOAT_NUMBER_REQUIRED": "Anzahl der Boote ist erforderlich",
+      "DATE_REQUIRED": "Datum ist erforderlich",
+      "BOAT_SPEED_REQUIRED": "Geschwindigkeit ist erforderlich"
     },
     "GENERATE_PLAN": "Plan generieren"
   },
   "SCHEDULE": {
     "TITLE": "Planung",
     "BOAT": "Boot",
-    "UNUSED": "Nicht genutzte Ressourcen"
+    "ACCIDENT": "Havarie",
+    "WEATHER": "Wetteränderung",
+    "CARDS": "Allgemein",
+    "GANTT": "Gantt",
+    "CARD": {
+      "UNUSED": "Nicht genutzte Ressourcen"
+    },
+    "GANTTVIEW": {
+      "DETAILS": "Details",
+      "NO_PLAN": "Für diesen Tag existiert kein Plan",
+      "NO_EMPLOYEE": "Kein Mitarbeiter",
+      "NO_TOOL": "Kein Werkzeug",
+      "TRAVEL": "Fahrt"
+    },
+    "WEATHERDIALOG": {
+      "TITLE": "Wetter",
+      "DATE": "Datum",
+      "SPEED": "Angepasste Geschwindigkeit (km/h)"
+    }
   },
   "MESSAGES": {
     "MISSING_QUALIFICATION": "Fehlende Qualifikation",

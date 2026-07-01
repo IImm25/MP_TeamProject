@@ -1,0 +1,70 @@
+# TC-13: Two boats, each must carry a TWO-task route simultaneously
+# Tests interaction of multi-boat assignment WITH multi-task sequencing per boat
+# (TC-02/05/08/11/12 use multi-boat but only 1 task/boat; TC-10 uses sequencing but only 1 boat)
+# Layout: w_1=harbor, w_2/w_3 cluster (boat A), w_4/w_5 cluster (boat B)
+# Boat A: ta_1(w_2) -> ta_2(w_3): 1h travel + 1h + 0.5h + 1h + 0.5h back = 4h
+# Boat B: ta_3(w_4) -> ta_4(w_5): same distances = 4h
+# Both fit in maxWorkingHours=5 IF and only if each boat correctly chains its own 2 tasks
+# and does NOT mix tasks across boats (which would break QualiCheck/tool stock per boat
+# or simply produce a worse/incorrect route).
+# Expect: OPTIMAL, all 4 tasks scheduled, boat 1 = {ta_1,ta_2}, boat 2 = {ta_3,ta_4} (or swapped),
+# after[b,ta_1,ta_2]=1 and after[b,ta_3,ta_4]=1 on their respective boats, no cross-boat task mixing.
+data;
+
+set TASKS  := ta_1 ta_2 ta_3 ta_4;
+set PEOPLE := p_1 p_2;
+set QUALIS := q_1;
+set TOOLS  := to_1;
+set PLACES := w_1 w_2 w_3 w_4 w_5;
+
+param amountBoats    := 2;
+param maxWorkingHours := 5;
+param drivingSpeed   := 36;
+param harbor         := 'w_1';
+
+param duration :=
+      ta_1 1.0
+      ta_2 1.0
+      ta_3 1.0
+      ta_4 1.0;
+
+param taskPrio :=
+      ta_1 5
+      ta_2 5
+      ta_3 5
+      ta_4 5;
+
+param taskLocation :=
+      ta_1 w_2
+      ta_2 w_3
+      ta_3 w_4
+      ta_4 w_5;
+
+# w_2/w_3 form a close cluster reachable from harbor; w_4/w_5 likewise.
+# Cross-cluster distances are large so mixing tasks across boats would blow the time budget.
+param distance : w_1 w_2 w_3 w_4 w_5 :=
+                 w_1  0  36  54  36  54
+                 w_2 36   0  18 144 144
+                 w_3 54  18   0 144 144
+                 w_4 36 144 144   0  18
+                 w_5 54 144 144  18   0;
+
+param hasQuali : q_1 :=
+      p_1        1
+      p_2        1;
+
+param requiredQualis : q_1 :=
+      ta_1        1
+      ta_2        1
+      ta_3        1
+      ta_4        1;
+
+param requiredTools : to_1 :=
+      ta_1         1
+      ta_2         1
+      ta_3         1
+      ta_4         1;
+
+param stockTools := to_1 10;
+
+end;
