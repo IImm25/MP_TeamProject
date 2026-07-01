@@ -158,15 +158,15 @@
   "SCHEDULER": {
     "TITLE": "Scheduler",
     "HEADER": "Schedulesettings",
-    "MAX_WORK_TIME": "Maximum Working Time (h)",
-    "BOAT_AMOUNT": "Number of Boats",
+    "MAX_WORK_HOURS": "Maximum Working Time (h)",
+    "BOAT_NUMBER": "Number of Boats",
     "DATE": "Date",
-    "SPEED": "Speed (km/h)",
+    "BOAT_SPEED": "Speed (km/h)",
     "VALIDATION": {
-      "MAX_WORK_TIME_REQUIRED": "Maximum working time is required",
-      "BOAT_AMOUNT_REQUIRED": "Number of boats is required",
+      "MAX_WORK_HOURS_REQUIRED": "Maximum working time is required",
+      "BOAT_NUMBER_REQUIRED": "Number of boats is required",
       "DATE_REQUIRED": "Date is required",
-      "SPEED_REQUIRED": "Speed is required"
+      "BOAT_SPEED_REQUIRED": "Speed is required"
     },
     "GENERATE_PLAN": "Generate Plan"
   },

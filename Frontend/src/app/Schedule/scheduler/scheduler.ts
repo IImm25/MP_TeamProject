@@ -39,10 +39,10 @@ export class Scheduler {
   private translate = inject(TranslateService);
 
   schedulerForm = this.fb.group({
-    maxTime: new FormControl<number>(8, [Validators.required, Validators.min(1)]),
-    boatAmount: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
+    maxWorkHours: new FormControl<number>(8, [Validators.required, Validators.min(1)]),
+    boatNumber: new FormControl<number>(1, [Validators.required, Validators.min(1)]),
     date: new FormControl<Date>(new Date(), [Validators.required]),
-    speed: new FormControl<number>(36, [Validators.required, Validators.min(1)]),
+    boatSpeed: new FormControl<number>(36, [Validators.required, Validators.min(1)]),
   });
 
 
@@ -54,15 +54,15 @@ export class Scheduler {
 
     const val = this.schedulerForm.value;
     const request: PlanRequest = {
-      maxTime: val.maxTime!,
-      boatNumber: val.boatAmount!,
-      date: val.date!.toISOString(),
-      speed: val.speed!,
+      maxWorkHours: val.maxWorkHours!,
+      boatNumber: val.boatNumber!,
+      boatSpeed: val.boatSpeed!
     };
+    const date: string = val.date!.toISOString().split('T')[0];;
 
-    this.http.postPlan(request).subscribe({
+    this.http.postPlan(request, date).subscribe({
       next: (plan: PlanResponse) => {
-        this.planService.setPlan(plan, request);
+        this.planService.setPlan(plan, request, val.date!);
         this.router.navigate(['/schedule-view']);
       },
       error: (error) => {
@@ -76,10 +76,10 @@ export class Scheduler {
   }
 
   validate(): boolean {
-        const maxTime = this.schedulerForm.controls.maxTime;
-        const boatAmount = this.schedulerForm.controls.boatAmount;
+        const maxTime = this.schedulerForm.controls.maxWorkHours;
+        const boatAmount = this.schedulerForm.controls.boatNumber;
         const date = this.schedulerForm.controls.date;
-        const speed = this.schedulerForm.controls.speed;
+        const speed = this.schedulerForm.controls.boatSpeed;
 
         maxTime.markAsTouched();
         boatAmount.markAsTouched();

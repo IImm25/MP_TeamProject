@@ -10,16 +10,6 @@
   </ng-template>
   <form [formGroup]="weatherForm">
     <div class="field">
-      <label for="date">{{ 'SCHEDULE.WEATHERDIALOG.DATE' | translate }}</label>
-      <p-datepicker
-        id="date"
-        type="date"
-        formControlName="date"
-        appendTo="body"
-        panelStyleClass="open-upward"
-      />
-    </div>
-    <div class="field">
       <label for="speed">{{ 'SCHEDULE.WEATHERDIALOG.SPEED' | translate }}</label>
       <p-inputNumber id="speed" formControlName="speed" />
     </div>

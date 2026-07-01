@@ -2,10 +2,10 @@ import { EmployeeSummary } from "./employee";
 import { TaskSummary, TaskTool } from "./task";
 
 export interface PlanRequest {
-  maxTime: number;
+  maxWorkHours: number;
   boatNumber: number;
-  date: string; //DateOnly
-  speed: number;
+  boatSpeed: number;
+  date?: Date;
 }
 
 export interface PlanResponse {

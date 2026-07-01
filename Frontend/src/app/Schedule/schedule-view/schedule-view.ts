@@ -65,6 +65,8 @@ export class ScheduleView implements OnInit {
   allTools: WritableSignal<Tool[]> = signal([]);
   allQualifications: WritableSignal<Qualification[]> = signal([]);
 
+  today: WritableSignal<Date> = signal(new Date());
+
   // Dialog-Toggles
   selectedTask: WritableSignal<Task | null> = signal(null);
   taskVisible: WritableSignal<boolean> = signal(false);
@@ -205,7 +207,7 @@ export class ScheduleView implements OnInit {
 
     // 1. Unbenutzte Aufgaben: Alle geladenen Tasks, die in keinem Boot vorkommen
     const unusedTasks: TaskSchedule[] = this.allTasks()
-      .filter((t) => !used.tasks.has(t.id))
+      .filter((t) => !used.tasks.has(t.id) && !t.isCompleted)
       .map((t) => ({
         task: {
           id: t.id,

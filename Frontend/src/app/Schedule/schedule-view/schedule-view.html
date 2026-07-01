@@ -18,18 +18,20 @@
         />
       </div>
 
-      <p-button
-        [label]="'SCHEDULE.ACCIDENT' | translate"
-        icon="pi pi-exclamation-triangle"
-        (onClick)="openTask(null, 'Accident')"
-        severity="danger"
-      />
+      @if (selectedDate().toDateString() == today().toDateString()) {
+        <p-button
+          [label]="'SCHEDULE.ACCIDENT' | translate"
+          icon="pi pi-exclamation-triangle"
+          (onClick)="openTask(null, 'Accident')"
+          severity="danger"
+        />
 
-      <p-button
-        [label]="'SCHEDULE.WEATHER' | translate"
-        icon="pi pi-cloud"
-        (click)="weatherVisible.set(true)"
-      />
+        <p-button
+          [label]="'SCHEDULE.WEATHER' | translate"
+          icon="pi pi-cloud"
+          (click)="weatherVisible.set(true)"
+        />
+      }
 
       <div class="view-switcher-container">
         <button
@@ -306,7 +308,11 @@
   </div>
 
   @if (taskVisible()) {
-    <app-dialog-task [type]="taskType()" [selectedTask]="selectedTask()" [(visible)]="taskVisible" />
+    <app-dialog-task
+      [type]="taskType()"
+      [selectedTask]="selectedTask()"
+      [(visible)]="taskVisible"
+    />
   }
   @if (employeeVisible()) {
     <app-dialog-employee

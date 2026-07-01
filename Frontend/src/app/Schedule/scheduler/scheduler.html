@@ -9,40 +9,40 @@
 
   <form [formGroup]="schedulerForm" class="p-fluid scheduler-form-container">
     <div class="field">
-      <label for="maxTime">{{ 'SCHEDULER.MAX_WORK_TIME' | translate }}*</label>
+      <label for="maxWorkHours">{{ 'SCHEDULER.MAX_WORK_HOURS' | translate }}*</label>
       <p-inputNumber
-        id="maxTime"
-        formControlName="maxTime"
+        id="maxWorkHours"
+        formControlName="maxWorkHours"
         suffix=" h"
         [min]="1"
         [showButtons]="true"
         [class.ng-invalid]="
-          schedulerForm.controls.maxTime.invalid && schedulerForm.controls.maxTime.touched
+          schedulerForm.controls.maxWorkHours.invalid && schedulerForm.controls.maxWorkHours.touched
         "
       />
-      @if (schedulerForm.controls.maxTime.invalid && schedulerForm.controls.maxTime.touched) {
+      @if (schedulerForm.controls.maxWorkHours.invalid && schedulerForm.controls.maxWorkHours.touched) {
         <div class="error-message">
           <i class="pi pi-exclamation-circle"></i>
-          <span>{{ 'SCHEDULER.VALIDATION.MAX_WORK_TIME_REQUIRED' | translate }}</span>
+          <span>{{ 'SCHEDULER.VALIDATION.MAX_WORK_HOURS_REQUIRED' | translate }}</span>
         </div>
       }
     </div>
 
     <div class="field">
-      <label for="boatAmount">{{ 'SCHEDULER.BOAT_AMOUNT' | translate }}*</label>
+      <label for="boatNumber">{{ 'SCHEDULER.BOAT_NUMBER' | translate }}*</label>
       <p-inputNumber
-        id="boatAmount"
-        formControlName="boatAmount"
+        id="boatNumber"
+        formControlName="boatNumber"
         [min]="1"
         [showButtons]="true"
         [class.ng-invalid]="
-          schedulerForm.controls.boatAmount.invalid && schedulerForm.controls.boatAmount.touched
+          schedulerForm.controls.boatNumber.invalid && schedulerForm.controls.boatNumber.touched
         "
       />
-      @if (schedulerForm.controls.boatAmount.invalid && schedulerForm.controls.boatAmount.touched) {
+      @if (schedulerForm.controls.boatNumber.invalid && schedulerForm.controls.boatNumber.touched) {
         <div class="error-message">
           <i class="pi pi-exclamation-circle"></i>
-          <span>{{ 'SCHEDULER.VALIDATION.BOAT_AMOUNT_REQUIRED' | translate }}</span>
+          <span>{{ 'SCHEDULER.VALIDATION.BOAT_NUMBER_REQUIRED' | translate }}</span>
         </div>
       }
     </div>
@@ -69,23 +69,23 @@
     </div>
 
     <div class="field">
-      <label for="speed">{{ 'SCHEDULER.SPEED' | translate }}*</label>
+      <label for="boatSpeed">{{ 'SCHEDULER.BOAT_SPEED' | translate }}*</label>
       <p-inputNumber
-        id="speed"
-        formControlName="speed"
+        id="boatSpeed"
+        formControlName="boatSpeed"
         suffix=" km/h"
         [min]="1"
         [minFractionDigits]="1"
         [maxFractionDigits]="2"
         [showButtons]="true"
         [class.ng-invalid]="
-          schedulerForm.controls.speed.invalid && schedulerForm.controls.speed.touched
+          schedulerForm.controls.boatSpeed.invalid && schedulerForm.controls.boatSpeed.touched
         "
       />
-      @if (schedulerForm.controls.speed.invalid && schedulerForm.controls.speed.touched) {
+      @if (schedulerForm.controls.boatSpeed.invalid && schedulerForm.controls.boatSpeed.touched) {
         <div class="error-message">
           <i class="pi pi-exclamation-circle"></i>
-          <span>{{ 'SCHEDULER.VALIDATION.SPEED_REQUIRED' | translate }}</span>
+          <span>{{ 'SCHEDULER.VALIDATION.BOAT_SPEED_REQUIRED' | translate }}</span>
         </div>
       }
     </div>
