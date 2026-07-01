@@ -31,7 +31,9 @@ param stockTools{TOOLS};
 param drivingSpeed; # in km/h
 param taskPrio{TASKS}; # priority of the task (for the objective function)
 param taskLocation{TASKS} symbolic in PLACES; # location of the task
+param startDistances{BOATS, PLACES}; # initial location
 param distance{PLACES, PLACES}; # distance matrix in km
+
 
 # -1 = free, >= 0 = task is locked to that boat number
 param fixedBoat{TASKS} integer, default -1;
@@ -62,6 +64,9 @@ var toolOnBoat{BOATS,TOOLS} integer >= 0;
 var after{BOATS, TASKS, TASKS} binary;
 
 /*helper*/
+
+param startTravelTime{b in BOATS, p in PLACES}
+    startDistances[b,p] / drivingSpeed;
 
 # travel time between two places in hours (avoids repeating the division everywhere)
 param travelTime{p1 in PLACES, p2 in PLACES} :=
@@ -206,7 +211,7 @@ s.t. DefIsLastLB{b in BOATS, ta in TASKS}:
 
 # first task starts after harbor travel
 s.t. StartFirst{b in BOATS, ta in TASKS: fixedStartTime[ta] < 0}:
-    startTime[b, ta] >= travelTime[harbor, taskLocation[ta]] * isFirst[b, ta];
+    startTime[b, ta] >= startTravelTime[b, taskLocation[ta]] * isFirst[b, ta];
 
 # successor starts after predecessor finishes + travel
 s.t. StartAfter{b in BOATS, ta1 in TASKS, ta2 in TASKS: ta1 <> ta2 and fixedStartTime[ta2] < 0}:
