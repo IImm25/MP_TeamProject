@@ -23,7 +23,7 @@ public class PlanService
     private readonly ITaskItemRepository taskRepo;
 
     private static readonly TimeOnly startOfWorkDay = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8));
-    private static readonly string modFilePath = @"../GMPL/modell_new.mod";
+    private static readonly string modFilePath = @"../GMPL/modell.mod";
 
 
     public PlanService(IMapper mapper, IGmplInputBuilder inputBuilder, IGlpkSolver solver, IPersonRepository personRepo, IRepository<Qualification> qualiRepo, IRepository<Tool> toolRepo, IRepository<Location> locationRepo, IPlanRepository planRepo, ITaskItemRepository taskRepo)
