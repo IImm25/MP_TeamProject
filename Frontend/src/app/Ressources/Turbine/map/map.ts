@@ -1,10 +1,9 @@
 import { AfterViewInit, Component, inject, signal } from '@angular/core';
 import * as L from 'leaflet';
-import { HttpService } from '../../../Services/http-service'; import { Turbine } from '../../../Models/turbine';
+import { HttpService } from '../../../Services/http-service';
+import { Turbine } from '../../../Models/turbine';
 import { Observable } from 'rxjs';
 import { DialogTurbine } from '../dialog-turbine/dialog-turbine';
-;
-
 @Component({
   selector: 'app-map',
   imports: [DialogTurbine],
@@ -12,7 +11,6 @@ import { DialogTurbine } from '../dialog-turbine/dialog-turbine';
   styleUrl: './map.css',
 })
 export class Map implements AfterViewInit {
-
   private map!: L.Map;
   private markerLayer!: L.LayerGroup;
   private http = inject(HttpService);
@@ -24,14 +22,14 @@ export class Map implements AfterViewInit {
     iconUrl: 'logo.png',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
-    popupAnchor: [0, -32]
+    popupAnchor: [0, -32],
   });
 
   private static harbourIcon = L.icon({
     iconUrl: 'harbour.png',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
-    popupAnchor: [0, -32]
+    popupAnchor: [0, -32],
   });
 
   private static harbour: L.LatLngExpression = [54.433304330384395, 13.031369793515506];
@@ -52,30 +50,27 @@ export class Map implements AfterViewInit {
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap contributors',
     }).addTo(this.map);
-
   }
 
   private updateMarkers() {
     this.markerLayer.clearLayers();
 
-    this.turbines().forEach(turbine => {
+    this.turbines().forEach((turbine) => {
+      if (turbine.id === 1) {
+        L.marker([turbine.latitude, turbine.longitude], { icon: Map.harbourIcon }) // lat first!
+          .bindPopup(turbine.name)
+          .addTo(this.markerLayer);
+      } else {
+        const marker = L.marker([turbine.latitude, turbine.longitude], { icon: Map.turbineIcon }) // lat first!
+          .addTo(this.markerLayer);
 
-      const marker = L.marker([turbine.latitude, turbine.longitude], { icon: Map.turbineIcon }) // lat first!
-        .addTo(this.markerLayer);
-
-      marker.addEventListener("click", () => {
+        marker.addEventListener('click', () => {
         this.selectedTurbine.set(turbine);
         this.visible.set(true);
       });
-
+      }
     });
-
-    L.marker(Map.harbour, { icon: Map.harbourIcon }) // lat first!
-      .bindPopup("Barhöft Hafen")
-      .addTo(this.markerLayer);
   }
-
-
 }

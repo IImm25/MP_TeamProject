@@ -4,8 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Turbine } from '../../../Models/turbine';
 import { HttpService } from '../../../Services/http-service';
 import { DialogTurbine } from '../dialog-turbine/dialog-turbine';
+import { Map } from '../map/map';
 
-// PrimeNG Imports
 import { TableModule } from 'primeng/table';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -17,7 +17,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Map } from "../map/map";
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-turbines',
@@ -36,14 +36,14 @@ import { Map } from "../map/map";
     TranslatePipe,
     DialogTurbine,
     ConfirmDialogModule,
-    Map
-],
+    Map,
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './turbines.html',
   styleUrl: './turbines.css',
 })
 export class Turbines implements OnInit {
-    private http = inject(HttpService);
+  private http = inject(HttpService);
   private translate = inject(TranslateService);
   private confirmationService = inject(ConfirmationService);
 
@@ -58,7 +58,10 @@ export class Turbines implements OnInit {
   }
 
   loadTurbines() {
-    this.http.getAllTurbines().subscribe((turbines) => this.turbines.set(turbines));
+    this.http
+      .getAllTurbines()
+      .pipe(map((turbines) => turbines.filter((t) => t.id !== 1)))
+      .subscribe((filteredTurbines) => this.turbines.set(filteredTurbines));
   }
 
   openEditOrDetail(turbine: Turbine, mode: 'Edit' | 'Detail') {

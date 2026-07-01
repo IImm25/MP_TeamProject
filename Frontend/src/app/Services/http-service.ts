@@ -122,7 +122,11 @@ export class HttpService {
   }
 
   // --- Scheduler ---
-  postPlan(planData: PlanRequest): Observable<PlanResponse> {
-    return this.http.post<PlanResponse>(`${this.apiUrl}/plan`, planData);
+  postPlan(planData: PlanRequest, date: string): Observable<PlanResponse> {
+    return this.http.post<PlanResponse>(`${this.apiUrl}/plan/${date}`, planData);
+  }
+
+  getPlanByDate(date: string): Observable<PlanResponse> {
+    return this.http.get<PlanResponse>(`${this.apiUrl}/plan/${date}`);
   }
 }

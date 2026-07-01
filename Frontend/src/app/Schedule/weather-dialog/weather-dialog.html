@@ -1,0 +1,32 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '30vw' }"
+>
+  <ng-template #header>
+    {{ 'SCHEDULE.WEATHERDIALOG.TITLE' | translate }}
+  </ng-template>
+  <form [formGroup]="weatherForm">
+    <div class="field">
+      <label for="speed">{{ 'SCHEDULE.WEATHERDIALOG.SPEED' | translate }}</label>
+      <p-inputNumber id="speed" formControlName="speed" />
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <p-button
+      [label]="'COMMON.CANCEL' | translate"
+      [text]="true"
+      severity="secondary"
+      (onClick)="this.visible.set(false)"
+    />
+    <p-button
+      [label]="'COMMON.SAVE' | translate"
+      icon="pi pi-check"
+      (onClick)="saveWeather()"
+      [disabled]="weatherForm.invalid"
+    />
+  </ng-template>
+</p-dialog>

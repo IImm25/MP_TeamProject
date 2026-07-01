@@ -10,11 +10,16 @@ export class ScheduleService {
 
   readonly currentPlan: WritableSignal<PlanResponse | null> = this.plan;
   readonly selectedRequest: WritableSignal<PlanRequest | null> = signal(null)
+  readonly selectedDate: WritableSignal<Date> = signal(new Date());
 
-  setPlan(plan: PlanResponse, request: PlanRequest) {
+  setPlan(plan: PlanResponse, request: PlanRequest, date: Date) {
     this.plan.set(plan);
     sessionStorage.removeItem('current_plan');
     sessionStorage.setItem('current_plan', JSON.stringify(plan));
+
+    this.selectedDate.set(date);
+    sessionStorage.removeItem('current_date');
+    sessionStorage.setItem('current_date', JSON.stringify(date));
 
     this.selectedRequest.set(request);
     sessionStorage.removeItem('current_request');
@@ -28,6 +33,12 @@ export class ScheduleService {
 
   loadRequestFromStorage(): PlanRequest | null {
     const stored = sessionStorage.getItem('current_request');
+    const date = sessionStorage.getItem('current_date');
+    let request: PlanRequest | null = null;
+    if (stored && date) {
+      request = JSON.parse(stored);
+      request!.date = new Date(date);
+    }
     return stored ? JSON.parse(stored) : null;
   }
 }

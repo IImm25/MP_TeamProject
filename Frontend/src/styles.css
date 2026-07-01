@@ -221,6 +221,16 @@ p-inputnumber,
   width: 100%;
 }
 
+.p-datepicker.open-upward {
+  transform: translateY(calc(-100% - 2.5rem)) !important;
+  transform-origin: bottom center !important;
+}
+
+.p-select.open-upward {
+  transform: translateY(calc(-100% - 2.5rem)) !important;
+  transform-origin: bottom center !important;
+}
+
 .p-select.p-disabled {
   background-color: var(--bg-color) !important;
   color: var(--text-color) !important;

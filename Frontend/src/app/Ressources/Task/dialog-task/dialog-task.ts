@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   inject,
-  input,
   Input,
   model,
   OnInit,
@@ -29,6 +28,10 @@ import { HttpService } from '../../../Services/http-service';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Turbine } from '../../../Models/turbine';
+import { CheckboxModule } from 'primeng/checkbox';
+import { PlanResponse } from '../../../Models/boat';
+import { Router } from '@angular/router';
+import { ScheduleService } from '../../../Schedule/schedule-service';
 
 @Component({
   selector: 'app-dialog-task',
@@ -47,6 +50,7 @@ import { Turbine } from '../../../Models/turbine';
     DialogTaskQualification,
     SelectModule,
     DatePickerModule,
+    CheckboxModule,
   ],
   templateUrl: './dialog-task.html',
   styleUrl: './dialog-task.css',
@@ -54,10 +58,12 @@ import { Turbine } from '../../../Models/turbine';
 export class DialogTask implements OnInit {
   private formBuilder = inject(FormBuilder);
   private http = inject(HttpService);
+  private router = inject(Router);
+  private scheduleService = inject(ScheduleService);
 
   @Output() taskSaved = new EventEmitter<void>();
 
-  @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' = 'New';
+  @Input({ required: true }) type: 'Edit' | 'New' | 'Detail' | 'Accident' = 'New';
 
   @Input() set selectedTurbine(turbine: Turbine | null) {
     if (turbine && this.type === 'New') {
@@ -98,7 +104,7 @@ export class DialogTask implements OnInit {
         executionIntervalStart: startDate,
         executionIntervalEnd: endDate,
         qualifications: val.requiredQualifications || [],
-        tools: val.requiredTools || [],
+        tools: val.requiredTools || []
       });
 
       if (this.type === 'Detail') {
@@ -115,7 +121,7 @@ export class DialogTask implements OnInit {
         executionIntervalStart: null,
         executionIntervalEnd: null,
         qualifications: [],
-        tools: [],
+        tools: []
       });
       console.log(this.selectedTurbine);
       console.log(this.taskForm.value);
@@ -150,7 +156,7 @@ export class DialogTask implements OnInit {
     executionIntervalStart: [null as Date | null, Validators.required],
     executionIntervalEnd: [null as Date | null, Validators.required],
     qualifications: [[] as TaskQualification[], Validators.required],
-    tools: [[] as TaskTool[], Validators.required],
+    tools: [[] as TaskTool[], Validators.required]
   });
 
   ngOnInit(): void {
@@ -162,7 +168,7 @@ export class DialogTask implements OnInit {
       this.allTools.set(tools);
     });
     this.http.getAllTurbines().subscribe((turbines) => {
-      this.allTurbines.set(turbines);
+      this.allTurbines.set(turbines.filter((t) => t.id !== 1));
       if (this.currentTask) {
         const matchingTurbine = turbines.find((t) => t.id === this.currentTask!.location?.id);
         if (matchingTurbine) {
@@ -269,7 +275,7 @@ export class DialogTask implements OnInit {
           this.visible.set(false);
         },
       });
-    } else if (this.type === 'New') {
+    } else if (this.type === 'New' || this.type === 'Accident') {
       const payload: TaskCreate = {
         name: val.name || '',
         durationHours: totalDuration,
@@ -288,6 +294,28 @@ export class DialogTask implements OnInit {
           this.visible.set(false);
         },
       });
+
+      if (this.type === 'Accident') {
+        let request = this.scheduleService.loadRequestFromStorage();
+            if (new Date(request?.date!) !== new Date()) {
+              request = {
+                maxWorkHours: 8,
+                boatNumber: 2,
+                boatSpeed: 36,
+                date: new Date(),
+              };
+            }
+
+            this.http.postPlan(request!, new Date().toISOString().split('T')[0]).subscribe({
+              next: (plan: PlanResponse) => {
+                this.scheduleService.setPlan(plan, request!, new Date()!);
+                this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+                  this.router.navigate(['/schedule-view']);
+                });
+                this.visible.set(false);
+              },
+            });
+      }
     }
   }
 
@@ -389,10 +417,8 @@ export class DialogTask implements OnInit {
       return `${year}-${month}-${day}`;
     }
 
-    // Falls es bereits ein Date-Objekt ist (z.B. vom p-datepicker)
     const date = dateVal instanceof Date ? dateVal : new Date(dateVal);
 
-    // Lokale Komponenten extrahieren, um Zeitzonen-Verschiebungen zu verhindern
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');

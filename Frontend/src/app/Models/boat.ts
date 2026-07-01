@@ -1,29 +1,44 @@
-import { Employee, EmployeeSummary } from "./employee";
-import { Task, TaskSummary, TaskTool } from "./task";
+import { EmployeeSummary } from "./employee";
+import { TaskSummary, TaskTool } from "./task";
 
 export interface PlanRequest {
-  maxTime: number;
+  maxWorkHours: number;
   boatNumber: number;
-  taskItemIds: number[];
-  personIds: number[];
-  toolIds: number[];
+  boatSpeed: number;
+  date?: Date;
 }
 
 export interface PlanResponse {
-  totalTime: number;
+  date: string; //DateOnly
+  createdAt: string; //DateTime
   boats: Boat[];
-  toolDiff: RequirementDiff[];
-  qualificationDiff: RequirementDiff[];
 }
 
 export interface Boat {
-  taskItems: TaskSummary[];
   persons: EmployeeSummary[];
   tools: TaskTool[];
+  taskSchedules: TaskSchedule[];
+  boatSchedules: BoatSchedule[];
+}
+
+export interface BoatSchedule {
+  departure: string; //TimeOnly
+  arrival: string; //TimeOnly
+}
+
+export interface TaskSchedule {
+  task: TaskSummary;
+  startTime: string;
 }
 
 export interface RequirementDiff {
   id: number;
   required: number;
   available: number;
+}
+
+export interface TravelTime {
+  boatNumber: number;
+  travelTime: string;
+  travelDuration: number;
 }
