@@ -104,8 +104,6 @@ namespace SystemTests.Tests
 
             Tool to_1 = new Tool("UC-4a to_1", 5);
 
-            PlanBoat boat = new PlanBoat();
-
             Person p_1 = new Person("UC-4a p_1", "p_1");
             PersonQualification p_1_q_1 = new PersonQualification()
             {
