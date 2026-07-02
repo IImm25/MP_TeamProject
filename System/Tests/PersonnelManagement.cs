@@ -5,7 +5,6 @@ using Microsoft.Playwright;
 namespace SystemTests.Tests
 {
     [TestClass]
-    [Ignore]
     public class PersonnelManagement : BaseSystemTest
     {
         private string _personnelFrontEndUrl = FrontendUrl + "/qualifications";

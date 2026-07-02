@@ -5,7 +5,6 @@ using Microsoft.Playwright;
 namespace SystemTests.Tests
 {
     [TestClass]
-    [Ignore]
     public class TaskManagement : BaseSystemTest
     {
         private string _taskFrontEndUrl = FrontendUrl + "/tasks";
