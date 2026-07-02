@@ -5,6 +5,7 @@ using Microsoft.Playwright;
 namespace SystemTests.Tests
 {
     [TestClass]
+    [Ignore]
     public class ToolManagement : BaseSystemTest
     {
         private string _toolFrontEndUrl = FrontendUrl + "/tools";

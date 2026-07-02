@@ -1,0 +1,45 @@
+data;
+
+set TASKS := ta_5;
+set PEOPLE := p_5;
+set QUALIS := q_25;
+set TOOLS := to_5;
+set PLACES := w_27 w_1;
+param maxWorkingHours := 4;
+param amountBoats := 1;
+param drivingSpeed := 36;
+
+param duration :=
+	ta_5 8
+;
+param hasQuali : q_25 :=
+	p_5 1
+;
+param requiredQualis : q_25 :=
+	ta_5 1
+;
+param requiredTools : to_5 :=
+	ta_5 1
+;
+param stockTools :=
+	to_5 5
+;
+param taskPrio :=
+	ta_5 0.10934064
+;
+param taskLocation :=
+	ta_5 w_27
+;
+param distance : w_27 w_1 :=
+	w_27 0 15.273465
+	w_1 15.273465 0
+;
+param fixedBoat :=
+;
+param fixedStartTime :=
+;
+param fixedPerson :=
+;
+param fixedToolAmount :  :=
+;
+end;
